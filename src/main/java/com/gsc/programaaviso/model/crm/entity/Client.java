@@ -1,4 +1,4 @@
-package com.gsc.programaaviso.model.entity;
+package com.gsc.programaaviso.model.crm.entity;
 
 import lombok.Getter;
 import lombok.Setter;

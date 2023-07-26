@@ -1,4 +1,4 @@
-package com.gsc.programaaviso.model.entity;
+package com.gsc.programaaviso.model.crm.entity;
 
 import com.gsc.programaaviso.constants.ProjectStatusType;
 import lombok.Getter;

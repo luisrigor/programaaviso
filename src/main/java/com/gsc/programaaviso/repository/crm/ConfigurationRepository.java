@@ -1,6 +1,6 @@
-package com.gsc.programaaviso.repository;
+package com.gsc.programaaviso.repository.crm;
 
-import com.gsc.programaaviso.model.entity.Configuration;
+import com.gsc.programaaviso.model.crm.entity.Configuration;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ConfigurationRepository extends JpaRepository<Configuration, Long> {

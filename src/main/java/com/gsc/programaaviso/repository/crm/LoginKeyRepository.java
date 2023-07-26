@@ -1,6 +1,6 @@
-package com.gsc.programaaviso.repository;
+package com.gsc.programaaviso.repository.crm;
 
-import com.gsc.programaaviso.model.entity.LoginKey;
+import com.gsc.programaaviso.model.crm.entity.LoginKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

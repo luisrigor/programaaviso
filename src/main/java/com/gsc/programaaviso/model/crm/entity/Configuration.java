@@ -1,7 +1,6 @@
-package com.gsc.programaaviso.model.entity;
+package com.gsc.programaaviso.model.crm.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -13,15 +12,17 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
-public class ServiceLogin implements Serializable {
+public class Configuration implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotEmpty
     @Size(max = 50)
     private String name;
@@ -31,23 +32,17 @@ public class ServiceLogin implements Serializable {
     @NotEmpty
     @Size(max = 100)
     private String description;
-    @NotNull
-    private Boolean uploadFile;
-    @NotNull
-    private Boolean cleanupProjects;
-    @NotNull
-    private Boolean downloadProjectFiles;
     @NotEmpty
     @Size(max = 50)
+    @Column(name = "created_by")
     private String createdBy;
     @NotNull
     @Column(name = "dt_created")
     private LocalDateTime created;
     @Size(max = 50)
+    @Column(name = "changed_by")
     private String changedBy;
     @Column(name = "dt_changed")
     private LocalDateTime changed;
-
-
 
 }

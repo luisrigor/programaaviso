@@ -3,8 +3,8 @@ package com.gsc.programaaviso.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsc.programaaviso.config.environment.EnvironmentConfig;
-import com.gsc.programaaviso.repository.ClientRepository;
-import com.gsc.programaaviso.repository.ConfigurationRepository;
+import com.gsc.programaaviso.repository.crm.ClientRepository;
+import com.gsc.programaaviso.repository.crm.ConfigurationRepository;
 import com.gsc.programaaviso.security.JwtAuthenticationFilter;
 import com.gsc.programaaviso.security.JwtAuthenticationManager;
 import com.gsc.programaaviso.security.RestAuthenticationEntryPoint;
@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-//                .csrf().disable()
+                .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeRequests()

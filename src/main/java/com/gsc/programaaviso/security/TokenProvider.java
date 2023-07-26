@@ -2,11 +2,11 @@ package com.gsc.programaaviso.security;
 
 import com.gsc.programaaviso.constants.AppProfile;
 import com.gsc.programaaviso.exceptions.AuthTokenException;
-import com.gsc.programaaviso.model.entity.LoginKey;
-import com.gsc.programaaviso.model.entity.ServiceLogin;
-import com.gsc.programaaviso.repository.ConfigurationRepository;
-import com.gsc.programaaviso.repository.LoginKeyRepository;
-import com.gsc.programaaviso.repository.ServiceLoginRepository;
+import com.gsc.programaaviso.model.crm.entity.LoginKey;
+import com.gsc.programaaviso.model.crm.entity.ServiceLogin;
+import com.gsc.programaaviso.repository.crm.ConfigurationRepository;
+import com.gsc.programaaviso.repository.crm.LoginKeyRepository;
+import com.gsc.programaaviso.repository.crm.ServiceLoginRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;

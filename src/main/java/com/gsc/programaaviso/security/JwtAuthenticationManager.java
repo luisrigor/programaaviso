@@ -3,9 +3,9 @@ package com.gsc.programaaviso.security;
 
 import com.gsc.programaaviso.config.environment.EnvironmentConfig;
 import com.gsc.programaaviso.constants.AppProfile;
-import com.gsc.programaaviso.model.entity.Client;
-import com.gsc.programaaviso.repository.ClientRepository;
-import com.gsc.programaaviso.repository.ConfigurationRepository;
+import com.gsc.programaaviso.model.crm.entity.Client;
+import com.gsc.programaaviso.repository.crm.ClientRepository;
+import com.gsc.programaaviso.repository.crm.ConfigurationRepository;
 import com.gsc.scgscwsauthentication.response.AuthenticationExtraResponse;
 import com.gsc.scgscwsauthentication.response.ExtranetUser;
 import com.gsc.scgscwsauthentication.response.PairIdName;
