@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /avisos-services
+    context-path: /ProgramaAvisos
     encoding:
       force-response: true
       charset: utf-8
