@@ -53,10 +53,8 @@ app:
     first:
       jndi: jdbc/toyxtaps
     second:
-      jndi: jdbc/lexxtaps
-    third:
       jndi: jdbc/dbtoynet
 
 secundary:
   dbs:
-    jndi: jdbc/usrlogon,jdbc/dbtoynet,jdbc/lexxtaps
+    jndi: jdbc/usrlogon,jdbc/dbtoynet,jdbc/cardb,jdbc/ctt,jdbc/webcallc,jdbc/dbclaims,jdbc/dblists

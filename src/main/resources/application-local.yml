@@ -46,7 +46,7 @@ log4j:
 #Ficheiro de configuracao da SC
 sc:
   config:
-    file: "C:/Users/Luis Parra/OneDrive - Rigor/Documentos/REPOSITORIOS/Proyectos GITHUB/programaaviso/src/main/resources/sc_config.properties"
+    file: ""
 
 #customom properties ex local url
 app:
@@ -62,11 +62,6 @@ app:
         password: db2admin
         driver-class-name: com.ibm.db2.jcc.DB2Driver
       second:
-        url: jdbc:db2://scdbesrva.sc.pt:50000/LEXXTAPS
-        username: db2inst1
-        password: db2admin
-        driver-class-name: com.ibm.db2.jcc.DB2Driver
-      third:
         url: jdbc:db2://scdbesrvb.sc.pt:50000/dbtoynet
         username: db2inst1
         password: db2admin
