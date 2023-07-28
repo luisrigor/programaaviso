@@ -30,7 +30,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "msEntityManagerFactory",
         transactionManagerRef = "msTransactionManager",
-        basePackages = {"com.gsc.programaaviso.repository.crm"}
+        basePackages = {"com.gsc.programaavisos.repository.crm"}
 )
 public class DbConfig {
 
@@ -74,7 +74,7 @@ public class DbConfig {
     LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier("msDatasource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("com.gsc.bdcrm.model.crm.entity")
+                .packages("com.gsc.programaavisos.model.crm.entity")
                 .persistenceUnit("msPersistenceUnit")
                 .properties(getHibernateProperties())
                 .build();
