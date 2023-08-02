@@ -46,7 +46,7 @@ log4j:
 #Ficheiro de configuracao da SC
 sc:
   config:
-    file: ""
+    file: "/home/ronald/Documents/rigor/repos/S4/programaaviso/src/main/resources/sc_config.properties"
 
 #customom properties ex local url
 app:
@@ -55,16 +55,16 @@ app:
     type: 10
   auth:
     token-name: accessToken
-    datasource:
-      first:
-        url: jdbc:db2://scdbesrva.sc.pt:50000/TOYXTAPS
-        username: db2inst1
-        password: db2admin
-        driver-class-name: com.ibm.db2.jcc.DB2Driver
-      second:
-        url: jdbc:db2://scdbesrvb.sc.pt:50000/dbtoynet
-        username: db2inst1
-        password: db2admin
-        driver-class-name: com.ibm.db2.jcc.DB2Driver
+  datasource:
+    first:
+      url: jdbc:db2://scdbesrva.sc.pt:50000/TOYXTAPS
+      username: db2inst1
+      password: db2admin
+      driver-class-name: com.ibm.db2.jcc.DB2Driver
+    second:
+      url: jdbc:db2://scdbesrvb.sc.pt:50000/CARDB
+      username: db2inst1
+      password: db2admin
+      driver-class-name: com.ibm.db2.jcc.DB2Driver
 
 
