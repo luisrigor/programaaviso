@@ -50,7 +50,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final AgeRepository ageRepository;
 
     @Override
-    public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
+        public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
         try {
             int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
             List<String> selectedTypes = new ArrayList<>();
@@ -83,6 +83,22 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
            return  documentUnitRepository.getByFilter(filter);
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching documentUnit ", e);
+        }
+    }
+
+    @Override
+    public List<DocumentUnit> searchItems(String searchInput,Date startDate,Integer tpaItemType, UserPrincipal userPrincipal) {
+        try {
+            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
+            ItemFilter filter = ItemFilter.builder()
+                    .searchInput(searchInput)
+                    .itemType(tpaItemType)
+                    .dtEnd(startDate)
+                    .idBrand(idBrand)
+                    .build();
+            return  documentUnitRepository.getByFilter(filter);
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching search items ", e);
         }
     }
 

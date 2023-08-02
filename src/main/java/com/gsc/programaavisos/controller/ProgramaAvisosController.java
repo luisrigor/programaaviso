@@ -72,10 +72,22 @@ public class ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body(age);
     }
     @GetMapping(ApiEndpoints.GET_DOCUMENT_UNIT)
-    public ResponseEntity<List<DocumentUnit>> getDocumentUnit(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) Integer type) {
+    public ResponseEntity<List<DocumentUnit>> getDocumentUnit(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                              @RequestParam(required = false) Integer type) {
         log.info("getDocumentUnit controller");
         List<DocumentUnit> paDocumentUnit = programaAvisosService.searchDocumentUnit(type, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(paDocumentUnit);
+    }
+
+    @GetMapping(ApiEndpoints.GET_SEARCH_ITEMS)
+    public ResponseEntity<List<DocumentUnit>> searchItems(@RequestParam(required = false) String searchInput,
+                                                          @RequestParam(required = false) Date startDate,
+                                                          @RequestParam(required = false) Integer tpaItemType,
+                                                          @AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                          @RequestParam(required = true) Integer type) {
+        log.info("searchItems controller");
+        List<DocumentUnit> items = programaAvisosService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
+        return ResponseEntity.status(HttpStatus.OK).body(items);
     }
 
     @PostMapping(ApiEndpoints.SAVE_PA)

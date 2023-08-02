@@ -9,5 +9,6 @@ public interface ApiEndpoints {
     String GET_ENTITY_TYPE = "/entity-type";
     String GET_AGE = "/age";
     String GET_DOCUMENT_UNIT = "/document-unit";
+    String GET_SEARCH_ITEMS = "/search-items";
     String SAVE_PA = "/save-pa";
 }

@@ -11,6 +11,7 @@ import java.util.List;
 public interface ProgramaAvisosService {
     List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal);
     List<DocumentUnit> searchDocumentUnit(Integer type, UserPrincipal userPrincipal);
+    List<DocumentUnit> searchItems(String searchInput,Date startDate,Integer tpaItemType, UserPrincipal userPrincipal);
     List<ContactReason> getContactReasons();
     List<Genre> getGenre();
     List<EntityType> getEntityType();
