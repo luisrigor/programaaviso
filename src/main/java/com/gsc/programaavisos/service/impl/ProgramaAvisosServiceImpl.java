@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -49,6 +46,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final QuarantineRepository quarantineRepository;
     private final AgeRepository ageRepository;
     private final KilometersRepository kilometersRepository;
+    private final FidelitysRepository fidelitysRepository;
 
     @Override
         public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
@@ -138,6 +136,15 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
+    public List<Fidelitys> getFidelitys() {
+        try {
+            return fidelitysRepository.findAll();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching fidelitys", e);
+        }
+    }
+
+    @Override
     public List<Kilometers> getKilometers() {
         try {
             return kilometersRepository.getAllKilometers();
@@ -165,8 +172,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             if(id > 0) {
                 ProgramaAvisos oPA =  dataPA(pa);
                 contactChanged = StringTasks.cleanString(pa.getContactChanged(), "0");
-                String hrScheduleContact = StringTasks.cleanString(pa.getHrScheduleContact(), "").trim();
-                if (!hrScheduleContact.equals("")) {
+                String hrScheduleContact = StringTasks.cleanString(pa.getHrScheduleContact(), StringUtils.EMPTY).trim();
+                if (!hrScheduleContact.equals(StringUtils.EMPTY)) {
                     hrScheduleContact += ":00";
                     Time otime = null;
                     try {
@@ -179,7 +186,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     oPA.setHrScheduleContact(null);
                 }
                 String registerClaim = StringTasks.cleanString(pa.getRegisterClaim(), "N").trim();
-                if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals("")) {
+                if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals(StringUtils.EMPTY)) {
                     try {
                         ClaimDetail oClaim = new ClaimDetail();
                        /* Dealer oDealerPA = Dealer.getHelper().getByObjectId(oGSCUser.getOidNet(), oPA.getOidDealer());
@@ -195,9 +202,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     }
                 }
 
-                String isToSendSchedule = StringTasks.cleanString(pa.getSendSchedule(), "");
+                String isToSendSchedule = StringTasks.cleanString(pa.getSendSchedule(), StringUtils.EMPTY);
                 if(isToSendSchedule!=null && isToSendSchedule.equals("S")){
-                    String oidDealerSchedule = StringTasks.cleanString(pa.getOidDealerSchedule(), "").trim();
+                    String oidDealerSchedule = StringTasks.cleanString(pa.getOidDealerSchedule(), StringUtils.EMPTY).trim();
                     int hrHrSchedule = StringTasks.cleanInteger(pa.getHrHrSchedule(), 0);
                     int minHrSchedule = StringTasks.cleanInteger(pa.getMinHrSchedule(), 0);
                     java.util.Date dtSchedule = StringTasks.cleanDate(pa.getDtSchedule());
@@ -213,7 +220,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                         hrSchedule+="0";
                     }
                     hrSchedule += String.valueOf(minHrSchedule);
-                    if (!hrSchedule.equals("")) {
+                    if (!hrSchedule.equals(StringUtils.EMPTY)) {
                         hrSchedule += ":00";
                         Time otime = null;
                         try {
@@ -243,6 +250,30 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             log.error("Ocorreu um erro ao guardar registo de contato");
         }
         //com.sc.commons.utils.MonitorTasks.MonitorOperation("Programa de Avisos","Save","SaveContact", oGSCUser.getLogin(), startRequestJava, java.util.Calendar.getInstance());
+    }
+
+    @Override
+    public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
+        log.info("removePA service");
+        try {
+             ProgramaAvisos oPA = paRepository.findById(Long.valueOf(id)).get();
+            if(oPA.getId() > 0) {
+              oPA = ProgramaAvisos.builder()
+                      .successContact("N")
+                      .successMotive(StringUtils.EMPTY)
+                      .dtScheduleContact(null)
+                      .hrScheduleContact(null)
+                      .revisionSchedule(PaConstants.REMOVED_MANUALLY_DESC)
+                      .revisionScheduleMotive(StringUtils.EMPTY)
+                      .revisionScheduleMotive2(StringUtils.EMPTY)
+                      .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
+                      .build();
+                paRepository.save(oPA);
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while removing a record from the list");
+            throw new ProgramaAvisosException("An error occurred while removing a record from the list", e);
+        }
     }
 
 

@@ -9,6 +9,7 @@ public class PaConstants {
     public static final String RSM_NOT_OWNER = "Mudança de Proprietário";
     public static final String RSM_NOT_OWNER2 = "Proprietário Desconhecido";
     public static final String RECEIVE_INFORMATION_NO = "Não";
+    public static final String REMOVED_MANUALLY_DESC = "Removido da Listagem";
 
     public static String PA_CONTACT_CHANNEL_EPOSTAL = "E";
     public static String PA_CONTACT_CHANNEL_POSTAL = "P";

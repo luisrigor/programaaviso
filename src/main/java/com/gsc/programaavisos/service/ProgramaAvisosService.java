@@ -18,6 +18,8 @@ public interface ProgramaAvisosService {
     List<Kilometers> getKilometers();
     List<EntityType> getEntityType();
     List<Age> getAge();
+    List<Fidelitys> getFidelitys();
     List<Modelo> getModels(UserPrincipal userPrincipal);
     void savePA(UserPrincipal userPrincipal, PADTO pa);
+    void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
 }
