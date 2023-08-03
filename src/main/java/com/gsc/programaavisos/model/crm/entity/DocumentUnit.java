@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -38,13 +39,13 @@ public class DocumentUnit {
     @Column(name = "STATUS")
     private String status;
     @Column(name = "DT_END")
-    private Timestamp dtEnd;
+    private LocalDate dtEnd;
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
-    private Timestamp dtCreated;
+    private LocalDate dtCreated;
     @Column(name = "CHANGED_BY")
     private String changedBy;
     @Column(name = "DT_CHANGED")
-    private Timestamp dtChanged;
+    private LocalDate dtChanged;
 }

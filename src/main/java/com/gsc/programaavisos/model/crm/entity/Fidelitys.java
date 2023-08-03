@@ -3,7 +3,7 @@ package com.gsc.programaavisos.model.crm.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,9 +20,9 @@ public class Fidelitys {
     @Column(name = "NAME")
     private String name;
     @Column(name = "STATUS")
-    private String status;
+    private Character status;
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
-    private Timestamp dtCreated;
+    private LocalDate dtCreated;
 }

@@ -6,8 +6,6 @@ import lombok.*;
 
 import javax.persistence.Query;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 @Getter
