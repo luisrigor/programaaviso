@@ -2,6 +2,7 @@ package com.gsc.programaavisos.controller;
 
 
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.ContactReason;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
@@ -42,6 +43,20 @@ public class ProgramaAvisosController {
         List<Modelo> models = programaAvisosService.getModels(userPrincipal);
 
         return ResponseEntity.status(HttpStatus.OK).body(models);
+    }
+
+    @GetMapping(ApiEndpoints.GET_FUELS)
+    public ResponseEntity<List<Fuel>> getFuels(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        List<Fuel> fuels = programaAvisosService.getFuels(userPrincipal);
+
+        return ResponseEntity.status(HttpStatus.OK).body(fuels);
+    }
+
+    @GetMapping(ApiEndpoints.GET_DOCUMENT_UNITS)
+    public ResponseEntity<?> getDocumentUnits(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        programaAvisosService.getDocumentUnits(userPrincipal, 1);
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping(ApiEndpoints.GET_CONTACT_REASONS)

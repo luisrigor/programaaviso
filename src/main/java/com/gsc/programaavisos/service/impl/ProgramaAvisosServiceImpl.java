@@ -3,14 +3,18 @@ package com.gsc.programaavisos.service.impl;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.cardb.Fuel;
+import com.gsc.programaavisos.model.cardb.entity.Combustivel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.ContactReason;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
+import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.ContactReasonRepository;
 import com.gsc.programaavisos.repository.crm.PaParameterizationRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +34,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PaParameterizationRepository paParameterizationRepository;
     private final ContactReasonRepository contactReasonRepository;
     private final ModeloRepository modeloRepository;
+    private final CombustivelRepository combustivelRepository;
 
     @Override
     public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
@@ -71,5 +76,53 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching models ", e);
         }
+    }
+
+    @Override
+    public List<Fuel> getFuels(UserPrincipal userPrincipal) {
+        try {
+            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
+
+            List<Fuel> fuels = combustivelRepository.getFuelsByIdBrand(idBrand);
+
+            boolean addNoInfo = true;
+            for(Fuel fuel: fuels){
+                if(fuel.getId() == TPAInvokerSimulator.CAR_DB_COMBUSTIVEL_SEM_INFO){
+                    addNoInfo = false;
+                    break;
+                }
+            }
+
+            if(addNoInfo){
+                fuels.add(new Fuel(TPAInvokerSimulator.CAR_DB_COMBUSTIVEL_SEM_INFO, "s/info", 0, null, null));
+            }
+
+            return fuels;
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching fuels ", e);
+        }
+    }
+
+    @Override
+    public void getDocumentUnits(UserPrincipal userPrincipal, int type) {
+//        try {
+//            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
+//
+//            ItemFilter oItemFilter = ItemFilter.builder()
+//                    .itemType(type)
+//                    .dtEnd()
+//                    .idBrand()
+//                    .build();
+//
+//
+//            oItemFilter.setItemType(type);
+//            oItemFilter.setDtEnd(new Date(Calendar.getInstance().getTime().getTime()));
+//            oItemFilter.setIdBrand(idBrand);
+//
+//            List<DocumentUnit> documentUnits = DocumentUnit.getHelper().getByFilter(oItemFilter);
+//
+//        } catch (SCErrorException e) {
+//            throw new ProgramaAvisosException("Error fetching document units ", e);
+//        }
     }
 }
