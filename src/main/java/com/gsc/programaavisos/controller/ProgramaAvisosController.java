@@ -97,8 +97,7 @@ public class ProgramaAvisosController {
     public ResponseEntity<List<DocumentUnit>> searchItems(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                           @RequestParam String searchInput,
                                                           @RequestParam Date startDate,
-                                                          @RequestParam Integer tpaItemType,
-                                                          ) {
+                                                          @RequestParam Integer tpaItemType) {
         log.info("searchItems controller");
         List<DocumentUnit> items = programaAvisosService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(items);
