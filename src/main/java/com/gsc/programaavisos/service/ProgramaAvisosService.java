@@ -14,6 +14,8 @@ public interface ProgramaAvisosService {
     List<DocumentUnit> searchItems(String searchInput,Date startDate,Integer tpaItemType, UserPrincipal userPrincipal);
     List<ContactReason> getContactReasons();
     List<Genre> getGenre();
+
+    List<Kilometers> getKilometers();
     List<EntityType> getEntityType();
     List<Age> getAge();
     List<Modelo> getModels(UserPrincipal userPrincipal);

@@ -58,6 +58,13 @@ public class ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body(genre);
     }
 
+    @GetMapping(ApiEndpoints.GET_KILOMENTERS)
+    public ResponseEntity<List<Kilometers>> getKilometers() {
+        log.info("getKilometers controller");
+        List<Kilometers> kilometers = programaAvisosService.getKilometers();
+        return ResponseEntity.status(HttpStatus.OK).body(kilometers);
+    }
+
     @GetMapping(ApiEndpoints.GET_ENTITY_TYPE)
     public ResponseEntity<List<EntityType>> getEntityType() {
         log.info("getEntityType controller");

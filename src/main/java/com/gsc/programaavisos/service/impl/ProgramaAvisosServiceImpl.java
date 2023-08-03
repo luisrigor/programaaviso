@@ -48,6 +48,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
     private final AgeRepository ageRepository;
+    private final KilometersRepository kilometersRepository;
 
     @Override
         public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
@@ -130,9 +131,18 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     @Override
     public List<Age> getAge() {
         try {
-            return ageRepository.findAll();
+            return ageRepository.getAllAge();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching age", e);
+        }
+    }
+
+    @Override
+    public List<Kilometers> getKilometers() {
+        try {
+            return kilometersRepository.getAllKilometers();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching kilometers", e);
         }
     }
 
