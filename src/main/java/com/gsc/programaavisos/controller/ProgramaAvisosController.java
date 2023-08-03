@@ -94,11 +94,11 @@ public class ProgramaAvisosController {
     }
 
     @GetMapping(ApiEndpoints.GET_SEARCH_ITEMS)
-    public ResponseEntity<List<DocumentUnit>> searchItems(@RequestParam(required = false) String searchInput,
-                                                          @RequestParam(required = false) Date startDate,
-                                                          @RequestParam(required = false) Integer tpaItemType,
-                                                          @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                          @RequestParam(required = true) Integer type) {
+    public ResponseEntity<List<DocumentUnit>> searchItems(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                          @RequestParam String searchInput,
+                                                          @RequestParam Date startDate,
+                                                          @RequestParam Integer tpaItemType,
+                                                          ) {
         log.info("searchItems controller");
         List<DocumentUnit> items = programaAvisosService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(items);
@@ -113,9 +113,9 @@ public class ProgramaAvisosController {
 
     @PostMapping(ApiEndpoints.REMOVE_PA)
     public void removePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                         @RequestParam(required = false) Integer id,
-                         @RequestParam(required = false) String removedOption,
-                         @RequestParam(required = false)String removedObs) {
+                         @RequestParam Integer id,
+                         @RequestParam String removedOption,
+                         @RequestParam String removedObs) {
         log.info("removePA controller");
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
     }
