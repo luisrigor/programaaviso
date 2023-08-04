@@ -7,6 +7,8 @@ import com.gsc.scwscardb.util.DATA;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 
 @Profile("development")
 @Component
@@ -25,6 +27,11 @@ public class DevelopmentEnvironmentConfig implements EnvironmentConfig {
    @Override
    public A2pApiInvoke getA2pApiInvoker() {
       return new A2pApiInvoke(com.gsc.a2p.util.DATA.A2P_SERVER_STAGING);
+   }
+
+   @Override
+   public Map<String, String> getEnvVariables() {
+      return MapProfileVariables.getEnvVariablesDevelopment();
    }
 
 }

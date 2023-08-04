@@ -3,9 +3,8 @@ package com.gsc.programaavisos.controller;
 
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
-import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -130,10 +129,20 @@ public class ProgramaAvisosController {
     }
 
     @GetMapping(ApiEndpoints.GET_MANAGE_ITEMS)
-    public ResponseEntity<?> getManageItems(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        List<Dealer> dealers = programaAvisosService.getManageItems(userPrincipal);
+    public ResponseEntity<ManageItemsDTO> getManageItems(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                            @RequestParam int itemType, @RequestParam int itemId) {
+        ManageItemsDTO manageItems = programaAvisosService.getManageItems(userPrincipal, itemType, itemId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(manageItems);
+    }
+
+    @PostMapping(ApiEndpoints.SEARCH_PA)
+    public ResponseEntity<?> searchPA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                               @RequestBody SearchPADTO searchPADTO) {
+        FilterBean filterBean = programaAvisosService.searchPA(userPrincipal, searchPADTO);
         Gson gson = new Gson();
-        return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(dealers));
+
+        return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(filterBean));
     }
 
     @PostMapping(ApiEndpoints.SAVE_PA)

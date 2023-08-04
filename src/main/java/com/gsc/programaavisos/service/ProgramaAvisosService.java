@@ -1,8 +1,7 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
-import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -27,6 +26,7 @@ public interface ProgramaAvisosService {
     void getDocumentUnits(UserPrincipal userPrincipal, int type);
     void savePA(UserPrincipal userPrincipal, PADTO pa);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
-    List<Dealer> getManageItems(UserPrincipal userPrincipal);
+    ManageItemsDTO getManageItems(UserPrincipal userPrincipal, int itemType, int itemId);
     void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
+    FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO);
 }

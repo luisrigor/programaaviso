@@ -20,4 +20,5 @@ public interface ApiEndpoints {
     String GET_DEALERS = "/dealers";
     String GET_MANAGE_ITEMS = "/manage-items";
     String REMOVE_PA = "/remove-pa";
+    String SEARCH_PA = "/search-pa";
 }
