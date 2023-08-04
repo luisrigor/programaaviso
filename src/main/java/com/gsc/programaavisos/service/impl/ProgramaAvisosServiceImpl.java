@@ -253,22 +253,22 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 } else if (roles.contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
                     vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
 
-                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");  //Coutauto Repara��o de Autom�veis, Lda.
+                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");
                     if (dlr3!=null)vecDealers.add(dlr3);
 
-                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");  //Baviera Viseu - RE-159205
+                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");
                     if (dlr4!=null)vecDealers.add(dlr4);
 
-                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");  //AM Gon�alves
+                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");
                     if (dlr6!=null)vecDealers.add(dlr6);
 
-                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");  //Caetano City e Active (Norte), SA - Castelo Branco
+                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");
                     if (dlr7!=null)vecDealers.add(dlr7);
 
-                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");  //Caetano City e Active (Norte), SA - Covilh�
+                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");
                     if (dlr8!=null)vecDealers.add(dlr8);
 
-                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");  //Caetano City e Active (Norte), SA - Portalegre
+                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");
                     if (dlr9!=null)vecDealers.add(dlr9);
 
                 } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
@@ -383,7 +383,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
-        Calendar startRequestJava = Calendar.getInstance();
         String contactChanged = "";
         int id = StringTasks.cleanInteger(String.valueOf(pa.getId()), 0);
         try {
@@ -393,7 +392,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 String hrScheduleContact = StringTasks.cleanString(pa.getHrScheduleContact(), StringUtils.EMPTY).trim();
                 if (!hrScheduleContact.equals(StringUtils.EMPTY)) {
                     hrScheduleContact += ":00";
-                    Time otime = null;
+                    Time otime;
                     try {
                         otime = Time.valueOf(hrScheduleContact);
                         oPA.setHrScheduleContact(otime);
@@ -407,7 +406,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 String userStamp = userPrincipal.getUsername().split("\\|\\|")[0]+"||"+userPrincipal.getUsername().split("\\|\\|")[1];
                 if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals(StringUtils.EMPTY)) {
                     try {
-                        ClaimDetail oClaim = new ClaimDetail();
+                        ClaimDetail oClaim;
                        Dealer oDealerPA = Dealer.getHelper().getByObjectId(userPrincipal.getOidNet(), oPA.getOidDealer());
                         oClaim = ClaimDetail.getHelper().createClaim(com.gsc.claims.initialization.ApplicationConfiguration.PORTAL_EXTRANET,
                                 userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)?com.gsc.claims.initialization.ApplicationConfiguration.TOYOTA_APP:com.gsc.claims.initialization.ApplicationConfiguration.LEXUS_APP, null, null, oDealerPA.getOid_Parent(), null, oPA.getName(),
@@ -441,7 +440,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     hrSchedule += String.valueOf(minHrSchedule);
                     if (!hrSchedule.equals(StringUtils.EMPTY)) {
                         hrSchedule += ":00";
-                        Time otime = null;
+                        Time otime;
                         try {
                             otime = Time.valueOf(hrSchedule);
                             oPA.setHrSchedule(otime);
@@ -466,7 +465,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }catch (Exception e) {
             log.error("Ocorreu um erro ao guardar registo de contato");
         }
-        //com.sc.commons.utils.MonitorTasks.MonitorOperation("Programa de Avisos","Save","SaveContact", oGSCUser.getLogin(), startRequestJava, java.util.Calendar.getInstance());
     }
 
     @Override
@@ -605,7 +603,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     private ProgramaAvisos dataPA(PADTO pa){
         ProgramaAvisos oPA;
-        oPA = paRepository.findById(pa.getId()).get();
+        oPA = paRepository.findById(pa.getId()).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + pa.getId()));
         String revisionScheduleMotive = StringTasks.cleanString(pa.getRevisionScheduleMotive(), "").trim();
         String newsletterReceived = StringTasks.cleanString(pa.getNewsletterReceived(), "").trim();
         String notReceivedMotive = StringTasks.cleanString(pa.getNotReceivedMotive(), "").trim();
