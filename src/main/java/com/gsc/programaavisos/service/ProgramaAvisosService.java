@@ -17,12 +17,16 @@ public interface ProgramaAvisosService {
     List<DocumentUnitDTO> searchItems(String searchInput,Date startDate,Integer tpaItemType, UserPrincipal userPrincipal);
     List<ContactReason> getContactReasons();
     List<Genre> getGenre();
+
+    List<Kilometers> getKilometers();
     List<EntityType> getEntityType();
     List<Age> getAge();
+    List<Fidelitys> getFidelitys();
     List<Modelo> getModels(UserPrincipal userPrincipal);
     List<Fuel> getFuels(UserPrincipal userPrincipal);
     void getDocumentUnits(UserPrincipal userPrincipal, int type);
     void savePA(UserPrincipal userPrincipal, PADTO pa);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
     List<Dealer> getManageItems(UserPrincipal userPrincipal);
+    void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
 }

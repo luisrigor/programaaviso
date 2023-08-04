@@ -76,6 +76,13 @@ public class ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body(genre);
     }
 
+    @GetMapping(ApiEndpoints.GET_KILOMENTERS)
+    public ResponseEntity<List<Kilometers>> getKilometers() {
+        log.info("getKilometers controller");
+        List<Kilometers> kilometers = programaAvisosService.getKilometers();
+        return ResponseEntity.status(HttpStatus.OK).body(kilometers);
+    }
+
     @GetMapping(ApiEndpoints.GET_ENTITY_TYPE)
     public ResponseEntity<List<EntityType>> getEntityType() {
         log.info("getEntityType controller");
@@ -88,6 +95,13 @@ public class ProgramaAvisosController {
         log.info("getAge controller");
         List<Age> age = programaAvisosService.getAge();
         return ResponseEntity.status(HttpStatus.OK).body(age);
+    }
+
+    @GetMapping(ApiEndpoints.GET_FIDELITYS)
+    public ResponseEntity<List<Fidelitys>> getFidelitys() {
+        log.info("getFidelitys controller");
+        List<Fidelitys> fidelitys = programaAvisosService.getFidelitys();
+        return ResponseEntity.status(HttpStatus.OK).body(fidelitys);
     }
     @GetMapping(ApiEndpoints.GET_DOCUMENT_UNIT)
     public ResponseEntity<List<DocumentUnitDTO>> getDocumentUnit(@AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -127,5 +141,14 @@ public class ProgramaAvisosController {
                        @RequestBody PADTO padto) {
         log.info("savePA controller");
         programaAvisosService.savePA(userPrincipal,padto);
+    }
+
+    @PostMapping(ApiEndpoints.REMOVE_PA)
+    public void removePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                         @RequestParam Integer id,
+                         @RequestParam String removedOption,
+                         @RequestParam String removedObs) {
+        log.info("removePA controller");
+        programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
     }
 }
