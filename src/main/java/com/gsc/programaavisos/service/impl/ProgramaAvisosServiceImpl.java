@@ -377,7 +377,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     dataVehicle(oPA.getLicensePlate());
                 }
                 if(contactChanged.equals("S")) {
-                    dataQuarantine(oPA,userStamp);
+                    dataQuarantine(oPA,userStamp, userPrincipal.getOidNet());
                 }
             }
         }catch (Exception e) {
@@ -390,7 +390,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(Long.valueOf(id)).get();
+             ProgramaAvisos oPA = paRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
               oPA = ProgramaAvisos.builder()
                       .successContact("N")
@@ -455,11 +455,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             vehicleRepository.save(vehicle);
         }
     }
-    private void dataQuarantine(ProgramaAvisos  oPA,String userStamp){
+    private void dataQuarantine(ProgramaAvisos  oPA,String userStamp,String oidNet) throws SCErrorException {
         Quarantine quarantine = new Quarantine();
-        //Dealer dealer = Dealer.getHelper().getByObjectId(oGSCUser.getOidNet(), oPA.getOidDealer());
+        Dealer dealer = Dealer.getHelper().getByObjectId(oidNet, oPA.getOidDealer());
         Calendar cal = Calendar.getInstance();
-        quarantine.setDealerParent("dealer.oidDealerParent");
+        quarantine.setDealerParent(dealer.getOid_Parent());
         quarantine.setIdOrigin(PaConstants.ID_ORIGIN_MRS);
         quarantine.setIdEvent(PaConstants.ID_EVENT_MRS);
         quarantine.setEventDate(new java.sql.Date(cal.getTime().getTime()));
