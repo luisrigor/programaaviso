@@ -1,13 +1,16 @@
 package com.gsc.programaavisos.controller;
 
 
+import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
+import com.rg.dealer.Dealer;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -87,22 +90,36 @@ public class ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body(age);
     }
     @GetMapping(ApiEndpoints.GET_DOCUMENT_UNIT)
-    public ResponseEntity<List<DocumentUnit>> getDocumentUnit(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<List<DocumentUnitDTO>> getDocumentUnit(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                               @RequestParam(required = false) Integer type) {
         log.info("getDocumentUnit controller");
-        List<DocumentUnit> paDocumentUnit = programaAvisosService.searchDocumentUnit(type, userPrincipal);
+        List<DocumentUnitDTO> paDocumentUnit = programaAvisosService.searchDocumentUnit(type, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(paDocumentUnit);
     }
 
     @GetMapping(ApiEndpoints.GET_SEARCH_ITEMS)
-    public ResponseEntity<List<DocumentUnit>> searchItems(@RequestParam(required = false) String searchInput,
+    public ResponseEntity<List<DocumentUnitDTO>> searchItems(@RequestParam(required = false) String searchInput,
                                                           @RequestParam(required = false) Date startDate,
                                                           @RequestParam(required = false) Integer tpaItemType,
                                                           @AuthenticationPrincipal UserPrincipal userPrincipal,
                                                           @RequestParam(required = true) Integer type) {
         log.info("searchItems controller");
-        List<DocumentUnit> items = programaAvisosService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
+        List<DocumentUnitDTO> items = programaAvisosService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(items);
+    }
+
+    @GetMapping(ApiEndpoints.GET_DEALERS)
+    public ResponseEntity<?> getDealers(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        List<Dealer> dealers = programaAvisosService.getDealers(userPrincipal);
+        Gson gson = new Gson();
+        return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(dealers));
+    }
+
+    @GetMapping(ApiEndpoints.GET_MANAGE_ITEMS)
+    public ResponseEntity<?> getManageItems(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        List<Dealer> dealers = programaAvisosService.getManageItems(userPrincipal);
+        Gson gson = new Gson();
+        return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(dealers));
     }
 
     @PostMapping(ApiEndpoints.SAVE_PA)

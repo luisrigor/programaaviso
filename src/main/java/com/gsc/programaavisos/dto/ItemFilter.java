@@ -18,14 +18,17 @@ public class ItemFilter {
     protected Date dtEnd;
 
     public String whereClause() {
-        StringBuffer clause = new StringBuffer(" WHERE 1 = 1 ");
-        clause.append(" AND PDU.ID_DOCUMENT_UNIT_TYPE = ? ");
-        clause.append(" AND PDU.ID_BRAND = ? ");
+
+        int paramCounter = 1;
+
+        StringBuilder clause = new StringBuilder(" WHERE 1 = 1 ");
+        clause.append(" AND PDU.ID_DOCUMENT_UNIT_TYPE = ?" + paramCounter++);
+        clause.append(" AND PDU.ID_BRAND = ?" +paramCounter++);
         if (searchInput != null && !"".equals(searchInput)) {
-            clause.append("AND (upper(PDU.NAME) LIKE ? OR upper(PDU.CODE) LIKE ?) ");
+            clause.append(" AND (upper(PDU.NAME) LIKE ?"+paramCounter++ +" OR upper(PDU.CODE) LIKE ?"+paramCounter++ + ") ");
         }
         if(dtEnd!=null) {
-            clause.append(" AND (PDU.DT_END > ? OR  PDU.DT_END IS NULL)");
+            clause.append(" AND (PDU.DT_END > ?"+paramCounter +" OR  PDU.DT_END IS NULL)");
         }
         return clause.toString();
     }

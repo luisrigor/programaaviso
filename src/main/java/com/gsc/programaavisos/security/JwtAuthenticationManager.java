@@ -79,20 +79,39 @@ public class JwtAuthenticationManager implements AuthenticationManager {
             throw new AuthenticationServiceException("No permissions");
         }
 
-        UserPrincipal authUser = new UserPrincipal(userId, roles, CLIENT_ID);
+        UserPrincipal authUser = new UserPrincipal(userId, roles, Long.parseLong(tokenParts[0]));
         authUser.setOidDealerParent(user.getDealerParent().getObjectId());
+        authUser.setOidDealer(user.getDealer().getObjectId());
         return JwtAuthenticationToken.authenticated(authUser, Collections.emptyList());
     }
 
     private Set<AppProfile> getRoles(ExtranetUser user) {
         Set<AppProfile> roles = new LinkedHashSet<>(AppProfile.values().length);
         Set<Integer> profiles = getProfiles(user);
-        roles.add(AppProfile.APPROVAL_MANAGER);
+
+
         for (Integer profileId : profiles) {
-            if (AppProfile.APPROVAL_MANAGER.getId().equals(profileId)) {
-                roles.add(AppProfile.APPROVAL_MANAGER);
-            } else if (AppProfile.PRODUCT_MANAGER.getId().equals(profileId)) {
-                roles.add(AppProfile.PRODUCT_MANAGER);
+            if (AppProfile.compareId(profileId, AppProfile.TOYOTA_LEXUS_PRF_TCAP)) {
+                roles.add(AppProfile.TOYOTA_LEXUS_PRF_TCAP);
+                roles.add(AppProfile.ROLE_VIEW_ALL_DEALERS);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_LEXUS_PRF_MANAGER_CA)) {
+                roles.add(AppProfile.TOYOTA_LEXUS_PRF_MANAGER_CA);
+                roles.add(AppProfile.ROLE_VIEW_CA_DEALERS);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_LEXUS_PRF_CALLCENTER)) {
+                roles.add(AppProfile.TOYOTA_LEXUS_PRF_CALLCENTER);
+                roles.add(AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_LEXUS_PRF_MANAGER_DEALER)) {
+                roles.add(AppProfile.TOYOTA_LEXUS_PRF_MANAGER_DEALER);
+                roles.add(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_PRF_MANAGER_INSTALLATION)) {
+                roles.add(AppProfile.TOYOTA_PRF_MANAGER_INSTALLATION);
+                roles.add(AppProfile.ROLE_VIEW_DEALER_OWN_INSTALLATION);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_PRF_IMPORT_EXPORT)) {
+                roles.add(AppProfile.TOYOTA_PRF_IMPORT_EXPORT);
+                roles.add(AppProfile.ROLE_IMPORT_EXPORT);
+            } else if (AppProfile.compareId(profileId, AppProfile.TOYOTA_PRF_TPA_BO_MANAGER_TPA)) {
+                roles.add(AppProfile.TOYOTA_PRF_TPA_BO_MANAGER_TPA);
+                roles.add(AppProfile.ROLE_TPA_BO);
             }
         }
         return roles;

@@ -1,8 +1,12 @@
 package com.gsc.programaavisos.service.impl;
 
+import com.gsc.claims.object.auxiliary.Area;
+import com.gsc.claims.object.auxiliary.DealerLevel1;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
+import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.constants.PaConstants;
+import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
@@ -28,14 +32,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
+import com.gsc.claims.object.core.ClaimDetail;
+//import com.gsc.c
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -55,6 +57,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
     private final AgeRepository ageRepository;
+    public static final int    CLAIMS_PA_CHANNEL = 36;
+
 
     @Override
         public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
@@ -79,7 +83,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public List<DocumentUnit> searchDocumentUnit(Integer type, UserPrincipal userPrincipal) {
+    public List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal) {
         try {
             int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
             ItemFilter filter = ItemFilter.builder()
@@ -94,13 +98,13 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public List<DocumentUnit> searchItems(String searchInput,Date startDate,Integer tpaItemType, UserPrincipal userPrincipal) {
+    public List<DocumentUnitDTO> searchItems(String searchInput,Date endDate,Integer tpaItemType, UserPrincipal userPrincipal) {
         try {
             int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
             ItemFilter filter = ItemFilter.builder()
                     .searchInput(searchInput)
                     .itemType(tpaItemType)
-                    .dtEnd(startDate)
+                    .dtEnd(endDate)
                     .idBrand(idBrand)
                     .build();
             return  documentUnitRepository.getByFilter(filter);
@@ -201,6 +205,80 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 //        }
     }
 
+    @Override
+    public List<Dealer> getDealers(UserPrincipal userPrincipal) {
+        try {
+            Set<AppProfile> roles = userPrincipal.getRoles();
+
+            List<Dealer> vecDealers = new ArrayList<>();
+            if (userPrincipal.getOidNet().equalsIgnoreCase(Dealer.OID_NET_TOYOTA)) {
+                if (roles.contains(AppProfile.ROLE_VIEW_ALL_DEALERS)) {
+                    vecDealers = Dealer.getToyotaHelper().GetAllActiveDealers();
+                } else if (roles.contains(AppProfile.ROLE_VIEW_CA_DEALERS)) {
+                    vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
+                } else if (roles.contains(AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS)) {
+                    vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
+
+                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");  //Coutauto Repara��o de Autom�veis, Lda.
+                    if (dlr3!=null)vecDealers.add(dlr3);
+
+                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");  //Baviera Viseu - RE-159205
+                    if (dlr4!=null)vecDealers.add(dlr4);
+
+                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");  //AM Gon�alves
+                    if (dlr6!=null)vecDealers.add(dlr6);
+
+                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");  //Caetano City e Active (Norte), SA - Castelo Branco
+                    if (dlr7!=null)vecDealers.add(dlr7);
+
+                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");  //Caetano City e Active (Norte), SA - Covilh�
+                    if (dlr8!=null)vecDealers.add(dlr8);
+
+                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");  //Caetano City e Active (Norte), SA - Portalegre
+                    if (dlr9!=null)vecDealers.add(dlr9);
+
+                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
+                    vecDealers = Dealer.getToyotaHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
+                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_OWN_INSTALLATION)) {
+                    vecDealers.add(Dealer.getToyotaHelper().getByObjectId(userPrincipal.getOidDealer()));
+                } else if (roles.contains(AppProfile.ROLE_IMPORT_EXPORT)) {
+                    vecDealers = Dealer.getToyotaHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
+                }
+            } else if (userPrincipal.getOidNet().equalsIgnoreCase(Dealer.OID_NET_LEXUS)) {
+                if (roles.contains(AppProfile.ROLE_VIEW_ALL_DEALERS)) {
+                    vecDealers = Dealer.getLexusHelper().GetAllActiveDealers();
+                } else if (roles.contains(AppProfile.ROLE_VIEW_CA_DEALERS)) {
+                    vecDealers = Dealer.getLexusHelper().GetCADealers("S");
+                } else if (roles.contains(AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS)) {
+                    vecDealers = Dealer.getLexusHelper().GetCADealers("S");
+                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
+                    vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
+                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_OWN_INSTALLATION)) {
+                    vecDealers.add(Dealer.getLexusHelper().getByObjectId(userPrincipal.getOidDealer()));
+                } else if (roles.contains(AppProfile.ROLE_IMPORT_EXPORT)) {
+                    vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
+                }
+            }
+
+            List<Dealer> dealers = new ArrayList<Dealer>(vecDealers);
+
+            Dealer dealerNotDefined = new Dealer();
+            dealerNotDefined.setObjectId("99");
+            dealerNotDefined.setDesig("N/D");
+            dealerNotDefined.setEnd("");
+            dealers.add(dealerNotDefined);
+
+            return dealers;
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching dealers", e);
+        }
+    }
+
+    @Override
+    public List<Dealer> getManageItems(UserPrincipal userPrincipal) {
+        return null;
+    }
+
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
         Calendar startRequestJava = Calendar.getInstance();
         String contactChanged = "";
@@ -223,17 +301,18 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     oPA.setHrScheduleContact(null);
                 }
                 String registerClaim = StringTasks.cleanString(pa.getRegisterClaim(), "N").trim();
+                String userStamp = userPrincipal.getUsername().split("\\|\\|")[0]+"||"+userPrincipal.getUsername().split("\\|\\|")[1];
                 if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals("")) {
                     try {
                         ClaimDetail oClaim = new ClaimDetail();
-                       /* Dealer oDealerPA = Dealer.getHelper().getByObjectId(oGSCUser.getOidNet(), oPA.getOidDealer());
+                       Dealer oDealerPA = Dealer.getHelper().getByObjectId(userPrincipal.getOidNet(), oPA.getOidDealer());
                         oClaim = ClaimDetail.getHelper().createClaim(com.gsc.claims.initialization.ApplicationConfiguration.PORTAL_EXTRANET,
-                                oGSCUser.getOidNet().equals(Dealer.OID_NET_TOYOTA)?com.gsc.claims.initialization.ApplicationConfiguration.TOYOTA_APP:com.gsc.claims.initialization.ApplicationConfiguration.LEXUS_APP, null, null, oDealerPA.getOid_Parent(), null, oPA.getName(),
+                                userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)?com.gsc.claims.initialization.ApplicationConfiguration.TOYOTA_APP:com.gsc.claims.initialization.ApplicationConfiguration.LEXUS_APP, null, null, oDealerPA.getOid_Parent(), null, oPA.getName(),
                                 oPA.getAddress(), oPA.getCp4(),	oPA.getCp3(), oPA.getCpext(), oPA.getEmail(), oPA.getContactPhone(), null,
-                                observations, oGSCUser.getOidNet().equals(Dealer.OID_NET_TOYOTA)? DealerLevel1.TCAP_TOYOTA_DEALERLEVEL1:DealerLevel1.TCAP_LEXUS_DEALERLEVEL1,
+                                pa.getObservations(), userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)? DealerLevel1.TCAP_TOYOTA_DEALERLEVEL1:DealerLevel1.TCAP_LEXUS_DEALERLEVEL1,
                                 oDealerPA.getOid_Parent(), oPA.getOidDealer(), oPA.getLicensePlate(), oPA.getBrand().equals("T")?"TOYOTA":oPA.getBrand().equals("L")?"LEXUS":"", oPA.getModel(), Area.TCAP_TOYOTA_AFTERSALES,
-                                CLAIMS_PA_CHANNEL, null, null, null, oGSCUser.getUserStamp(), null);*/
-                        oPA.setIdClaim(1);
+                                CLAIMS_PA_CHANNEL, null, null, null, userStamp, null);
+                        oPA.setIdClaim(oClaim.getId());
                     } catch (Exception e) {
                         log.error("Ocorreu um erro ao registar o contato como reclamação");
                     }
@@ -272,14 +351,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     sendMail(oPA,dtSchedule,hrSchedule,oidDealerSchedule);
                 }
                 oPA.setBlockedBy("");
-                //oPA.save(String.valueOf(oGSCUser.getIdUser()), oGSCUser.containsRole(ApplicationConfiguration.ROLE_VIEW_CALL_CENTER_DEALERS));
                 paRepository.save(oPA);
 
                 if(oPA.getRevisionScheduleMotive().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER) || oPA.getRevisionSchedule().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER2)) {
                     dataVehicle(oPA.getLicensePlate());
                 }
                 if(contactChanged.equals("S")) {
-                    String userStamp = userPrincipal.getUsername().split("\\|\\|")[0]+"||"+userPrincipal.getUsername().split("\\|\\|")[1];
                     dataQuarantine(oPA,userStamp);
                 }
             }
@@ -323,8 +400,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     private void dataVehicle(String licencePlate){
-        //Vehicle vehicle = Vehicle.getHelper().getVehicle(licencePlate);
-        Vehicle vehicle = null;
+        if(licencePlate!=null)
+            licencePlate = StringTasks.ReplaceStr(licencePlate, "-", "").toUpperCase();
+
+        Vehicle vehicle = vehicleRepository.getVehicle(licencePlate);
         if(vehicle != null) {
             vehicle.setIdOwner(0);
             vehicle.setIdUser(0);

@@ -1,5 +1,8 @@
 package com.gsc.programaavisos.config.datasource.crm;
 
+import com.ibm.db2.jcc.DB2SimpleDataSource;
+import com.sc.commons.dbconnection.ServerJDBCConnection;
+import com.sc.commons.initialization.SCGlobalPreferences;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +44,35 @@ public class DbConfigLocal {
 
     @PostConstruct
     private void init() {
+        SCGlobalPreferences.setResources(scConfigFile);
+        ServerJDBCConnection conn = ServerJDBCConnection.getInstance();
+        DB2SimpleDataSource dbToynet = new DB2SimpleDataSource();
+        dbToynet.setServerName("scdbesrva.sc.pt");
+        dbToynet.setPortNumber(50000);
+        dbToynet.setDatabaseName("DBTOYNET");
+        dbToynet.setDriverType(4);
+        dbToynet.setUser("db2inst1");
+        dbToynet.setPassword("db2admin");
+        conn.setDataSource(dbToynet, "jdbc/dbtoynet");
+        log.info("Datasource initialized successfully: jdbc/dbtoynet");
+        DB2SimpleDataSource dblexxtaps = new DB2SimpleDataSource();
+        dblexxtaps.setServerName("scdbesrvb.sc.pt");
+        dblexxtaps.setPortNumber(50000);
+        dblexxtaps.setDatabaseName("LEXXTAPS");
+        dblexxtaps.setDriverType(4);
+        dblexxtaps.setUser("db2inst1");
+        dblexxtaps.setPassword("db2admin");
+        conn.setDataSource(dblexxtaps, "jdbc/lexxtaps");
+        log.info("Datasource initialized successfully: jdbc/lexxtaps");
+        DB2SimpleDataSource dbclaims = new DB2SimpleDataSource();
+        dbclaims.setServerName("scdbesrva.sc.pt");
+        dbclaims.setPortNumber(50000);
+        dbclaims.setDatabaseName("DBCLAIMS");
+        dbclaims.setDriverType(4);
+        dbclaims.setUser("db2inst1");
+        dbclaims.setPassword("db2admin");
+        conn.setDataSource(dbclaims, "jdbc/dbclaims");
+        log.info("Datasource initialized successfully: jdbc/dbclaims");
 
     }
 

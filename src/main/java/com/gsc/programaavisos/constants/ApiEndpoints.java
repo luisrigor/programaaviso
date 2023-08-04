@@ -14,4 +14,6 @@ public interface ApiEndpoints {
     String GET_DOCUMENT_UNIT = "/document-unit";
     String GET_SEARCH_ITEMS = "/search-items";
     String SAVE_PA = "/save-pa";
+    String GET_DEALERS = "/dealers";
+    String GET_MANAGE_ITEMS = "/manage-items";
 }

@@ -27,6 +27,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.gsc.programaavisos.constants.ApiConstants.LEXUS_APP;
+import static com.gsc.programaavisos.constants.ApiConstants.TOYOTA_APP;
+
 @Service
 public class TokenProvider {
 
@@ -40,6 +43,7 @@ public class TokenProvider {
    private static final String JWT_ENVIRONMENT = "environment";
    private static final String JWT_CLIENT_ID = "client";
    private static final String OID_DEALER_PARENT = "dealer_parent";
+   private static final String OID_DEALER = "dealer";
    private static final String OID_NET = "oid_net";
 
    private final ConfigurationRepository configurationRepository;
@@ -57,9 +61,9 @@ public class TokenProvider {
 
    public String createToken(Authentication authentication, String appId) throws AuthenticationException {
       UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-      if(appId.equals("13")) {
+      if(appId.equals(String.valueOf(TOYOTA_APP))) {
          userPrincipal.setOidNet("SC00010001");
-      } else if (appId.equals("10053")) {
+      } else if (appId.equals(String.valueOf(LEXUS_APP))) {
          userPrincipal.setOidNet("SC00010002");
       }
 
@@ -73,20 +77,21 @@ public class TokenProvider {
       Date expiryDate = new Date(now.getTime() + configurationRepository.getTokenExpirationMsec());
 
       return Jwts.builder()
-         .setIssuer(ISSUER)
-         .setSubject(userPrincipal.getUsername())
-         .setAudience(AUDIENCE)
-         .setExpiration(expiryDate)
-         .setIssuedAt(new Date())
-         .setId(UUID.randomUUID().toString())
-         .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(loginKey.get().getKeyValue())))
-         .setHeaderParam("kid", loginKey.get().getId())
-         .claim(JWT_ENVIRONMENT, activeProfile)
-         .claim(JWT_CLIENT_ID, Integer.parseInt(appId))
-         .claim(ROLES, userPrincipal.getRoles())
-         .claim(OID_DEALER_PARENT, userPrincipal.getOidDealerParent())
-         .claim(OID_NET, userPrincipal.getOidNet())
-         .compact();
+              .setIssuer(ISSUER)
+              .setSubject(userPrincipal.getUsername())
+              .setAudience(AUDIENCE)
+              .setExpiration(expiryDate)
+              .setIssuedAt(new Date())
+              .setId(UUID.randomUUID().toString())
+              .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(loginKey.get().getKeyValue())))
+              .setHeaderParam("kid", loginKey.get().getId())
+              .claim(JWT_ENVIRONMENT, activeProfile)
+              .claim(JWT_CLIENT_ID, userPrincipal.getClientId())
+              .claim(ROLES, userPrincipal.getRoles())
+              .claim(OID_DEALER_PARENT, userPrincipal.getOidDealerParent())
+              .claim(OID_DEALER, userPrincipal.getOidDealer())
+              .claim(OID_NET, userPrincipal.getOidNet())
+              .compact();
    }
 
    private Optional<LoginKey> getKey() {
@@ -138,13 +143,14 @@ public class TokenProvider {
             .collect(Collectors.toSet());
 
          return JwtAuthenticationToken.authenticated(
-            new UserPrincipal(
-               claims.getSubject(),
-               roles,
-               claims.get(JWT_CLIENT_ID, Long.class),
-               claims.get(OID_NET, String.class),
-               claims.get(OID_DEALER_PARENT, String.class)
-            ),
+                 new UserPrincipal(
+                         claims.getSubject(),
+                         roles,
+                         claims.get(JWT_CLIENT_ID, Long.class),
+                         claims.get(OID_NET, String.class),
+                         claims.get(OID_DEALER_PARENT, String.class),
+                         claims.get(OID_DEALER, String.class)
+                 ),
             Collections.emptyList()
          );
       } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
@@ -177,17 +183,17 @@ public class TokenProvider {
    private Set<AppProfile> getRoles(ServiceLogin sl) {
       Set<AppProfile> profiles = new HashSet<>();
 
-      if (Objects.equals(sl.getUploadFile(), Boolean.TRUE)) {
-         profiles.add(AppProfile.UPLOAD_FILE);
-      }
-
-      if (Objects.equals(sl.getCleanupProjects(), Boolean.TRUE)) {
-         profiles.add(AppProfile.CLEANUP_PROJECTS);
-      }
-
-      if (Objects.equals(sl.getDownloadProjectFiles(), Boolean.TRUE)) {
-         profiles.add(AppProfile.DOWNLOAD_PROJECT_FILES);
-      }
+//      if (Objects.equals(sl.getUploadFile(), Boolean.TRUE)) {
+//         profiles.add(AppProfile.UPLOAD_FILE);
+//      }
+//
+//      if (Objects.equals(sl.getCleanupProjects(), Boolean.TRUE)) {
+//         profiles.add(AppProfile.CLEANUP_PROJECTS);
+//      }
+//
+//      if (Objects.equals(sl.getDownloadProjectFiles(), Boolean.TRUE)) {
+//         profiles.add(AppProfile.DOWNLOAD_PROJECT_FILES);
+//      }
 
       return profiles;
    }

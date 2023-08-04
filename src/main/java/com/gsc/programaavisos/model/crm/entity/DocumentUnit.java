@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.model.crm.entity;
 
+import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,6 +12,31 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SqlResultSetMapping(
+        name = "DocumentUnitMapping",
+        classes = @ConstructorResult(
+                targetClass = DocumentUnitDTO.class,
+                columns = {
+                        @ColumnResult(name = "ID", type = Integer.class),
+                        @ColumnResult(name = "ID_BRAND", type = Integer.class),
+                        @ColumnResult(name = "ID_DOCUMENT_UNIT_TYPE", type = Integer.class),
+                        @ColumnResult(name = "ID_DOCUMENT_UNIT_CATEGORY", type = Integer.class),
+                        @ColumnResult(name = "NAME", type = String.class),
+                        @ColumnResult(name = "DESCRIPTION", type = String.class),
+                        @ColumnResult(name = "CODE", type = String.class),
+                        @ColumnResult(name = "LINK", type = String.class),
+                        @ColumnResult(name = "IMG_POSTAL", type = String.class),
+                        @ColumnResult(name = "IMG_E_POSTAL", type = String.class),
+                        @ColumnResult(name = "STATUS", type = String.class),
+                        @ColumnResult(name = "DT_END", type = LocalDate.class),
+                        @ColumnResult(name = "CREATED_BY", type = String.class),
+                        @ColumnResult(name = "DT_CREATED", type = LocalDate.class),
+                        @ColumnResult(name = "CHANGED_BY", type = String.class),
+                        @ColumnResult(name = "DT_CHANGED", type = LocalDate.class),
+                        @ColumnResult(name = "CATEGORY_DESCRIPTION", type = String.class)
+                }
+        )
+)
 @Entity
 @Table(name = "PA_DOCUMENT_UNIT")
 public class DocumentUnit {

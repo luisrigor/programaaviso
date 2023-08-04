@@ -4,6 +4,10 @@ import com.rg.dealer.Dealer;
 
 public class ApiConstants {
 
+    public static final int TOYOTA_APP = 59;
+    public static final int LEXUS_APP = 10047;
+
+
     public static final int ID_BRAND_TOYOTA = 1;
     public static final int ID_BRAND_LEXUS = 2;
 
