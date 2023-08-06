@@ -4,7 +4,6 @@ import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
-import com.gsc.programaavisos.config.environment.MapProfileVariables;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.constants.PaConstants;
@@ -61,23 +60,13 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
     private final AgeRepository ageRepository;
-    public static final int    CLAIMS_PA_CHANNEL = 36;
-    public static final int PARAM_ID_TPA_ITEM_TYPE_SERVICE = 1;
-    public static final int PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT = 2;
-    public static final int PARAM_ID_TPA_ITEM_TYPE_HEADER = 3;
-    public static final String FTP_EPOSTAL_PATH = "/epostais/comum";
-    public static final String FTP_POSTAL_SERVICE = "/postais/servicos";
-    public static final String FTP_POSTAL_DESTAQUE = "/postais/comum";
-    public static final String FTP_POSTAL_HEADER = "/postais/headers";
-
-
     private final KilometersRepository kilometersRepository;
     private final FidelitysRepository fidelitysRepository;
     private final DocumentUnitCategoryRepository documentUnitCategoryRepository;
     private final EnvironmentConfig environmentConfig;
 
     @Override
-        public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
+    public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
         try {
             int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
             List<String> selectedTypes = new ArrayList<>();
@@ -94,7 +83,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
             return  paParameterizationRepository.getByFilter(filter);
         } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching parametrizations ", e);
+            throw new ProgramaAvisosException("Error fetching parametrization", e);
         }
     }
 
@@ -168,7 +157,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         try {
             return fidelitysRepository.findAll();
         } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching fidelitys", e);
+            throw new ProgramaAvisosException("Error fetching fidelity", e);
         }
     }
 
@@ -294,14 +283,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
             }
 
-            List<Dealer> dealers = new ArrayList<Dealer>(vecDealers);
-
+            List<Dealer> dealers = new ArrayList<>(vecDealers);
             Dealer dealerNotDefined = new Dealer();
             dealerNotDefined.setObjectId("99");
             dealerNotDefined.setDesig("N/D");
-            dealerNotDefined.setEnd("");
+            dealerNotDefined.setEnd(StringUtils.EMPTY);
             dealers.add(dealerNotDefined);
-
             return dealers;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching dealers", e);
@@ -312,9 +299,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public ManageItemsDTO getManageItems(UserPrincipal userPrincipal, int itemType, int itemId) {
 
         DocumentUnit item = null;
-        List<DocumentUnitCategory> categories = null;
+        List<DocumentUnitCategory> categories;
         Map<String, String>  envV = environmentConfig.getEnvVariables();
-
         try {
             categories = documentUnitCategoryRepository.getByType(itemType);
             if (itemId > 0) {
@@ -325,57 +311,56 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 File img1 = null;
                 File img2 = null;
                 String uplodadDir = System.getProperty("java.io.tmpdir");
-                if (itemType == PARAM_ID_TPA_ITEM_TYPE_SERVICE) {
+                if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_SERVICE) {
 
                     if (ePostal != null) {
                         img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + FTP_EPOSTAL_PATH, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
                         img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_POSTAL_SERVICE, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_SERVICE, uplodadDir);
                     }
 
-                } else if (itemType == PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT) {
+                } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT) {
 
                     if (ePostal != null) {
                         img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + FTP_EPOSTAL_PATH, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
                         img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + FTP_POSTAL_DESTAQUE, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_POSTAL_DESTAQUE, uplodadDir);
                     }
 
-                } else if (itemType == PARAM_ID_TPA_ITEM_TYPE_HEADER) {
+                } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HEADER) {
 
                     if (ePostal != null) {
                         img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_EPOSTAL_PATH, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
                         img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_POSTAL_HEADER, uplodadDir);
+                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_HEADER, uplodadDir);
                     }
 
                 }
 
             }
-
             return ManageItemsDTO.builder()
                     .item(item)
                     .itemType(itemType)
                     .categories(categories)
-                    .itemId(item==null?item.getId():null)
+                    .itemId(item!=null?item.getId():null)
                     .build();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching manage items ", e);
@@ -383,10 +368,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
-        String contactChanged = "";
-        int id = StringTasks.cleanInteger(String.valueOf(pa.getId()), 0);
+        String contactChanged;
         try {
-            if(id > 0) {
+            if(pa.getId() > 0) {
                 ProgramaAvisos oPA =  dataPA(pa);
                 contactChanged = StringTasks.cleanString(pa.getContactChanged(), "0");
                 String hrScheduleContact = StringTasks.cleanString(pa.getHrScheduleContact(), StringUtils.EMPTY).trim();
@@ -413,10 +397,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                                 oPA.getAddress(), oPA.getCp4(),	oPA.getCp3(), oPA.getCpext(), oPA.getEmail(), oPA.getContactPhone(), null,
                                 pa.getObservations(), userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)? DealerLevel1.TCAP_TOYOTA_DEALERLEVEL1:DealerLevel1.TCAP_LEXUS_DEALERLEVEL1,
                                 oDealerPA.getOid_Parent(), oPA.getOidDealer(), oPA.getLicensePlate(), oPA.getBrand().equals("T")?"TOYOTA":oPA.getBrand().equals("L")?"LEXUS":"", oPA.getModel(), Area.TCAP_TOYOTA_AFTERSALES,
-                                CLAIMS_PA_CHANNEL, null, null, null, userStamp, null);
+                                PaConstants.CLAIMS_PA_CHANNEL, null, null, null, userStamp, null);
                         oPA.setIdClaim(oClaim.getId());
                     } catch (Exception e) {
-                        log.error("Ocorreu um erro ao registar o contato como reclamação");
+                        throw new ProgramaAvisosException("There was an error registering the contact as a claim", e);
                     }
                 }
 
@@ -463,7 +447,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
             }
         }catch (Exception e) {
-            log.error("Ocorreu um erro ao guardar registo de contato");
+            log.error("An error occurred while saving contact record");
+            throw new ProgramaAvisosException("An error occurred while saving contact record", e);
         }
     }
 
@@ -493,64 +478,36 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     @Override
     public FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO) {
+        log.info("searchPA service");
         try {
             FilterBean filter = getFilter(userPrincipal);
-
-            //1� Linha
-            int fromYear 					= searchPADTO.getFromYear();
-            int fromMonth 					= searchPADTO.getFromMonth();
-            int toYear 					    = searchPADTO.getToYear();
-            int toMonth 					= searchPADTO.getToMonth();
-
-            String arrOidDealer[] 			= searchPADTO.getArrOidDealer();
-            String changedBy 				= StringTasks.cleanString(searchPADTO.getChangedBy(), "*todos*");
-
-            //2� Linha
-            int idSource 					= searchPADTO.getIdSource();
-            int idChannel 					= searchPADTO.getIdChannel();
-            int idContactType 				= searchPADTO.getIdContactType();
-            String flagHibrid 				= StringTasks.cleanString(searchPADTO.getFlagHibrid(), "");
-            String delegatedTo 				= StringTasks.cleanString(searchPADTO.getDelegatedTo(), "*todos*");
-
-            //3� Linha
-            String filterOptions[] 			= searchPADTO.getFilterOptions();
-            String arrMaintenanceTypes[] 	= searchPADTO.getArrMaintenanceTypes();
-            String hasMaintenanceContract 	= StringTasks.cleanString(searchPADTO.getHasMaintenanceContract(), "");
-            String mrsMissedCalls 			= StringTasks.cleanString(searchPADTO.getMrsMissedCalls(), "");
-            String plate 					= StringTasks.ReplaceStr(StringTasks.cleanString(searchPADTO.getPlate(), ""), "'", "");
-
-            //4� Linha
-            String flag5Plus 				= StringTasks.cleanString(searchPADTO.getFlag5Plus(), "");
-            int idClientType				= searchPADTO.getIdClientType();
-
-            //Outros
-            boolean ShowImportByExcell 		= StringTasks.cleanString(searchPADTO.getShowImportByExcell(), "N").equalsIgnoreCase("S");
-
-            // OWNER
-            String filterOwner 		= StringTasks.cleanString(searchPADTO.getFilterOwner(), "");
+            String changedBy  = StringTasks.cleanString(searchPADTO.getChangedBy(), PaConstants.ALL);
+            String flagHybrid = StringTasks.cleanString(searchPADTO.getFlagHibrid(), StringUtils.EMPTY);
+            String delegatedTo = StringTasks.cleanString(searchPADTO.getDelegatedTo(), PaConstants.ALL);
+            String filterOptions[] 	= searchPADTO.getFilterOptions();
+            String hasMaintenanceContract = StringTasks.cleanString(searchPADTO.getHasMaintenanceContract(), StringUtils.EMPTY);
+            String mrsMissedCalls = StringTasks.cleanString(searchPADTO.getMrsMissedCalls(), StringUtils.EMPTY);
+            String plate = StringTasks.ReplaceStr(StringTasks.cleanString(searchPADTO.getPlate(), StringUtils.EMPTY), "'", StringUtils.EMPTY);
+            String flag5Plus = StringTasks.cleanString(searchPADTO.getFlag5Plus(), StringUtils.EMPTY);
+            boolean ShowImportByExcel 	= StringTasks.cleanString(searchPADTO.getShowImportByExcell(), "N").equalsIgnoreCase("S");
+            String filterOwner 	= StringTasks.cleanString(searchPADTO.getFilterOwner(), StringUtils.EMPTY);
             log.debug("filterOwner: "+filterOwner);
 
-            //Set filter
-            //1� Linha
-            filter.setFromYear(fromYear);
-            filter.setFromMonth(fromMonth);
-            filter.setToYear(toYear);
-            filter.setToMonth(toMonth);
-            if (arrOidDealer!=null)
-                filter.setArrSelDealer(arrOidDealer);
+            filter.setFromYear(searchPADTO.getFromYear());
+            filter.setFromMonth(searchPADTO.getFromMonth());
+            filter.setToYear(searchPADTO.getToYear());
+            filter.setToMonth(searchPADTO.getToMonth());
+            if (searchPADTO.getArrOidDealer()!=null)
+                filter.setArrSelDealer(searchPADTO.getArrOidDealer());
 
             filter.setChangedBy(changedBy);
             filter.setChangedList(null);
-
-            //2� Linha
-            filter.setIdSource(idSource);
-            filter.setIdChannel(idChannel);
-            filter.setIdContactType(idContactType);
-            filter.setFlagHibrid(flagHibrid);
+            filter.setIdSource(searchPADTO.getIdSource());
+            filter.setIdChannel(searchPADTO.getIdChannel());
+            filter.setIdContactType(searchPADTO.getIdContactType());
+            filter.setFlagHibrid(flagHybrid);
             filter.setDelegatedTo(delegatedTo);
             filter.setDelegators(null);
-
-            //3� Linha
             filter.clearState();
             if(filterOptions != null) {
                 for (int i = 0; i < filterOptions.length; i++) {
@@ -577,24 +534,16 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     }
                 }
             }
-//			filter.setMaintenanceType(maintenanceType);
-            filter.setArrSelMaintenanceTypes(arrMaintenanceTypes);
+            filter.setArrSelMaintenanceTypes(searchPADTO.getArrMaintenanceTypes());
             filter.setHasMaintenanceContract(hasMaintenanceContract);
             filter.setMissedCalls(mrsMissedCalls);
             filter.setPlate(plate);
-
-            //4� Linha
             filter.setFlag5Plus(flag5Plus);
-            filter.setIdClientType(idClientType);
-
-            //Outros
-            filter.setShowImportByExcell(ShowImportByExcell);
+            filter.setIdClientType(searchPADTO.getIdClientType());
+            filter.setShowImportByExcell(ShowImportByExcel);
             filter.setCurrPage(1);
             filter.setOrderColumn("");
-
-            // consent
             filter.setOwner(filterOwner);
-
             return filter;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error searchPA ", e);
@@ -736,7 +685,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public FilterBean getFilter(UserPrincipal oGSCUser) throws SCErrorException {
         FilterBean filter = null;
-
         if (filter == null) {
             List<Dealer> vecDealers = new ArrayList<>();
             if (oGSCUser.getOidNet().equalsIgnoreCase(Dealer.OID_NET_TOYOTA)) {
@@ -747,22 +695,22 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
                     vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
 
-                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");  //Coutauto Repara��o de Autom�veis, Lda.
+                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");
                     if (dlr3!=null)vecDealers.add(dlr3);
 
-                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");  //Baviera Viseu - RE-159205
+                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");
                     if (dlr4!=null)vecDealers.add(dlr4);
 
-                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");  //AM Gon�alves
+                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");
                     if (dlr6!=null)vecDealers.add(dlr6);
 
-                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");  //Caetano City e Active (Norte), SA - Castelo Branco
+                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");
                     if (dlr7!=null)vecDealers.add(dlr7);
 
-                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");  //Caetano City e Active (Norte), SA - Covilh�
+                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");
                     if (dlr8!=null)vecDealers.add(dlr8);
 
-                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");  //Caetano City e Active (Norte), SA - Portalegre
+                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");
                     if (dlr9!=null)vecDealers.add(dlr9);
 
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
@@ -779,7 +727,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     vecDealers = Dealer.getLexusHelper().GetCADealers("S");
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
                     vecDealers = Dealer.getLexusHelper().GetCADealers("S");
-                    Dealer dlr10 = Dealer.getLexusHelper().getByObjectId("SC04500003");  //Lexus Seixal Almada
+                    Dealer dlr10 = Dealer.getLexusHelper().getByObjectId("SC04500003");
                     if (dlr10!=null)vecDealers.add(dlr10);
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
                     vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(oGSCUser.getOidDealerParent());
@@ -790,8 +738,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
             }
             filter = new FilterBean();
-
-            //1� Linha
             Calendar cal = Calendar.getInstance();
             int toYear = cal.get(Calendar.YEAR);
             int toMonth = cal.get(Calendar.MONTH) + 1;
@@ -818,20 +764,13 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
             }
             filter.setArrSelDealer(arrDealer);
-            filter.setPlate("");
-
-            //2� Linha
+            filter.setPlate(StringUtils.EMPTY);
             filter.setStatePending(1);
             filter.setStateHasSchedule(1);
-
             filter.setArrSelMaintenanceTypes(null);
-
-            //3� Linha
-            filter.setChangedBy("*todos*");
-            filter.setDelegatedTo("*todos*");
-            filter.setMissedCalls("*todos*");
-
-            //Outros
+            filter.setChangedBy(PaConstants.ALL);
+            filter.setDelegatedTo(PaConstants.ALL);
+            filter.setMissedCalls(PaConstants.ALL);
             filter.setCurrPage(1);
             filter.setFirstPage(1);
             filter.setShowImportByExcell(false);

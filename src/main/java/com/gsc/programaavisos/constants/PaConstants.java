@@ -16,4 +16,13 @@ public class PaConstants {
     public static String PA_CONTACT_CHANNEL_SMS = "S";
     public static int ID_EVENT_MRS = 10;
     public static int ID_ORIGIN_MRS = 9;
+    public static final int    CLAIMS_PA_CHANNEL = 36;
+    public static final int PARAM_ID_TPA_ITEM_TYPE_SERVICE = 1;
+    public static final int PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT = 2;
+    public static final int PARAM_ID_TPA_ITEM_TYPE_HEADER = 3;
+    public static final String FTP_EPOSTAL_PATH = "/epostais/comum";
+    public static final String FTP_POSTAL_SERVICE = "/postais/servicos";
+    public static final String FTP_POSTAL_DESTAQUE = "/postais/comum";
+    public static final String FTP_POSTAL_HEADER = "/postais/headers";
+    public static final String ALL = "*todos*";
 }
