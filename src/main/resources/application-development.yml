@@ -54,6 +54,8 @@ app:
       jndi: jdbc/toyxtaps
     second:
       jndi: jdbc/dbtoynet
+    third:
+      jndi: jdbc/cardb
 
 secundary:
   dbs:

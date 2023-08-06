@@ -48,26 +48,7 @@ public class CarDBConfig {
 
     @PostConstruct
     private void init() {
-//        SCGlobalPreferences.setResources(scConfigFile);
-//        ServerJDBCConnection conn = ServerJDBCConnection.getInstance();
-//        DB2SimpleDataSource dbToynet = new DB2SimpleDataSource();
-//        dbToynet.setServerName("scdbesrva.sc.pt");
-//        dbToynet.setPortNumber(50000);
-//        dbToynet.setDatabaseName("DBTOYNET");
-//        dbToynet.setDriverType(4);
-//        dbToynet.setUser("db2inst1");
-//        dbToynet.setPassword("db2admin");
-//        conn.setDataSource(dbToynet, "jdbc/dbtoynet");
-//        log.info("Datasource initialized successfully: jdbc/dbtoynet");
-//        DB2SimpleDataSource usrLogon = new DB2SimpleDataSource();
-//        usrLogon.setServerName("scdbesrvb.sc.pt");
-//        usrLogon.setPortNumber(50000);
-//        usrLogon.setDatabaseName("USRLOGON");
-//        usrLogon.setDriverType(4);
-//        usrLogon.setUser("db2inst1");
-//        usrLogon.setPassword("db2admin");
-//        conn.setDataSource(usrLogon, "jdbc/usrlogon");
-//        log.info("Datasource initialized successfully: jdbc/usrlogon");
+//   log.info("Datasource initialized successfully: jdbc/dbtoynet");
     }
 
     @Bean(name="carDataSource")
