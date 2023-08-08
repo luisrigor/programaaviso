@@ -65,7 +65,7 @@
         <dependency>
             <groupId>GSC</groupId>
             <artifactId>SCGSCWSAuthentication</artifactId>
-            <version>20220329</version>
+            <version>20230726</version>
         </dependency>
         <dependency>
             <groupId>GSC</groupId>
