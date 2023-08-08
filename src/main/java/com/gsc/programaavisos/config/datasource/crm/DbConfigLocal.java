@@ -44,7 +44,7 @@ public class DbConfigLocal {
 
     @PostConstruct
     private void init() {
-
+       //jndi config
     }
 
     @Primary
