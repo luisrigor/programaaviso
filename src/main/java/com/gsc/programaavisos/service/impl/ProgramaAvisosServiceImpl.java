@@ -3,43 +3,26 @@ package com.gsc.programaavisos.service.impl;
 import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
-import com.gsc.programaavisos.config.environment.EnvironmentConfig;
-import com.gsc.programaavisos.constants.ApiConstants;
-import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.model.cardb.Fuel;
-import com.gsc.programaavisos.model.cardb.entity.Modelo;
-import com.gsc.programaavisos.model.crm.entity.ContactReason;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
-import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.model.crm.entity.*;
-import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
-import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.DateTimerTasks;
-import com.sc.commons.utils.SftpTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import com.gsc.claims.object.core.ClaimDetail;
-//import com.gsc.c
-import java.io.File;
-import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.AppProfile.*;
 
 
@@ -49,323 +32,10 @@ import static com.gsc.programaavisos.constants.AppProfile.*;
 public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public final SimpleDateFormat timeZoFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-    private final PaParameterizationRepository paParameterizationRepository;
-    private final ContactReasonRepository contactReasonRepository;
-    private final ModeloRepository modeloRepository;
-    private final CombustivelRepository combustivelRepository;
-    private final GenreRepository genreRepository;
-    private final EntityTypeRepository entityTypeRepository;
-    private final DocumentUnitRepository documentUnitRepository;
     private final PARepository paRepository;
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
-    private final AgeRepository ageRepository;
-    private final KilometersRepository kilometersRepository;
-    private final FidelitysRepository fidelitysRepository;
-    private final DocumentUnitCategoryRepository documentUnitCategoryRepository;
-    private final EnvironmentConfig environmentConfig;
 
-    @Override
-    public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
-        try {
-            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-            List<String> selectedTypes = new ArrayList<>();
-
-            if(!StringUtils.isEmpty(selectedTypeParam))
-                selectedTypes = Arrays.asList(selectedTypeParam.split(","));
-
-            ParameterizationFilter filter = ParameterizationFilter.builder()
-                    .dtStart(startDate)
-                    .dtEnd(endDate)
-                    .selectedTypes(selectedTypes)
-                    .idBrand(idBrand)
-                    .build();
-
-            return  paParameterizationRepository.getByFilter(filter);
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching parametrization", e);
-        }
-    }
-
-    @Override
-    public List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal) {
-        try {
-            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-            ItemFilter filter = ItemFilter.builder()
-                    .itemType(type)
-                    .dtEnd(new Date(Calendar.getInstance().getTime().getTime()))
-                    .idBrand(idBrand)
-                    .build();
-           return  documentUnitRepository.getByFilter(filter);
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching documentUnit ", e);
-        }
-    }
-
-    @Override
-    public List<DocumentUnitDTO> searchItems(String searchInput,Date endDate,Integer tpaItemType, UserPrincipal userPrincipal) {
-        try {
-            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-            ItemFilter filter = ItemFilter.builder()
-                    .searchInput(searchInput)
-                    .itemType(tpaItemType)
-                    .dtEnd(endDate)
-                    .idBrand(idBrand)
-                    .build();
-            return  documentUnitRepository.getByFilter(filter);
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching search items ", e);
-        }
-    }
-
-    @Override
-    public List<ContactReason> getContactReasons() {
-        try {
-            return contactReasonRepository.findAll();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching contact reasons ", e);
-        }
-    }
-    @Override
-    public List<Genre> getGenre() {
-        try {
-            return genreRepository.findAll();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching genre ", e);
-        }
-    }
-    @Override
-    public List<EntityType> getEntityType() {
-        try {
-            return entityTypeRepository.findAll();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching entity type ", e);
-        }
-    }
-
-    @Override
-    public List<Age> getAge() {
-        try {
-            return ageRepository.getAllAge();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching age", e);
-        }
-    }
-
-    @Override
-    public List<Fidelitys> getFidelitys() {
-        try {
-            return fidelitysRepository.findAll();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching fidelity", e);
-        }
-    }
-
-    @Override
-    public List<Kilometers> getKilometers() {
-        try {
-            return kilometersRepository.getAllKilometers();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching kilometers", e);
-        }
-    }
-
-    @Override
-    public List<Modelo> getModels(UserPrincipal userPrincipal) {
-        try {
-            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-            return modeloRepository.getModels(idBrand);
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching models ", e);
-        }
-    }
-
-    @Override
-    public List<Fuel> getFuels(UserPrincipal userPrincipal) {
-        try {
-            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-
-            List<Fuel> fuels = combustivelRepository.getFuelsByIdBrand(idBrand);
-
-            boolean addNoInfo = true;
-            for(Fuel fuel: fuels){
-                if(fuel.getId() == TPAInvokerSimulator.CAR_DB_COMBUSTIVEL_SEM_INFO){
-                    addNoInfo = false;
-                    break;
-                }
-            }
-
-            if(addNoInfo){
-                fuels.add(new Fuel(TPAInvokerSimulator.CAR_DB_COMBUSTIVEL_SEM_INFO, "s/info", 0, null, null));
-            }
-
-            return fuels;
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching fuels ", e);
-        }
-    }
-
-    @Override
-    public void getDocumentUnits(UserPrincipal userPrincipal, int type) {
-//        try {
-//            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-//
-//            ItemFilter oItemFilter = ItemFilter.builder()
-//                    .itemType(type)
-//                    .dtEnd()
-//                    .idBrand()
-//                    .build();
-//
-//
-//            oItemFilter.setItemType(type);
-//            oItemFilter.setDtEnd(new Date(Calendar.getInstance().getTime().getTime()));
-//            oItemFilter.setIdBrand(idBrand);
-//
-//            List<DocumentUnit> documentUnits = DocumentUnit.getHelper().getByFilter(oItemFilter);
-//
-//        } catch (SCErrorException e) {
-//            throw new ProgramaAvisosException("Error fetching document units ", e);
-//        }
-    }
-
-    @Override
-    public List<Dealer> getDealers(UserPrincipal userPrincipal) {
-        try {
-            Set<AppProfile> roles = userPrincipal.getRoles();
-
-            List<Dealer> vecDealers = new ArrayList<>();
-            if (userPrincipal.getOidNet().equalsIgnoreCase(Dealer.OID_NET_TOYOTA)) {
-                if (roles.contains(ROLE_VIEW_ALL_DEALERS)) {
-                    vecDealers = Dealer.getToyotaHelper().GetAllActiveDealers();
-                } else if (roles.contains(ROLE_VIEW_CA_DEALERS)) {
-                    vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
-                } else if (roles.contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
-                    vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
-
-                    Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");
-                    if (dlr3!=null)vecDealers.add(dlr3);
-
-                    Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");
-                    if (dlr4!=null)vecDealers.add(dlr4);
-
-                    Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");
-                    if (dlr6!=null)vecDealers.add(dlr6);
-
-                    Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");
-                    if (dlr7!=null)vecDealers.add(dlr7);
-
-                    Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");
-                    if (dlr8!=null)vecDealers.add(dlr8);
-
-                    Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");
-                    if (dlr9!=null)vecDealers.add(dlr9);
-
-                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
-                    vecDealers = Dealer.getToyotaHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
-                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_OWN_INSTALLATION)) {
-                    vecDealers.add(Dealer.getToyotaHelper().getByObjectId(userPrincipal.getOidDealer()));
-                } else if (roles.contains(AppProfile.ROLE_IMPORT_EXPORT)) {
-                    vecDealers = Dealer.getToyotaHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
-                }
-            } else if (userPrincipal.getOidNet().equalsIgnoreCase(Dealer.OID_NET_LEXUS)) {
-                if (roles.contains(ROLE_VIEW_ALL_DEALERS)) {
-                    vecDealers = Dealer.getLexusHelper().GetAllActiveDealers();
-                } else if (roles.contains(ROLE_VIEW_CA_DEALERS)) {
-                    vecDealers = Dealer.getLexusHelper().GetCADealers("S");
-                } else if (roles.contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
-                    vecDealers = Dealer.getLexusHelper().GetCADealers("S");
-                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
-                    vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
-                } else if (roles.contains(AppProfile.ROLE_VIEW_DEALER_OWN_INSTALLATION)) {
-                    vecDealers.add(Dealer.getLexusHelper().getByObjectId(userPrincipal.getOidDealer()));
-                } else if (roles.contains(AppProfile.ROLE_IMPORT_EXPORT)) {
-                    vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(userPrincipal.getOidDealerParent());
-                }
-            }
-
-            List<Dealer> dealers = new ArrayList<>(vecDealers);
-            Dealer dealerNotDefined = new Dealer();
-            dealerNotDefined.setObjectId("99");
-            dealerNotDefined.setDesig("N/D");
-            dealerNotDefined.setEnd(StringUtils.EMPTY);
-            dealers.add(dealerNotDefined);
-            return dealers;
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching dealers", e);
-        }
-    }
-
-    @Override
-    public ManageItemsDTO getManageItems(UserPrincipal userPrincipal, int itemType, int itemId) {
-
-        DocumentUnit item = null;
-        List<DocumentUnitCategory> categories;
-        Map<String, String>  envV = environmentConfig.getEnvVariables();
-        try {
-            categories = documentUnitCategoryRepository.getByType(itemType);
-            if (itemId > 0) {
-                item = documentUnitRepository.findById(itemId).orElseThrow(()-> new ProgramaAvisosException("itemId not found " + itemId));
-
-                String ePostal = item.getImgEPostal();
-                String postal = item.getImgPostal();
-                File img1 = null;
-                File img2 = null;
-                String uplodadDir = System.getProperty("java.io.tmpdir");
-                if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_SERVICE) {
-
-                    if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
-                    }
-
-                    if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_SERVICE, uplodadDir);
-                    }
-
-                } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT) {
-
-                    if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
-                    }
-
-                    if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_POSTAL_DESTAQUE, uplodadDir);
-                    }
-
-                } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HEADER) {
-
-                    if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
-                    }
-
-                    if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
-                                envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
-                                false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_HEADER, uplodadDir);
-                    }
-
-                }
-
-            }
-            return ManageItemsDTO.builder()
-                    .item(item)
-                    .itemType(itemType)
-                    .categories(categories)
-                    .itemId(item!=null?item.getId():null)
-                    .build();
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error fetching manage items ", e);
-        }
-    }
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
         String contactChanged;
@@ -436,7 +106,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     }
                     sendMail(oPA,dtSchedule,hrSchedule,oidDealerSchedule);
                 }
-                oPA.setBlockedBy("");
+                oPA.setBlockedBy(StringUtils.EMPTY);
                 paRepository.save(oPA);
 
                 if(oPA.getRevisionScheduleMotive().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER) || oPA.getRevisionSchedule().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER2)) {
@@ -510,26 +180,26 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             filter.setDelegators(null);
             filter.clearState();
             if(filterOptions != null) {
-                for (int i = 0; i < filterOptions.length; i++) {
-                    if(filterOptions[i].equalsIgnoreCase("pending")) {
+                for (String filterOption : filterOptions) {
+                    if (filterOption.equalsIgnoreCase("pending")) {
                         filter.setStatePending(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("hasSchedule")) {
+                    } else if (filterOption.equalsIgnoreCase("hasSchedule")) {
                         filter.setStateHasSchedule(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("scheduleDone")) {
+                    } else if (filterOption.equalsIgnoreCase("scheduleDone")) {
                         filter.setStateScheduleDone(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("scheduleRejected")) {
+                    } else if (filterOption.equalsIgnoreCase("scheduleRejected")) {
                         filter.setStateScheduleRejected(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("notOwner")) {
+                    } else if (filterOption.equalsIgnoreCase("notOwner")) {
                         filter.setStateNotOwner(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("astContactsClient")) {
+                    } else if (filterOption.equalsIgnoreCase("astContactsClient")) {
                         filter.setStateAstContactsClient(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("clientScheduledAtWorkshop")) {
+                    } else if (filterOption.equalsIgnoreCase("clientScheduledAtWorkshop")) {
                         filter.setStateClientScheduledAtWorkshop(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("showRemovedManually")) {
+                    } else if (filterOption.equalsIgnoreCase("showRemovedManually")) {
                         filter.setStateShowRemovedManually(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("showRemovedAutoByManut")) {
+                    } else if (filterOption.equalsIgnoreCase("showRemovedAutoByManut")) {
                         filter.setStateShowRemovedAutoByManut(1);
-                    } else if(filterOptions[i].equalsIgnoreCase("showRemovedAutoByPeriod")) {
+                    } else if (filterOption.equalsIgnoreCase("showRemovedAutoByPeriod")) {
                         filter.setStateShowRemovedAutoByPeriod(1);
                     }
                 }
@@ -629,7 +299,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 quarantine.setPaPreferredCommunicationnChannel(PaConstants.PA_CONTACT_CHANNEL_SMS);
                 break;
             default:
-                quarantine.setPaPreferredCommunicationnChannel("");
+                quarantine.setPaPreferredCommunicationnChannel(StringUtils.EMPTY);
                 break;
         }
         quarantine.setCreatedBy(userStamp);
@@ -757,9 +427,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 arrDealer = new String[] {oGSCUser.getOidDealer()};
             } else {
                 arrDealer = new String[vecDealers.size()];
-                Iterator<Dealer> iter = vecDealers.iterator();
-                while (iter.hasNext()) {
-                    Dealer oDealer = iter.next();
+                for (Dealer oDealer : vecDealers) {
                     arrDealer[pos++] = oDealer.getObjectId();
                 }
             }
