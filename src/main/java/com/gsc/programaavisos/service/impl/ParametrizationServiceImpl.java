@@ -23,7 +23,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
 
     private final PaParameterizationRepository paParameterizationRepository;
     @Override
-    public List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
+    public List<PaParameterization> searchParametrization(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
         try {
             int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
             List<String> selectedTypes = new ArrayList<>();
@@ -41,6 +41,17 @@ public class ParametrizationServiceImpl implements ParametrizationService {
             return  paParameterizationRepository.getByFilter(filter);
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching parametrization", e);
+        }
+    }
+
+    @Override
+    public void deleteParametrization(UserPrincipal userPrincipal, Integer id) {
+        log.info("deleteParametrization service: " + id);
+        try{
+            paParameterizationRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Error delete parametrization");
+            throw new ProgramaAvisosException("Error delete parametrization", e);
         }
     }
 

@@ -6,5 +6,6 @@ import java.sql.Date;
 import java.util.List;
 
 public interface ParametrizationService {
-    List<PaParameterization> searchParametrizations(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal);
+    List<PaParameterization> searchParametrization(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal);
+    void deleteParametrization(UserPrincipal userPrincipal,Integer id);
 }
