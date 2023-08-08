@@ -25,7 +25,7 @@ public class ParametrizationController {
     private final ParametrizationService parametrizationService;
 
     @GetMapping(ApiEndpoints.SEARCH_PARAMETRIZATIONS)
-    public ResponseEntity<List<PaParameterization>> searchParametrizations(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<List<PaParameterization>> searchParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                            @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate,
                                                                            @RequestParam(required = false) String selectedTypeParam) {
         log.info("searchParametrization controller");

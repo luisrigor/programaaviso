@@ -18,7 +18,6 @@ import com.sc.commons.utils.SftpTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
-import java.io.File;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;

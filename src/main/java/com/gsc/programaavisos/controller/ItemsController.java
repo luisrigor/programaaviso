@@ -29,8 +29,7 @@ public class ItemsController {
     public ResponseEntity<List<DocumentUnitDTO>> searchItems(@RequestParam(required = false) String searchInput,
                                                              @RequestParam(required = false) Date startDate,
                                                              @RequestParam(required = false) Integer tpaItemType,
-                                                             @AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                             @RequestParam(required = true) Integer type) {
+                                                             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("searchItems controller");
         List<DocumentUnitDTO> items = itemService.searchItems(searchInput,startDate,tpaItemType, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(items);
