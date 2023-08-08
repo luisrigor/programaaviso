@@ -29,7 +29,14 @@ public class ParametrizationController {
                                                                            @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate,
                                                                            @RequestParam(required = false) String selectedTypeParam) {
         log.info("searchParametrization controller");
-        List<PaParameterization> paParameterizationList = parametrizationService.searchParametrizations(startDate, endDate, selectedTypeParam, userPrincipal);
+        List<PaParameterization> paParameterizationList = parametrizationService.searchParametrization(startDate, endDate, selectedTypeParam, userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
+    }
+
+    @DeleteMapping(ApiEndpoints.DELETE_PARAMATRIZATION)
+    public void deleteParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                          @RequestParam(required = false) Integer id ) {
+        log.info("deleteParametrization controller");
+        parametrizationService.deleteParametrization(userPrincipal,id);
     }
 }
