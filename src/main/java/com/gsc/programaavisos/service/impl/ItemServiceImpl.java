@@ -64,19 +64,18 @@ public class ItemServiceImpl implements ItemService {
 
                 String ePostal = item.getImgEPostal();
                 String postal = item.getImgPostal();
-                File img1 = null;
-                File img2 = null;
+
                 String uplodadDir = System.getProperty("java.io.tmpdir");
                 if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_SERVICE) {
 
                     if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_SERVICE, uplodadDir);
                     }
@@ -84,13 +83,13 @@ public class ItemServiceImpl implements ItemService {
                 } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT) {
 
                     if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS)  + PaConstants.FTP_POSTAL_DESTAQUE, uplodadDir);
                     }
@@ -98,13 +97,13 @@ public class ItemServiceImpl implements ItemService {
                 } else if (itemType == PaConstants.PARAM_ID_TPA_ITEM_TYPE_HEADER) {
 
                     if (ePostal != null) {
-                        img2 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), ePostal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_EPOSTAL_PATH, uplodadDir);
                     }
 
                     if (postal != null) {
-                        img1 = SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
+                        SftpTasks.getFile(envV.get(CONST_FTP_MANAGE_ITEM_SERVER),
                                 envV.get(CONST_FTP_MANAGE_ITEM_LOGIN), envV.get(CONST_FTP_MANAGE_ITEM_PWD), postal,
                                 false, envV.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_HEADER, uplodadDir);
                     }
