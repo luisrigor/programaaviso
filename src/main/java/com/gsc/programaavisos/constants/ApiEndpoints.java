@@ -22,4 +22,5 @@ public interface ApiEndpoints {
     String REMOVE_PA = "/remove-pa";
     String SEARCH_PA = "/search-pa";
     String GET_DELEGATORS = "/delegators";
+    String DELETE_PARAMATRIZATION = "/delete-parametrization";
 }
