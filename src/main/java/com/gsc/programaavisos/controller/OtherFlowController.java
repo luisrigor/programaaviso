@@ -2,7 +2,9 @@ package com.gsc.programaavisos.controller;
 
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -104,5 +106,13 @@ public class OtherFlowController {
         List<Dealer> dealers = otherFlowService.getDealers(userPrincipal);
         Gson gson = new Gson();
         return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(dealers));
+    }
+
+    @PostMapping(ApiEndpoints.GET_DELEGATORS)
+    public ResponseEntity<DelegatorsDTO> getDelegators(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                           @RequestBody GetDelegatorsDTO delegatorsDTO) {
+        DelegatorsDTO rs = otherFlowService.getDelegators(userPrincipal, delegatorsDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 }

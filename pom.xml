@@ -134,6 +134,11 @@
             <artifactId>SCClaims</artifactId>
             <version>20230510</version>
         </dependency>
+        <dependency>
+            <groupId>GSCNotOfficialMaven</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
     </dependencies>
 
     <build>

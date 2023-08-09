@@ -1,5 +1,7 @@
 package com.gsc.programaavisos.config.datasource.crm;
 
+import com.sc.commons.dbconnection.ServerJDBCConnection;
+import com.sc.commons.initialization.SCGlobalPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,17 +52,17 @@ public class DbConfig {
 
     @PostConstruct
     private void init() {
-//        SCGlobalPreferences.setResources(scConfigFile);
-//        jndis.stream().forEach(jndiName -> {
-//            try {
-//                InitialContext ctx = new InitialContext();
-//                ServerJDBCConnection conn = ServerJDBCConnection.getInstance();
-//                conn.setDataSource((DataSource) ctx.lookup(jndiName), jndiName);
-//                log.info("Datasource initialized successfully: {}", jndiName);
-//            } catch (NamingException e) {
-//                log.error("Error initializing datasource ({}): {}", jndiName, e.getMessage());
-//            }
-//        });
+        SCGlobalPreferences.setResources(scConfigFile);
+        jndis.stream().forEach(jndiName -> {
+            try {
+                InitialContext ctx = new InitialContext();
+                ServerJDBCConnection conn = ServerJDBCConnection.getInstance();
+                conn.setDataSource((DataSource) ctx.lookup(jndiName), jndiName);
+                log.info("Datasource initialized successfully: {}", jndiName);
+            } catch (NamingException e) {
+                log.error("Error initializing datasource ({}): {}", jndiName, e.getMessage());
+            }
+        });
     }
     @Primary
     @Bean(name="msDatasource",
