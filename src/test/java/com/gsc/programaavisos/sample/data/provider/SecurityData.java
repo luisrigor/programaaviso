@@ -3,6 +3,7 @@ package com.gsc.programaavisos.sample.data.provider;
 import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.model.crm.entity.LoginKey;
 import com.gsc.programaavisos.security.UserPrincipal;
+import com.rg.dealer.Dealer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -73,5 +74,15 @@ public class SecurityData {
         return new UserPrincipal("137||tcap1@tpo||tiago.fernandes@parceiro.rigorcg.pt",
                 roles,59L);
     }
+
+    public static UserPrincipal getUserPrincipalStatic() {
+        Set<AppProfile> roles = new HashSet<>();
+        roles.add(AppProfile.TOYOTA_LEXUS_PRF_TCAP);
+        UserPrincipal userPrincipal = new UserPrincipal("137||tcap1@tpo||tiago.fernandes@parceiro.rigorcg.pt",
+                roles,59L);
+        userPrincipal.setOidNet(Dealer.OID_NET_TOYOTA);
+        return userPrincipal;
+    }
+
 
 }

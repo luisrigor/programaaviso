@@ -3,6 +3,7 @@ package com.gsc.programaavisos.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
+import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
@@ -14,7 +15,9 @@ import com.gsc.programaavisos.sample.data.provider.ItemData;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.TokenProvider;
+import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
+import com.sc.commons.utils.SftpTasks;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,13 +29,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -59,6 +62,7 @@ public class ItemsControllerTest {
     private EnvironmentConfig environmentConfig;
     @MockBean
     private ClientRepository clientRepository;
+
     private SecurityData securityData;
     private static String generatedToken;
 
@@ -80,8 +84,8 @@ public class ItemsControllerTest {
     void whenRequestDocumentUnitDTOListThenItsReturnSuccessfully() throws Exception {
         String accessToken = generatedToken;
         List<DocumentUnitDTO> documentList = new ArrayList<>(Collections.singletonList(OtherFlowData.getDocumentUnit()));
-        when(itemService.searchItems(any(),any(),any(),any())).thenReturn(documentList);
-        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_SEARCH_ITEMS)
+        when(itemService.searchItems(anyString(),any(Date.class),anyInt(),any())).thenReturn(documentList);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_SEARCH_ITEMS+"?searchInput=string&startDate=2023-08-10&tpaItemType=1")
                         .header("accessToken", accessToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -92,8 +96,8 @@ public class ItemsControllerTest {
     void whenRequestManageItemsDTOThenItsReturnSuccessfully() throws Exception {
         String accessToken = generatedToken;
         ManageItemsDTO manageItemsDTO = ItemData.getManageItemsDTO();
-        when(itemService.getManageItems(any(),any(),any())).thenReturn(manageItemsDTO);
-        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_MANAGE_ITEMS)
+        when(itemService.getManageItems(any(),anyInt(),anyInt())).thenReturn(manageItemsDTO);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_MANAGE_ITEMS+"?itemId=1&itemType=1")
                         .header("accessToken", accessToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))

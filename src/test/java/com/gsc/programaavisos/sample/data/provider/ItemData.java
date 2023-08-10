@@ -1,15 +1,20 @@
 package com.gsc.programaavisos.sample.data.provider;
 
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ItemData {
 
     public static final Integer RANDOM_ID = 111;
     public static final String RANDOM_NAME = "RANDOM_NAME";
+    public static final Date RANDOM_DATE = new Date(111111L);
 
 
 /*
@@ -29,6 +34,15 @@ public class ItemData {
                 .categories(new ArrayList<>())
                 .itemType(RANDOM_ID)
                 .itemId(RANDOM_ID)
+                .build();
+    }
+
+    public static ItemFilter getItemFilter(){
+        return ItemFilter.builder()
+                .itemType(RANDOM_ID)
+                .idBrand(RANDOM_ID+1)
+                .searchInput(RANDOM_NAME)
+                .dtEnd(RANDOM_DATE)
                 .build();
     }
 
