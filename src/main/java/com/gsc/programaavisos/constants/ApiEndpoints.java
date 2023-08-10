@@ -6,8 +6,6 @@ public interface ApiEndpoints {
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";
-    String GET_DOCUMENT_UNITS = "/document-units";
-
     String GET_GENRE = "/genre";
     String GET_KILOMENTERS = "/kilometers";
     String GET_ENTITY_TYPE = "/entity-type";

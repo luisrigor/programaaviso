@@ -41,9 +41,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final DocumentUnitRepository documentUnitRepository;
     private final PARepository paRepository;
 
-
-    private static final String QUOTES = "\"";
-
     @Override
     public List<ContactReason> getContactReasons() {
         try {
@@ -131,29 +128,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching fuels ", e);
         }
-    }
-
-    @Override
-    public void getDocumentUnits(UserPrincipal userPrincipal, int type) {
-//        try {
-//            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-//
-//            ItemFilter oItemFilter = ItemFilter.builder()
-//                    .itemType(type)
-//                    .dtEnd()
-//                    .idBrand()
-//                    .build();
-//
-//
-//            oItemFilter.setItemType(type);
-//            oItemFilter.setDtEnd(new Date(Calendar.getInstance().getTime().getTime()));
-//            oItemFilter.setIdBrand(idBrand);
-//
-//            List<DocumentUnit> documentUnits = DocumentUnit.getHelper().getByFilter(oItemFilter);
-//
-//        } catch (SCErrorException e) {
-//            throw new ProgramaAvisosException("Error fetching document units ", e);
-//        }
     }
 
     @Override

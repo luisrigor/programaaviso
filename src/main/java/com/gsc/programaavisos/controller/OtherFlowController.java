@@ -44,13 +44,6 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(fuels);
     }
 
-    @GetMapping(ApiEndpoints.GET_DOCUMENT_UNITS)
-    public ResponseEntity<?> getDocumentUnits(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("getDocumentUnits controller");
-        otherFlowService.getDocumentUnits(userPrincipal, 1);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
-
     @GetMapping(ApiEndpoints.GET_CONTACT_REASONS)
     public ResponseEntity<List<ContactReason>> getContactReasons() {
         log.info("getContactReasons controller");
