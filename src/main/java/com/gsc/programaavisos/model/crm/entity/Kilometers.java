@@ -18,7 +18,7 @@ public class Kilometers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "NAME")
+    @Column(name = "KILOMETERS")
     private String name;
     @Column(name = "STATUS")
     private Character status;

@@ -83,7 +83,8 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     @Override
     public List<Age> getAge() {
         try {
-            return ageRepository.getAllAge();
+             List<Age> data = ageRepository.getAllAge();
+             return data;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching age", e);
         }

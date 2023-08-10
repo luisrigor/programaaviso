@@ -18,7 +18,7 @@ public class Age {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "NAME")
+    @Column(name = "AGE")
     private String name;
     @Column(name = "STATUS")
     private Character status;
