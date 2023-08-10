@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface AgeRepository extends JpaRepository<Age,Integer> {
-    @Query( "SELECT A FROM Age A ORDER BY ID ASC")
+    @Query( "SELECT A FROM Age A ORDER BY A.id ASC")
     List<Age> getAllAge();
 }

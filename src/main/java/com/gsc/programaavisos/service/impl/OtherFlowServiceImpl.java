@@ -14,14 +14,11 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
-import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.*;
 
@@ -253,8 +250,8 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             oidsDealer += ",'" + currentOidDealer + "'";
         }
 
-        List<String> listDelegators = new ArrayList<>();
-        Map<String, String> mapLastChangedBy = new HashMap<>();
+        List<String> listDelegators;
+        Map<String, String> mapLastChangedBy;
         List<DelegatorsValues> delegators = new ArrayList<>();
         List<DelegatorsValues> changedBy = new ArrayList<>();
         try {
