@@ -1,9 +1,7 @@
 package com.gsc.programaavisos.service;
 
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
-import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
@@ -14,20 +12,14 @@ import com.gsc.programaavisos.sample.data.provider.ItemData;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.service.impl.ItemServiceImpl;
-import com.rg.dealer.Dealer;
-import com.sc.commons.utils.SftpTasks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.stubbing.OngoingStubbing;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
@@ -66,7 +57,7 @@ public class ItemsServiceImplTest {
         when(documentUnitRepository.getByFilter(any())).thenReturn(expectedDocumentList);
         // Act
         List<DocumentUnitDTO> actualDocumentList = itemService.searchItems(ItemData.RANDOM_NAME,
-                Date.valueOf(LocalDate.MIN),ItemData.RANDOM_ID,SecurityData.getUserPrincipalStatic());
+                Date.valueOf(LocalDate.MIN),ItemData.RANDOM_ID,SecurityData.getUserDefaultStatic());
         // Assert
         Assertions.assertEquals(expectedDocumentList,actualDocumentList);
     }
@@ -78,7 +69,7 @@ public class ItemsServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class, () -> itemService.searchItems(ItemData.RANDOM_NAME,
-                Date.valueOf(LocalDate.MIN), ItemData.RANDOM_ID, SecurityData.getUserPrincipalStatic()));
+                Date.valueOf(LocalDate.MIN), ItemData.RANDOM_ID, SecurityData.getUserDefaultStatic()));
     }
 
     @Test
@@ -89,7 +80,7 @@ public class ItemsServiceImplTest {
         List<DocumentUnitCategory> categories = new ArrayList<>();
         when(documentUnitCategoryRepository.getByType(any())).thenReturn(categories);
         // Act
-        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId);
+        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserDefaultStatic(),itemType,itemId);
         // Assert
         Assertions.assertNull(actualManageItemsDTO.getItem());
         Assertions.assertNull(actualManageItemsDTO.getItemId());
@@ -106,7 +97,7 @@ public class ItemsServiceImplTest {
         when(documentUnitCategoryRepository.getByType(any())).thenThrow(ProgramaAvisosException.class);
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class, () ->
-                itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId));
+                itemService.getManageItems(SecurityData.getUserDefaultStatic(),itemType,itemId));
     }
 
     @Test
@@ -119,7 +110,7 @@ public class ItemsServiceImplTest {
         when(documentUnitCategoryRepository.getByType(any())).thenReturn(categories);
         when(documentUnitRepository.findById(itemId)).thenReturn(Optional.of(expectedItem));
         // Act
-        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId);
+        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserDefaultStatic(),itemType,itemId);
         // Assert
         Assertions.assertEquals(expectedItem,actualManageItemsDTO.getItem());
         Assertions.assertNull(actualManageItemsDTO.getItemId());
@@ -138,7 +129,7 @@ public class ItemsServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class, () ->
-                itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId));
+                itemService.getManageItems(SecurityData.getUserDefaultStatic(),itemType,itemId));
     }
 /*
     @Test

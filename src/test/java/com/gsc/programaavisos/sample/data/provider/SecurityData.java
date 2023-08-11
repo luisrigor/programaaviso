@@ -68,14 +68,14 @@ public class SecurityData {
                 .compact();
     }
 
-    public UserPrincipal getUserPrincipal() {
+    public UserPrincipal getUser() {
         Set<AppProfile> roles = new HashSet<>();
-        roles.add(AppProfile.TOYOTA_LEXUS_PRF_TCAP);
+        roles.add(AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS);
         return new UserPrincipal("137||tcap1@tpo||tiago.fernandes@parceiro.rigorcg.pt",
                 roles,59L);
     }
 
-    public static UserPrincipal getUserPrincipalStatic() {
+    public static UserPrincipal getUserDefaultStatic() {
         Set<AppProfile> roles = new HashSet<>();
         roles.add(AppProfile.TOYOTA_LEXUS_PRF_TCAP);
         UserPrincipal userPrincipal = new UserPrincipal("137||tcap1@tpo||tiago.fernandes@parceiro.rigorcg.pt",

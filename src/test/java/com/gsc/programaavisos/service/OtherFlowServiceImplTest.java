@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -20,7 +19,6 @@ import com.rg.dealer.Dealer;
 import com.rg.dealer.DealerHelper;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.initialization.SCGlobalPreferences;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
 
-import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_ALL_DEALERS;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -57,12 +54,6 @@ public class OtherFlowServiceImplTest {
     private KilometersRepository kilometersRepository;
     @Mock
     private FidelitysRepository fidelitysRepository;
-    @Mock
-    private SCGlobalPreferences scGlobalPreferences;
-    @Spy
-    Dealer dealer;
-    @Spy
-    DealerHelper dealerHelper;
     @InjectMocks
     private OtherFlowServiceImpl otherFlowServiceImpl;
 
@@ -194,7 +185,7 @@ public class OtherFlowServiceImplTest {
         List<Modelo> expectedModels = new ArrayList<>(Collections.singletonList(OtherFlowData.getModelo()));
         when(modeloRepository.getModels(anyInt())).thenReturn(expectedModels);
         //Act
-        List<Modelo> actualModels = otherFlowServiceImpl.getModels(SecurityData.getUserPrincipalStatic());
+        List<Modelo> actualModels = otherFlowServiceImpl.getModels(SecurityData.getUserDefaultStatic());
         //Assert
         Assertions.assertEquals(expectedModels,actualModels);
     }
@@ -204,7 +195,7 @@ public class OtherFlowServiceImplTest {
         //Arrange
         when(modeloRepository.getModels(anyInt())).thenThrow(ProgramaAvisosException.class);
         //Act & Assert
-        Assertions.assertThrows(ProgramaAvisosException.class, ()-> otherFlowServiceImpl.getModels(SecurityData.getUserPrincipalStatic()));
+        Assertions.assertThrows(ProgramaAvisosException.class, ()-> otherFlowServiceImpl.getModels(SecurityData.getUserDefaultStatic()));
     }
 
     @Test
@@ -213,7 +204,7 @@ public class OtherFlowServiceImplTest {
         List<Fuel> expectedFuelList = new ArrayList<>(Collections.singletonList(OtherFlowData.getFuel()));
         when(combustivelRepository.getFuelsByIdBrand(anyInt())).thenReturn(expectedFuelList);
         //Act
-        List<Fuel> actualFuelList = otherFlowServiceImpl.getFuels(SecurityData.getUserPrincipalStatic());
+        List<Fuel> actualFuelList = otherFlowServiceImpl.getFuels(SecurityData.getUserDefaultStatic());
         //Assert
         Assertions.assertEquals(expectedFuelList,actualFuelList);
     }
@@ -226,7 +217,7 @@ public class OtherFlowServiceImplTest {
                 TPAInvokerSimulator.CAR_DB_COMBUSTIVEL_SEM_INFO, "s/info", 0, null, null));
         when(combustivelRepository.getFuelsByIdBrand(anyInt())).thenReturn(expectedFuelList);
         //Act
-        List<Fuel> actualFuelList = otherFlowServiceImpl.getFuels(SecurityData.getUserPrincipalStatic());
+        List<Fuel> actualFuelList = otherFlowServiceImpl.getFuels(SecurityData.getUserDefaultStatic());
         //Assert
         Assertions.assertEquals(expectedFuelList,actualFuelList);
     }
@@ -236,7 +227,7 @@ public class OtherFlowServiceImplTest {
         //Arrange
         when(combustivelRepository.getFuelsByIdBrand(anyInt())).thenThrow(ProgramaAvisosException.class);
         //Act & Assert
-        Assertions.assertThrows(ProgramaAvisosException.class, ()-> otherFlowServiceImpl.getFuels(SecurityData.getUserPrincipalStatic()));
+        Assertions.assertThrows(ProgramaAvisosException.class, ()-> otherFlowServiceImpl.getFuels(SecurityData.getUserDefaultStatic()));
     }
 
     @Test
@@ -246,7 +237,7 @@ public class OtherFlowServiceImplTest {
         List<DocumentUnitDTO> documentListExpected = new ArrayList<>(Collections.singletonList(OtherFlowData.getDocumentUnit()));
         when(documentUnitRepository.getByFilter(any(ItemFilter.class))).thenReturn(documentListExpected);
         //Act
-        List<DocumentUnitDTO> documentListActual = otherFlowServiceImpl.searchDocumentUnit(1,SecurityData.getUserPrincipalStatic());
+        List<DocumentUnitDTO> documentListActual = otherFlowServiceImpl.searchDocumentUnit(1,SecurityData.getUserDefaultStatic());
         //Assert
         Assertions.assertEquals(documentListExpected,documentListActual);
     }
@@ -257,13 +248,13 @@ public class OtherFlowServiceImplTest {
         when(documentUnitRepository.getByFilter(any(ItemFilter.class))).thenThrow(ProgramaAvisosException.class);
         //Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class,
-                ()-> otherFlowServiceImpl.searchDocumentUnit(1, SecurityData.getUserPrincipalStatic()));
+                ()-> otherFlowServiceImpl.searchDocumentUnit(1, SecurityData.getUserDefaultStatic()));
     }
 
     @Test
     void getDealersDefaultSuccessfullyCase() {
         //Arrange
-        UserPrincipal userPrincipal = SecurityData.getUserPrincipalStatic();
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
         //Act
         List<Dealer> dealers = otherFlowServiceImpl.getDealers(userPrincipal);
         //Assert
@@ -273,7 +264,7 @@ public class OtherFlowServiceImplTest {
     @Test
     void getDealersToyotaIdCaseSuccessfullyCase() throws SCErrorException {
         //Arrange
-        UserPrincipal userPrincipal = SecurityData.getUserPrincipalStatic();
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
         userPrincipal.setOidNet(Dealer.OID_NET_LEXUS);
         //Act
         List<Dealer> dealers = otherFlowServiceImpl.getDealers(userPrincipal);

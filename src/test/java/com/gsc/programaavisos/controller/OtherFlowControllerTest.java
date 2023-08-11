@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -172,6 +173,15 @@ public class OtherFlowControllerTest {
     }
 
     @Test
+    void whenRequestDocumentUnitThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(otherFlowService).getDocumentUnits(any(),anyInt());
+        mvc.perform(get(BASE_REQUEST_MAPPING+ApiEndpoints.GET_DOCUMENT_UNITS)
+                        .header("accessToken", accessToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void whenRequestDocumentListThenItsReturnSuccessfully() throws Exception {
         String accessToken = generatedToken;
         List<DocumentUnitDTO> documentList = new ArrayList<>(Collections.singletonList(OtherFlowData.getDocumentUnit()));
@@ -188,22 +198,10 @@ public class OtherFlowControllerTest {
         String accessToken = generatedToken;
         List<Dealer> dealers = new ArrayList<>(Collections.singletonList(OtherFlowData.getDealer()));
         when(otherFlowService.getDealers(any())).thenReturn(dealers);
-        mvc.perform(get(BASE_REQUEST_MAPPING+ApiEndpoints.GET_DOCUMENT_UNIT)
+        mvc.perform(get(BASE_REQUEST_MAPPING+ApiEndpoints.GET_DEALERS)
                         .header("accessToken", accessToken))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE));
+                .andExpect(content().contentType(MediaType.TEXT_PLAIN+";charset=UTF-8"));
     }
-
-
-/*
-
-    @GetMapping(ApiEndpoints.GET_DOCUMENT_UNITS)
-    public ResponseEntity<?> getDocumentUnits(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("getDocumentUnits controller");
-        otherFlowService.getDocumentUnits(userPrincipal, 1);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
-
-    */
 
 }
