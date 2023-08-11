@@ -6,8 +6,6 @@ public interface ApiEndpoints {
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";
-    String GET_DOCUMENT_UNITS = "/document-units";
-
     String GET_GENRE = "/genre";
     String GET_KILOMENTERS = "/kilometers";
     String GET_ENTITY_TYPE = "/entity-type";
@@ -21,5 +19,6 @@ public interface ApiEndpoints {
     String GET_MANAGE_ITEMS = "/manage-items";
     String REMOVE_PA = "/remove-pa";
     String SEARCH_PA = "/search-pa";
+    String GET_DELEGATORS = "/delegators";
     String DELETE_PARAMATRIZATION = "/delete-parametrization";
 }

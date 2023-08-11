@@ -1,6 +1,8 @@
 package com.gsc.programaavisos.service;
 
+import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -17,7 +19,7 @@ public interface OtherFlowService {
     List<Fidelitys> getFidelitys();
     List<Modelo> getModels(UserPrincipal userPrincipal);
     List<Fuel> getFuels(UserPrincipal userPrincipal);
-    void getDocumentUnits(UserPrincipal userPrincipal, int type);
     List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
+    DelegatorsDTO getDelegators(UserPrincipal userPrincipal, GetDelegatorsDTO delegatorsDTO);
 }

@@ -2,7 +2,9 @@ package com.gsc.programaavisos.controller;
 
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -40,13 +42,6 @@ public class OtherFlowController {
         List<Fuel> fuels = otherFlowService.getFuels(userPrincipal);
 
         return ResponseEntity.status(HttpStatus.OK).body(fuels);
-    }
-
-    @GetMapping(ApiEndpoints.GET_DOCUMENT_UNITS)
-    public ResponseEntity<?> getDocumentUnits(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("getDocumentUnits controller");
-        otherFlowService.getDocumentUnits(userPrincipal, 1);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping(ApiEndpoints.GET_CONTACT_REASONS)
@@ -104,5 +99,13 @@ public class OtherFlowController {
         List<Dealer> dealers = otherFlowService.getDealers(userPrincipal);
         Gson gson = new Gson();
         return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(dealers));
+    }
+
+    @PostMapping(ApiEndpoints.GET_DELEGATORS)
+    public ResponseEntity<DelegatorsDTO> getDelegators(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                           @RequestBody GetDelegatorsDTO delegatorsDTO) {
+        DelegatorsDTO rs = otherFlowService.getDelegators(userPrincipal, delegatorsDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 }

@@ -2,8 +2,7 @@ package com.gsc.programaavisos.service.impl;
 
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.AppProfile;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.ItemFilter;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
@@ -15,15 +14,14 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
+import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import static com.gsc.programaavisos.constants.AppProfile.*;
 import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
 
@@ -41,6 +39,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final KilometersRepository kilometersRepository;
     private final FidelitysRepository fidelitysRepository;
     private final DocumentUnitRepository documentUnitRepository;
+    private final PARepository paRepository;
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -81,7 +80,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     @Override
     public List<Age> getAge() {
         try {
-            return ageRepository.getAllAge();
+             return ageRepository.getAllAge();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching age", e);
         }
@@ -129,29 +128,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching fuels ", e);
         }
-    }
-
-    @Override
-    public void getDocumentUnits(UserPrincipal userPrincipal, int type) {
-//        try {
-//            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-//
-//            ItemFilter oItemFilter = ItemFilter.builder()
-//                    .itemType(type)
-//                    .dtEnd()
-//                    .idBrand()
-//                    .build();
-//
-//
-//            oItemFilter.setItemType(type);
-//            oItemFilter.setDtEnd(new Date(Calendar.getInstance().getTime().getTime()));
-//            oItemFilter.setIdBrand(idBrand);
-//
-//            List<DocumentUnit> documentUnits = DocumentUnit.getHelper().getByFilter(oItemFilter);
-//
-//        } catch (SCErrorException e) {
-//            throw new ProgramaAvisosException("Error fetching document units ", e);
-//        }
     }
 
     @Override
@@ -233,6 +209,77 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             return dealers;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching dealers", e);
+        }
+    }
+
+    @Override
+    public DelegatorsDTO getDelegators(UserPrincipal userPrincipal, GetDelegatorsDTO delegatorsDTO) {
+        int fromYear = StringTasks.cleanInteger(delegatorsDTO.getFromYear(), 0);
+        int toYear = StringTasks.cleanInteger(delegatorsDTO.getToYear(), 0);
+        int fromMonth = StringTasks.cleanInteger(delegatorsDTO.getFromMonth(), 0);
+        int toMonth = StringTasks.cleanInteger(delegatorsDTO.getToMonth(), 0);
+        String[] arrayOidDealer = delegatorsDTO.getArrayOidDealer();
+        String oidsDealer = "'*DUMMY*'";
+        for (String currentOidDealer: arrayOidDealer) {
+            oidsDealer += ",'" + currentOidDealer + "'";
+        }
+
+        List<String> listDelegators;
+        Map<String, String> mapLastChangedBy;
+        List<DelegatorsValues> delegators = new ArrayList<>();
+        List<DelegatorsValues> changedBy = new ArrayList<>();
+        try {
+            listDelegators = paRepository.getDelegators(fromYear, fromMonth, toYear, toMonth, oidsDealer);
+
+            DelegatorsValues delegatorsValue = DelegatorsValues.builder()
+                    .value("*todos*")
+                    .text("Todos")
+                    .build();
+
+            delegators.add(delegatorsValue);
+
+            for (String delegatedTo: listDelegators) {
+                delegatorsValue = DelegatorsValues.builder()
+                        .value(delegatedTo)
+                        .text(delegatedTo)
+                        .build();
+
+                delegators.add(delegatorsValue);
+            }
+
+            mapLastChangedBy = paRepository.getLastChangedBy(fromYear, fromMonth, toYear, toMonth, oidsDealer);
+
+            DelegatorsValues changedByValues = DelegatorsValues.builder()
+                    .value("*todos*")
+                    .text("Todos")
+                    .build();
+
+            changedBy.add(changedByValues);
+
+            changedByValues = DelegatorsValues.builder()
+                    .value("*ninguem*")
+                    .text("Ninguém")
+                    .build();
+
+            changedBy.add(changedByValues);
+
+            for (String idChangedBy: mapLastChangedBy.keySet()) {
+                String nameChangedBy = mapLastChangedBy.get(idChangedBy);
+
+                changedByValues = DelegatorsValues.builder()
+                        .value(idChangedBy)
+                        .text(nameChangedBy)
+                        .build();
+
+                changedBy.add(changedByValues);
+            }
+
+        return DelegatorsDTO.builder()
+                .delegators(delegators)
+                .changedBy(changedBy)
+                .build();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching delegators ", e);
         }
     }
 }
