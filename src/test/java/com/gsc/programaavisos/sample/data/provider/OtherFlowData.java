@@ -1,5 +1,7 @@
 package com.gsc.programaavisos.sample.data.provider;
 
+import com.gsc.programaavisos.dto.DelegatorsDTO;
+import com.gsc.programaavisos.dto.DelegatorsValues;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
@@ -7,6 +9,8 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.rg.dealer.Dealer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class OtherFlowData {
 
@@ -97,6 +101,14 @@ public class OtherFlowData {
                 .name(RANDOM_NAME)
                 .categoryDescription("RANDOM CATEGORY")
                 .description("RANDOM DESCRIPTION")
+                .build();
+    }
+
+    public static DelegatorsDTO getDelegators(){
+        DelegatorsValues delegatorsValues = new DelegatorsValues(RANDOM_NAME,RANDOM_NAME+" VALUE");
+        return DelegatorsDTO.builder()
+                .delegators(new ArrayList<>(Collections.singletonList(delegatorsValues)))
+                .changedBy(new ArrayList<>(Collections.singletonList(delegatorsValues)))
                 .build();
     }
 

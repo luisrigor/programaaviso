@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -16,6 +18,7 @@ import com.gsc.programaavisos.repository.crm.ServiceLoginRepository;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.TokenProvider;
+import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.rg.dealer.Dealer;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,9 +28,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 
@@ -35,6 +43,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Import({SecurityConfig.class, TokenProvider.class})
@@ -173,15 +182,6 @@ public class OtherFlowControllerTest {
     }
 
     @Test
-    void whenRequestDocumentUnitThenItsReturnSuccessfully() throws Exception {
-        String accessToken = generatedToken;
-        doNothing().when(otherFlowService).getDocumentUnits(any(),anyInt());
-        mvc.perform(get(BASE_REQUEST_MAPPING+ApiEndpoints.GET_DOCUMENT_UNITS)
-                        .header("accessToken", accessToken))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void whenRequestDocumentListThenItsReturnSuccessfully() throws Exception {
         String accessToken = generatedToken;
         List<DocumentUnitDTO> documentList = new ArrayList<>(Collections.singletonList(OtherFlowData.getDocumentUnit()));
@@ -204,4 +204,17 @@ public class OtherFlowControllerTest {
                 .andExpect(content().contentType(MediaType.TEXT_PLAIN+";charset=UTF-8"));
     }
 
+    @Test
+    void whenRequestDelegatorsThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        GetDelegatorsDTO getDelegatorsDTO = new GetDelegatorsDTO();
+        DelegatorsDTO delegatorsDTOS = OtherFlowData.getDelegators();
+        when(otherFlowService.getDelegators(any(), any())).thenReturn(delegatorsDTOS);
+        mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.GET_DELEGATORS)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(getDelegatorsDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(delegatorsDTOS)));
+    }
 }

@@ -223,7 +223,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         for (String currentOidDealer: arrayOidDealer) {
             oidsDealer += ",'" + currentOidDealer + "'";
         }
-
         List<String> listDelegators;
         Map<String, String> mapLastChangedBy;
         List<DelegatorsValues> delegators = new ArrayList<>();
