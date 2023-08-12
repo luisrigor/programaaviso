@@ -24,4 +24,5 @@ public interface ApiEndpoints {
     String GET_CLIENT_TYPE = "/client-type";
     String GET_CHANNEL = "/channels";
     String GET_SOURCE = "/source";
+    String UNLOCK_PA = "/unlock-pa";
 }

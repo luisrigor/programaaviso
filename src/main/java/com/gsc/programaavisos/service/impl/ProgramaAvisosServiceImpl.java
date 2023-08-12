@@ -126,7 +126,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
+             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
               oPA = ProgramaAvisos.builder()
                       .successContact("N")
@@ -219,6 +219,16 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             throw new ProgramaAvisosException("Error searchPA ", e);
         }
     }
+
+    @Override
+    public void unlockPARegister(Integer id) {
+        try {
+            paRepository.updateblockedByById("", id);
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Desbloquear registo", e);
+        }
+    }
+
 
     private ProgramaAvisos dataPA(PADTO pa){
         ProgramaAvisos oPA;
@@ -447,4 +457,5 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
         return filter;
     }
+
 }

@@ -7,4 +7,5 @@ public interface ProgramaAvisosService {
     void savePA(UserPrincipal userPrincipal, PADTO pa);
     void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
     FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO);
+    void unlockPARegister(Integer id);
 }

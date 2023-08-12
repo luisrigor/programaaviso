@@ -48,4 +48,10 @@ public class ProgramaAvisosController {
         log.info("removePA controller");
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
     }
+
+    @PutMapping(ApiEndpoints.UNLOCK_PA)
+    public void unlockPARegister(@RequestParam Integer id) {
+        log.info("unlockPARegister controller");
+        programaAvisosService.unlockPARegister(id);
+    }
 }

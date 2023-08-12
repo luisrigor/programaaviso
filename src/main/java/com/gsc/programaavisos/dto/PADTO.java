@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PADTO {
-    Long id;
+    Integer id;
     String contactChanged;
     String dataIsCorrect;
     String newNif;
