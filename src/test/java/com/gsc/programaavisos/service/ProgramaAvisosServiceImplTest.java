@@ -52,7 +52,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenSavePAAndPAIdIsLowerThanZeroThenDoNotSaveAnythingCase() {
         // Arrange
         PADTO padto = ProgramaAvisosData.getPADTO();
-        padto.setId(0L);
+        padto.setId(0);
         ProgramaAvisos oPA = new ProgramaAvisos();
         // Act
         programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
@@ -65,7 +65,7 @@ public class ProgramaAvisosServiceImplTest {
         // Arrange
         PADTO padto = ProgramaAvisosData.getPADTO();
         ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(anyLong())).thenReturn(Optional.ofNullable(oPA));
+        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
         // Act
         programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
         // Assert
@@ -76,7 +76,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenSavePAAndIdDoNotFoundThenThrowProgramaAvisosException() {
         // Arrange
         PADTO padto = ProgramaAvisosData.getPADTO();
-        when(paRepository.findById(anyLong())).thenThrow(ProgramaAvisosException.class);
+        when(paRepository.findById(anyInt())).thenThrow(ProgramaAvisosException.class);
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class,
                 () -> programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto));
@@ -90,7 +90,7 @@ public class ProgramaAvisosServiceImplTest {
         padto.setRevisionScheduleMotive(PaConstants.RSM_NOT_OWNER);
         padto.setRevisionSchedule(PaConstants.RSM_NOT_OWNER2);
         Vehicle vehicle = Vehicle.builder().idUser(1).build();
-        when(paRepository.findById(anyLong())).thenReturn(Optional.ofNullable(oPA));
+        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
         when(vehicleRepository.getVehicle(any())).thenReturn(vehicle);
         // Act
         programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
@@ -102,7 +102,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenRemovePAAndPAIdIsLowerThanZeroThenDoNotSaveAnythingCase() {
         ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
         oPA.setId(0);
-        when(paRepository.findById(anyLong())).thenReturn(Optional.ofNullable(oPA));
+        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
         // Act
         programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
         // Assert
@@ -113,7 +113,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenRemovePASuccessfullyCase() {
         // Arrange
         ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(anyLong())).thenReturn(Optional.ofNullable(oPA));
+        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
         // Act
         programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
         // Assert
@@ -124,7 +124,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenRemovePAIdDoNotFoundThenThrowProgramaAvisosException() {
         // Arrange
         PADTO padto = ProgramaAvisosData.getPADTO();
-        when(paRepository.findById(anyLong())).thenThrow(ProgramaAvisosException.class);
+        when(paRepository.findById(anyInt())).thenThrow(ProgramaAvisosException.class);
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class,
                 () -> programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs"));

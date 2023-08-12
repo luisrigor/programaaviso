@@ -135,7 +135,7 @@ public class ProgramaAvisosData {
 
     public static PADTO getPADTO() {
         return PADTO.builder()
-                .id(1L)
+                .id(1)
                 .contactChanged("Yes")
                 .dataIsCorrect("Correct")
                 .newNif("987654321B")
