@@ -311,7 +311,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         String to = StringTasks.cleanString(oPA.getNewEmail(), "").equals("") ? oPA.getEmail() : oPA.getNewEmail();
         String subject = "Ir à "+ (oPA.getBrand().equals("T")?"Toyota":"Lexus");
         String eventDescription = (oPA.getBrand().equals("T")?"Toyota":"Lexus")+ " " + oPA.getModel() + " " + oPA.getLicensePlate();
-
         String dateScheduledFormatted = DateTimerTasks.fmtDT2.format(dtSchedule)+"T"+hrSchedule.replace(":","")+"Z";
         Calendar oCal = Calendar.getInstance();
         String currentDateFormatted = timeZoFormat.format(oCal.getTime());
