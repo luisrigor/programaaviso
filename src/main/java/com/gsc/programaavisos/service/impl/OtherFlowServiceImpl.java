@@ -40,6 +40,9 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final FidelitysRepository fidelitysRepository;
     private final DocumentUnitRepository documentUnitRepository;
     private final PARepository paRepository;
+    private final ClientTypeRepository clientTypeRepository;
+    private final SourceRepository sourceRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -280,6 +283,33 @@ public class OtherFlowServiceImpl implements OtherFlowService {
                 .build();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching delegators ", e);
+        }
+    }
+
+    @Override
+    public List<ClientType> getClientTypes() {
+        try {
+            return clientTypeRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching clientType", e);
+        }
+    }
+
+    @Override
+    public List<Channel> getChannels() {
+        try {
+            return channelRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching channel ", e);
+        }
+    }
+
+    @Override
+    public List<Source> getSources() {
+        try {
+            return sourceRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching source ", e);
         }
     }
 }

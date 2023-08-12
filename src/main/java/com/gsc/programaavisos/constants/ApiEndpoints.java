@@ -21,4 +21,7 @@ public interface ApiEndpoints {
     String SEARCH_PA = "/search-pa";
     String GET_DELEGATORS = "/delegators";
     String DELETE_PARAMATRIZATION = "/delete-parametrization";
+    String GET_CLIENT_TYPE = "/client-type";
+    String GET_CHANNEL = "/channels";
+    String GET_SOURCE = "/source";
 }

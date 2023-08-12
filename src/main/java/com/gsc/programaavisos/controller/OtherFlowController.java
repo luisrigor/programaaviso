@@ -108,4 +108,25 @@ public class OtherFlowController {
 
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
+
+    @GetMapping(ApiEndpoints.GET_CLIENT_TYPE)
+    public ResponseEntity<List<ClientType>> getClientType() {
+        log.info("getClientType controller");
+        List<ClientType> rs = otherFlowService.getClientTypes();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_CHANNEL)
+    public ResponseEntity<List<Channel>> getChannels() {
+        log.info("getChannels controller");
+        List<Channel> rs = otherFlowService.getChannels();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_SOURCE)
+    public ResponseEntity<List<Source>> getSource() {
+        log.info("getSource controller");
+        List<Source> rs = otherFlowService.getSources();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
 }

@@ -22,4 +22,7 @@ public interface OtherFlowService {
     List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
     DelegatorsDTO getDelegators(UserPrincipal userPrincipal, GetDelegatorsDTO delegatorsDTO);
+    List<ClientType> getClientTypes();
+    List<Channel> getChannels();
+    List<Source> getSources();
 }
