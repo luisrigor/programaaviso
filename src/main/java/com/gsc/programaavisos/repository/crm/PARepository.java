@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface PARepository extends JpaRepository<ProgramaAvisos, Integer>, PACustomRepository {
 
@@ -13,4 +14,5 @@ public interface PARepository extends JpaRepository<ProgramaAvisos, Integer>, PA
     @Transactional
     @Query("UPDATE ProgramaAvisos P SET P.blockedBy = :blockedBy WHERE P.id = :id")
     void updateblockedByById(@Param("blockedBy") String blockedBy,@Param("id") Integer id);
+
 }

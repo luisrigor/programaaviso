@@ -6,6 +6,7 @@ import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.crm.entity.PATotals;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -35,13 +36,14 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PARepository paRepository;
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
+    private final PABeanRepository paBeanRepository;
 
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
         String contactChanged;
         try {
-            if(pa.getId() > 0) {
-                ProgramaAvisos oPA =  dataPA(pa);
+            if (pa.getId() > 0) {
+                ProgramaAvisos oPA = dataPA(pa);
                 contactChanged = StringTasks.cleanString(pa.getContactChanged(), "0");
                 String hrScheduleContact = StringTasks.cleanString(pa.getHrScheduleContact(), StringUtils.EMPTY).trim();
                 if (!hrScheduleContact.equals(StringUtils.EMPTY)) {
@@ -57,16 +59,16 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     oPA.setHrScheduleContact(null);
                 }
                 String registerClaim = StringTasks.cleanString(pa.getRegisterClaim(), "N").trim();
-                String userStamp = userPrincipal.getUsername().split("\\|\\|")[0]+"||"+userPrincipal.getUsername().split("\\|\\|")[1];
-                if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals(StringUtils.EMPTY)) {
+                String userStamp = userPrincipal.getUsername().split("\\|\\|")[0] + "||" + userPrincipal.getUsername().split("\\|\\|")[1];
+                if (registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals(StringUtils.EMPTY)) {
                     try {
                         ClaimDetail oClaim;
-                       Dealer oDealerPA = Dealer.getHelper().getByObjectId(userPrincipal.getOidNet(), oPA.getOidDealer());
+                        Dealer oDealerPA = Dealer.getHelper().getByObjectId(userPrincipal.getOidNet(), oPA.getOidDealer());
                         oClaim = ClaimDetail.getHelper().createClaim(com.gsc.claims.initialization.ApplicationConfiguration.PORTAL_EXTRANET,
-                                userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)?com.gsc.claims.initialization.ApplicationConfiguration.TOYOTA_APP:com.gsc.claims.initialization.ApplicationConfiguration.LEXUS_APP, null, null, oDealerPA.getOid_Parent(), null, oPA.getName(),
-                                oPA.getAddress(), oPA.getCp4(),	oPA.getCp3(), oPA.getCpext(), oPA.getEmail(), oPA.getContactPhone(), null,
-                                pa.getObservations(), userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA)? DealerLevel1.TCAP_TOYOTA_DEALERLEVEL1:DealerLevel1.TCAP_LEXUS_DEALERLEVEL1,
-                                oDealerPA.getOid_Parent(), oPA.getOidDealer(), oPA.getLicensePlate(), oPA.getBrand().equals("T")?"TOYOTA":oPA.getBrand().equals("L")?"LEXUS":"", oPA.getModel(), Area.TCAP_TOYOTA_AFTERSALES,
+                                userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA) ? com.gsc.claims.initialization.ApplicationConfiguration.TOYOTA_APP : com.gsc.claims.initialization.ApplicationConfiguration.LEXUS_APP, null, null, oDealerPA.getOid_Parent(), null, oPA.getName(),
+                                oPA.getAddress(), oPA.getCp4(), oPA.getCp3(), oPA.getCpext(), oPA.getEmail(), oPA.getContactPhone(), null,
+                                pa.getObservations(), userPrincipal.getOidNet().equals(Dealer.OID_NET_TOYOTA) ? DealerLevel1.TCAP_TOYOTA_DEALERLEVEL1 : DealerLevel1.TCAP_LEXUS_DEALERLEVEL1,
+                                oDealerPA.getOid_Parent(), oPA.getOidDealer(), oPA.getLicensePlate(), oPA.getBrand().equals("T") ? "TOYOTA" : oPA.getBrand().equals("L") ? "LEXUS" : "", oPA.getModel(), Area.TCAP_TOYOTA_AFTERSALES,
                                 PaConstants.CLAIMS_PA_CHANNEL, null, null, null, userStamp, null);
                         oPA.setIdClaim(oClaim.getId());
                     } catch (Exception e) {
@@ -75,7 +77,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
 
                 String isToSendSchedule = StringTasks.cleanString(pa.getSendSchedule(), StringUtils.EMPTY);
-                if(isToSendSchedule!=null && isToSendSchedule.equals("S")){
+                if (isToSendSchedule != null && isToSendSchedule.equals("S")) {
                     String oidDealerSchedule = StringTasks.cleanString(pa.getOidDealerSchedule(), StringUtils.EMPTY).trim();
                     int hrHrSchedule = StringTasks.cleanInteger(pa.getHrHrSchedule(), 0);
                     int minHrSchedule = StringTasks.cleanInteger(pa.getMinHrSchedule(), 0);
@@ -83,13 +85,13 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     oPA.setOidDealerSchedule(oidDealerSchedule);
                     oPA.setDtSchedule(dtSchedule);
                     String hrSchedule = "";
-                    if(hrHrSchedule<10){
-                        hrSchedule+="0";
+                    if (hrHrSchedule < 10) {
+                        hrSchedule += "0";
                     }
                     hrSchedule += String.valueOf(hrHrSchedule);
                     hrSchedule += ":";
-                    if(minHrSchedule<10){
-                        hrSchedule+="0";
+                    if (minHrSchedule < 10) {
+                        hrSchedule += "0";
                     }
                     hrSchedule += String.valueOf(minHrSchedule);
                     if (!hrSchedule.equals(StringUtils.EMPTY)) {
@@ -104,19 +106,19 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     } else {
                         oPA.setHrSchedule(null);
                     }
-                    sendMail(oPA,dtSchedule,hrSchedule,oidDealerSchedule);
+                    sendMail(oPA, dtSchedule, hrSchedule, oidDealerSchedule);
                 }
                 oPA.setBlockedBy(StringUtils.EMPTY);
                 paRepository.save(oPA);
 
-                if(oPA.getRevisionScheduleMotive().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER) || oPA.getRevisionSchedule().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER2)) {
+                if (oPA.getRevisionScheduleMotive().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER) || oPA.getRevisionSchedule().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER2)) {
                     dataVehicle(oPA.getLicensePlate());
                 }
-                if(contactChanged.equals("S")) {
-                    dataQuarantine(oPA,userStamp, userPrincipal.getOidNet());
+                if (contactChanged.equals("S")) {
+                    dataQuarantine(oPA, userStamp, userPrincipal.getOidNet());
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("An error occurred while saving contact record");
             throw new ProgramaAvisosException("An error occurred while saving contact record", e);
         }
@@ -126,18 +128,18 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
-            if(oPA.getId() > 0) {
-              oPA = ProgramaAvisos.builder()
-                      .successContact("N")
-                      .successMotive(StringUtils.EMPTY)
-                      .dtScheduleContact(null)
-                      .hrScheduleContact(null)
-                      .revisionSchedule(PaConstants.REMOVED_MANUALLY_DESC)
-                      .revisionScheduleMotive(StringUtils.EMPTY)
-                      .revisionScheduleMotive2(StringUtils.EMPTY)
-                      .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
-                      .build();
+            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("Id not found: " + id));
+            if (oPA.getId() > 0) {
+                oPA = ProgramaAvisos.builder()
+                        .successContact("N")
+                        .successMotive(StringUtils.EMPTY)
+                        .dtScheduleContact(null)
+                        .hrScheduleContact(null)
+                        .revisionSchedule(PaConstants.REMOVED_MANUALLY_DESC)
+                        .revisionScheduleMotive(StringUtils.EMPTY)
+                        .revisionScheduleMotive2(StringUtils.EMPTY)
+                        .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
+                        .build();
                 paRepository.save(oPA);
             }
         } catch (Exception e) {
@@ -151,23 +153,23 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         log.info("searchPA service");
         try {
             FilterBean filter = getFilter(userPrincipal);
-            String changedBy  = StringTasks.cleanString(searchPADTO.getChangedBy(), PaConstants.ALL);
+            String changedBy = StringTasks.cleanString(searchPADTO.getChangedBy(), PaConstants.ALL);
             String flagHybrid = StringTasks.cleanString(searchPADTO.getFlagHibrid(), StringUtils.EMPTY);
             String delegatedTo = StringTasks.cleanString(searchPADTO.getDelegatedTo(), PaConstants.ALL);
-            String filterOptions[] 	= searchPADTO.getFilterOptions();
+            String filterOptions[] = searchPADTO.getFilterOptions();
             String hasMaintenanceContract = StringTasks.cleanString(searchPADTO.getHasMaintenanceContract(), StringUtils.EMPTY);
             String mrsMissedCalls = StringTasks.cleanString(searchPADTO.getMrsMissedCalls(), StringUtils.EMPTY);
             String plate = StringTasks.ReplaceStr(StringTasks.cleanString(searchPADTO.getPlate(), StringUtils.EMPTY), "'", StringUtils.EMPTY);
             String flag5Plus = StringTasks.cleanString(searchPADTO.getFlag5Plus(), StringUtils.EMPTY);
-            boolean ShowImportByExcel 	= StringTasks.cleanString(searchPADTO.getShowImportByExcell(), "N").equalsIgnoreCase("S");
-            String filterOwner 	= StringTasks.cleanString(searchPADTO.getFilterOwner(), StringUtils.EMPTY);
-            log.debug("filterOwner: "+filterOwner);
+            boolean ShowImportByExcel = StringTasks.cleanString(searchPADTO.getShowImportByExcell(), "N").equalsIgnoreCase("S");
+            String filterOwner = StringTasks.cleanString(searchPADTO.getFilterOwner(), StringUtils.EMPTY);
+            log.debug("filterOwner: " + filterOwner);
 
             filter.setFromYear(searchPADTO.getFromYear());
             filter.setFromMonth(searchPADTO.getFromMonth());
             filter.setToYear(searchPADTO.getToYear());
             filter.setToMonth(searchPADTO.getToMonth());
-            if (searchPADTO.getArrOidDealer()!=null)
+            if (searchPADTO.getArrOidDealer() != null)
                 filter.setArrSelDealer(searchPADTO.getArrOidDealer());
 
             filter.setChangedBy(changedBy);
@@ -179,7 +181,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             filter.setDelegatedTo(delegatedTo);
             filter.setDelegators(null);
             filter.clearState();
-            if(filterOptions != null) {
+            if (filterOptions != null) {
                 for (String filterOption : filterOptions) {
                     if (filterOption.equalsIgnoreCase("pending")) {
                         filter.setStatePending(1);
@@ -230,9 +232,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
 
-    private ProgramaAvisos dataPA(PADTO pa){
+    private ProgramaAvisos dataPA(PADTO pa) {
         ProgramaAvisos oPA;
-        oPA = paRepository.findById(pa.getId()).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + pa.getId()));
+        oPA = paRepository.findById(pa.getId()).orElseThrow(() -> new ProgramaAvisosException("Id not found: " + pa.getId()));
         String revisionScheduleMotive = StringTasks.cleanString(pa.getRevisionScheduleMotive(), "").trim();
         String newsletterReceived = StringTasks.cleanString(pa.getNewsletterReceived(), "").trim();
         String notReceivedMotive = StringTasks.cleanString(pa.getNotReceivedMotive(), "").trim();
@@ -249,7 +251,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         oPA.setNewCpExt(StringTasks.cleanString(pa.getNewCpExt(), "").trim());
         oPA.setNewContactPhone(StringTasks.cleanString(pa.getNewContactPhone(), "").trim());
         oPA.setNewEmail(StringTasks.cleanString(pa.getNewEmail(), "").trim());
-        oPA.setSuccessContact( StringTasks.cleanString(pa.getSuccessContact(), ""));
+        oPA.setSuccessContact(StringTasks.cleanString(pa.getSuccessContact(), ""));
         oPA.setSuccessMotive(StringTasks.cleanString(pa.getSuccessMotive(), "").trim());
         oPA.setDtScheduleContact(StringTasks.cleanDate(pa.getDtScheduleContact()));
         oPA.setRecoveryAndShipping(StringTasks.cleanString(pa.getRecoveryAndShipping(), "").trim());
@@ -262,19 +264,20 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return oPA;
     }
 
-    private void dataVehicle(String licencePlate){
-        if(licencePlate!=null)
+    private void dataVehicle(String licencePlate) {
+        if (licencePlate != null)
             licencePlate = StringTasks.ReplaceStr(licencePlate, "-", "").toUpperCase();
 
         Vehicle vehicle = vehicleRepository.getVehicle(licencePlate);
-        if(vehicle != null) {
+        if (vehicle != null) {
             vehicle.setIdOwner(0);
             vehicle.setIdUser(0);
             vehicle.setIdFinancial(0);
             vehicleRepository.save(vehicle);
         }
     }
-    private void dataQuarantine(ProgramaAvisos  oPA,String userStamp,String oidNet) throws SCErrorException {
+
+    private void dataQuarantine(ProgramaAvisos oPA, String userStamp, String oidNet) throws SCErrorException {
         Quarantine quarantine = new Quarantine();
         Dealer dealer = Dealer.getHelper().getByObjectId(oidNet, oPA.getOidDealer());
         Calendar cal = Calendar.getInstance();
@@ -291,14 +294,14 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         quarantine.setCp3(oPA.getNewCp3());
         quarantine.setCpExt(oPA.getNewCpExt());
         quarantine.setPhone1(oPA.getNewContactPhone());
-        if(!oPA.getNewEmail().equals("")) {
+        if (!oPA.getNewEmail().equals("")) {
             quarantine.setEmail(oPA.getNewEmail());
         }
         quarantine.setLicencePlate(oPA.getLicensePlate());
         quarantine.setVin(oPA.getVin());
         quarantine.setIsVehicleOwner("S");
 
-        switch(oPA.getIdClientChannelPreference()){
+        switch (oPA.getIdClientChannelPreference()) {
             case PaConstants.EMAIL:
                 quarantine.setPaPreferredCommunicationnChannel(PaConstants.PA_CONTACT_CHANNEL_EPOSTAL);
                 break;
@@ -317,20 +320,20 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     private void sendMail(ProgramaAvisos oPA, java.util.Date dtSchedule, String hrSchedule, String oidDealerSchedule) throws SCErrorException {
-        String from = oPA.getBrand().equals("T")?"Toyota<toyota@toyotacaetano.pt>":"Lexus<info@lexus.pt>";
+        String from = oPA.getBrand().equals("T") ? "Toyota<toyota@toyotacaetano.pt>" : "Lexus<info@lexus.pt>";
         String to = StringTasks.cleanString(oPA.getNewEmail(), "").equals("") ? oPA.getEmail() : oPA.getNewEmail();
-        String subject = "Ir à "+ (oPA.getBrand().equals("T")?"Toyota":"Lexus");
-        String eventDescription = (oPA.getBrand().equals("T")?"Toyota":"Lexus")+ " " + oPA.getModel() + " " + oPA.getLicensePlate();
-        String dateScheduledFormatted = DateTimerTasks.fmtDT2.format(dtSchedule)+"T"+hrSchedule.replace(":","")+"Z";
+        String subject = "Ir à " + (oPA.getBrand().equals("T") ? "Toyota" : "Lexus");
+        String eventDescription = (oPA.getBrand().equals("T") ? "Toyota" : "Lexus") + " " + oPA.getModel() + " " + oPA.getLicensePlate();
+        String dateScheduledFormatted = DateTimerTasks.fmtDT2.format(dtSchedule) + "T" + hrSchedule.replace(":", "") + "Z";
         Calendar oCal = Calendar.getInstance();
         String currentDateFormatted = timeZoFormat.format(oCal.getTime());
-        String strICalendar = getEmailStr(from, to, oidDealerSchedule, eventDescription , subject, dateScheduledFormatted, currentDateFormatted);
+        String strICalendar = getEmailStr(from, to, oidDealerSchedule, eventDescription, subject, dateScheduledFormatted, currentDateFormatted);
         Mail.SendMailICalendar(from, to, "", subject, strICalendar);
     }
 
-    private String getEmailStr(String from, String to,String oidDealer, String eventDescription, String subject, String dateScheduledFormatted, String currentDateFormatted) throws SCErrorException {
+    private String getEmailStr(String from, String to, String oidDealer, String eventDescription, String subject, String dateScheduledFormatted, String currentDateFormatted) throws SCErrorException {
         Dealer oDealer = ApplicationConfiguration.getDealer(oidDealer);
-        String dealerDesc = oDealer.getDesig()+" ( "+oDealer.getCpExt() + " ) - " + oDealer.getEnd();
+        String dealerDesc = oDealer.getDesig() + " ( " + oDealer.getCpExt() + " ) - " + oDealer.getEnd();
         StringBuffer buffer = new StringBuffer("BEGIN:VCALENDAR\n" +
                 "PRODID:-//rede.toyota.pt/ProgramaAvisos\n" +
                 "VERSION:2.0\n" +
@@ -339,17 +342,17 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 "BEGIN:VEVENT\n" +
                 "UID:/ProgramaAvisos/" + System.currentTimeMillis() + "\n" +
                 "CLASS:PUBLIC\n" +
-                "ATTENDEE;ROLE=REQ-PARTICIPANT;RSVP=TRUE:MAILTO:"+to+"\n" +
-                "DTSTART: "+dateScheduledFormatted+"\n" +
-                "DTEND:"+dateScheduledFormatted+"\n" +
-                "DTSTAMP:"+currentDateFormatted+"\n" +
-                "DESCRIPTION:"+eventDescription+"\n" +
-                "LOCATION:" +dealerDesc+"\n" +
-                "GEO:"+oDealer.getGPS_X()+";"+oDealer.getGPS_Y()+"\n" +
-                "ORGANIZER:MAILTO:"+from+"\n" +
+                "ATTENDEE;ROLE=REQ-PARTICIPANT;RSVP=TRUE:MAILTO:" + to + "\n" +
+                "DTSTART: " + dateScheduledFormatted + "\n" +
+                "DTEND:" + dateScheduledFormatted + "\n" +
+                "DTSTAMP:" + currentDateFormatted + "\n" +
+                "DESCRIPTION:" + eventDescription + "\n" +
+                "LOCATION:" + dealerDesc + "\n" +
+                "GEO:" + oDealer.getGPS_X() + ";" + oDealer.getGPS_Y() + "\n" +
+                "ORGANIZER:MAILTO:" + from + "\n" +
                 "PRIORITY:5\n" +
                 "SEQUENCE:0\n" +
-                "SUMMARY:"+subject+"\n" +
+                "SUMMARY:" + subject + "\n" +
                 "TRANSP:OPAQUE\n" +
                 "CATEGORIES:Oficina\n" +
                 "BEGIN:VALARM\n" +
@@ -375,22 +378,22 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     vecDealers = Dealer.getToyotaHelper().GetCADealers("S");
 
                     Dealer dlr3 = Dealer.getToyotaHelper().getByObjectId("SC00290012");
-                    if (dlr3!=null)vecDealers.add(dlr3);
+                    if (dlr3 != null) vecDealers.add(dlr3);
 
                     Dealer dlr4 = Dealer.getToyotaHelper().getByObjectId("SC00200001");
-                    if (dlr4!=null)vecDealers.add(dlr4);
+                    if (dlr4 != null) vecDealers.add(dlr4);
 
                     Dealer dlr6 = Dealer.getToyotaHelper().getByObjectId("SC00020003");
-                    if (dlr6!=null)vecDealers.add(dlr6);
+                    if (dlr6 != null) vecDealers.add(dlr6);
 
                     Dealer dlr7 = Dealer.getToyotaHelper().getByObjectId("SC03720002");
-                    if (dlr7!=null)vecDealers.add(dlr7);
+                    if (dlr7 != null) vecDealers.add(dlr7);
 
                     Dealer dlr8 = Dealer.getToyotaHelper().getByObjectId("SC03720005");
-                    if (dlr8!=null)vecDealers.add(dlr8);
+                    if (dlr8 != null) vecDealers.add(dlr8);
 
                     Dealer dlr9 = Dealer.getToyotaHelper().getByObjectId("SC04030001");
-                    if (dlr9!=null)vecDealers.add(dlr9);
+                    if (dlr9 != null) vecDealers.add(dlr9);
 
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
                     vecDealers = Dealer.getToyotaHelper().GetActiveDealersForParent(oGSCUser.getOidDealerParent());
@@ -407,7 +410,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS)) {
                     vecDealers = Dealer.getLexusHelper().GetCADealers("S");
                     Dealer dlr10 = Dealer.getLexusHelper().getByObjectId("SC04500003");
-                    if (dlr10!=null)vecDealers.add(dlr10);
+                    if (dlr10 != null) vecDealers.add(dlr10);
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_DEALER_ALL_INSTALLATION)) {
                     vecDealers = Dealer.getLexusHelper().GetActiveDealersForParent(oGSCUser.getOidDealerParent());
                 } else if (oGSCUser.getRoles().contains(ROLE_VIEW_DEALER_OWN_INSTALLATION)) {
@@ -432,8 +435,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             filter.setVecDealers(vecDealers);
             String[] arrDealer;
             int pos = 0;
-            if(vecDealers == null) {
-                arrDealer = new String[] {oGSCUser.getOidDealer()};
+            if (vecDealers == null) {
+                arrDealer = new String[]{oGSCUser.getOidDealer()};
             } else {
                 arrDealer = new String[vecDealers.size()];
                 for (Dealer oDealer : vecDealers) {
@@ -457,5 +460,28 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
         return filter;
     }
+
+    @Override
+    public PAInfoDTO getInfoPA(UserPrincipal userPrincipal) {
+        try {
+            FilterBean filter = getFilter(userPrincipal);
+            List<ProgramaAvisosBean> pAList = paBeanRepository.getPAList();
+            Date startDate = new Date();
+            Date endDate = new Date();
+            return PAInfoDTO.builder()
+                    .paInfoList(pAList)
+                    .paTotals(new PATotals())
+                    .filterBean(filter)
+                    .build();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error ListPABean ", e);
+        }
+    }
+/*
+    public PATotals getPaTotals(Date startDate, Date endDate){
+        return paBeanRepository.calculateTotals(startDate,endDate,false);
+    }
+
+ */
 
 }

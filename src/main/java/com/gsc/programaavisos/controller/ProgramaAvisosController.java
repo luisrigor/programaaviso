@@ -4,15 +4,23 @@ package com.gsc.programaavisos.controller;
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
+import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
+
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import io.swagger.annotations.Api;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Filter;
+
 @RequiredArgsConstructor
 @Log4j
 @RequestMapping("${app.baseUrl}")
@@ -54,4 +62,12 @@ public class ProgramaAvisosController {
         log.info("unlockPARegister controller");
         programaAvisosService.unlockPARegister(id);
     }
+
+    @GetMapping(ApiEndpoints.LIST_PA)
+    public ResponseEntity<PAInfoDTO> paInfoList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        log.info("INFO PA controller");
+        return new ResponseEntity<>(programaAvisosService.getInfoPA(userPrincipal),HttpStatus.OK);
+    }
+
+
 }
