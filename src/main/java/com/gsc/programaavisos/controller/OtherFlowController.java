@@ -129,4 +129,13 @@ public class OtherFlowController {
         List<Source> rs = otherFlowService.getSources();
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
+
+    @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
+    public ResponseEntity<List<ContactType>> getAllContactType() {
+        log.info("getAllContactType controller");
+        List<ContactType> rs = otherFlowService.getAllContactTypes();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+
 }

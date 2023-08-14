@@ -10,6 +10,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.repository.crm.impl.ContactTypeRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
@@ -43,6 +44,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final ClientTypeRepository clientTypeRepository;
     private final SourceRepository sourceRepository;
     private final ChannelRepository channelRepository;
+    private final ContactTypeRepository contactTypeRepository;
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -307,6 +309,15 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     public List<Source> getSources() {
         try {
             return sourceRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching source ", e);
+        }
+    }
+
+    @Override
+    public List<ContactType> getAllContactTypes() {
+        try {
+            return contactTypeRepository.findAll();
         }catch (Exception e){
             throw new ProgramaAvisosException("Error fetching source ", e);
         }

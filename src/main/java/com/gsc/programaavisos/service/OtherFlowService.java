@@ -25,4 +25,5 @@ public interface OtherFlowService {
     List<ClientType> getClientTypes();
     List<Channel> getChannels();
     List<Source> getSources();
+    List<ContactType> getAllContactTypes();
 }
