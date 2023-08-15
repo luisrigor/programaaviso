@@ -6,7 +6,6 @@ import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.model.crm.entity.PATotals;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -34,10 +33,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public final SimpleDateFormat timeZoFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
     private final PARepository paRepository;
+    private final PABeanRepository paBeanRepository;
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
-    private final PABeanRepository paBeanRepository;
-
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
         String contactChanged;
@@ -464,24 +462,25 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     @Override
     public PAInfoDTO getInfoPA(UserPrincipal userPrincipal) {
         try {
-            FilterBean filter = getFilter(userPrincipal);
-            List<ProgramaAvisosBean> pAList = paBeanRepository.getPAList();
-            Date startDate = new Date();
-            Date endDate = new Date();
+            FilterBean filterBean = getFilter(userPrincipal);
+            PATotals paTotals = getPaTotals(filterBean);
+            List<ProgramaAvisosBean> pAList = paBeanRepository.findAll();
+
             return PAInfoDTO.builder()
                     .paInfoList(pAList)
-                    .paTotals(new PATotals())
-                    .filterBean(filter)
+                    .paTotals(paTotals)
+                    .filterBean(filterBean)
                     .build();
+
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error ListPABean ", e);
         }
     }
-/*
-    public PATotals getPaTotals(Date startDate, Date endDate){
-        return paBeanRepository.calculateTotals(startDate,endDate,false);
+
+    public PATotals getPaTotals(FilterBean filterBean) throws SCErrorException {
+        return paBeanRepository.getPaTotals(filterBean);
     }
 
- */
+
 
 }

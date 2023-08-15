@@ -16,40 +16,45 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "PA_DATA_INFO")
+@SqlResultSetMapping(
+        name = "GetPATotalsMapping",
+        classes = {
+                @ConstructorResult(
+                        targetClass = PATotals.class,
+                        columns = {
+                                @ColumnResult(name = "TOTAL", type = Integer.class),
+                                @ColumnResult(name = "DONE", type = Integer.class),
+                                @ColumnResult(name = "NOT_DONE", type = Integer.class),
+                                @ColumnResult(name = "WITH_APPOINTMENT", type = Integer.class),
+                                @ColumnResult(name = "SCHEDULE", type = Integer.class),
+                                @ColumnResult(name = "REMOVED_MANUALLY", type = Integer.class),
+                                @ColumnResult(name = "REMOVED_AUTO_BY_MANUT", type = Integer.class),
+                                @ColumnResult(name = "REMOVED_AUTO_BY_PERIOD", type = Integer.class),
+                        }
+                )
+        }
+)
 public class ProgramaAvisosBean {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "PA_ID")
+    private Integer id;
     @Column(name = "PA_ID_SOURCE")
-    private int idSource;
-    @Column(name = "PA_ID_DOCUMENT")
+    private Integer idSource;
     private String idDocument;
-    @Column(name = "PA_ID_CHANNEL")
-    private int idChannel;
-    @Column(name = "PA_ID_CONTACTTYPE")
-    private int idContactType;
-    @Column(name = "PA_ID_CLIENT_ORIGIN")
-    private int idClientType;
-    @Column(name = "PA_YEAR")
-    private int year;
-    @Column(name = "PA_MONTH")
-    private int month;
-    @Column(name = "PA_DAY")
-    private int day;
-    @Column(name = "PA_OID_DEALER")
+    private Integer idChannel;
+    private Integer idContactType;
+    private Integer idClientType;
+    private Integer year;
+    private Integer month;
+    private Integer day;
     private String oidDealer;
-    @Column(name = "PA_LICENSE_PLATE")
     private String licensePlate;
-    @Column(name = "PA_BRAND")
     private String brand;
-    @Column(name = "PA_MODEL")
     private String model;
-    @Column(name = "PA_NIF")
     private String nif;
-    @Column(name = "PA_NAME")
     private String name;
-    @Column(name = "PA_ADDRESS")
     private String address;
     private String cp4;
     private String cp3;
@@ -79,12 +84,12 @@ public class ProgramaAvisosBean {
     private String delegatedTo;
     private String client;
     private String blockedBy;
-    private int nrMissedCalls;
+    private Integer nrMissedCalls;
     private String changedBy;
     private Timestamp dtChanged;
-    private int nrCalls;
+    private Integer nrCalls;
     private Integer idClaim;
-    private int idClientChannelPreference;
+    private Integer idClientChannelPreference;
     private String receiveInformation;
     private String oidNewsletter;
     private String newsletterPersonalData;
@@ -99,11 +104,11 @@ public class ProgramaAvisosBean {
     private String lastRevisionKm;
     private Date dtLastRevision;
     private String nextRevision;
-    private int yearNextRevision;
-    private int monthNextRevision;
+    private Integer yearNextRevision;
+    private Integer monthNextRevision;
     private Date dtNextRevision;
     private Date dtItv;
-    private double maintenancePrice;
+    private Double maintenancePrice;
     private String eurocare;
     private String flag5Plus;
     private String flagSend;
@@ -133,21 +138,21 @@ public class ProgramaAvisosBean {
     private Date extraCarePlusDateLimit;
     private String description;
     private String expectedDate;
-   // private Dealer dealer;
-    //   private List<Campaign> technicalCampaigns;
-    //  private List<Revision> revisions;
-    //    private List<Warranty> warranties;
-    //   private List<ECareNotification> eCareNotifications;
-    //  private List<ECareNotification> eCareAllNotifications;
-    private int IDOrigin;
-    private int extIDInOrigin;
-    //   private List<Claim> claims;
-    //   private List<Rpt> rpts;
+    //private Dealer dealer;
+    //private List<Campaign> technicalCampaigns;
+   //private List<Revision> revisions;
+   //private List<Warranty> warranties;
+   //private List<ECareNotification> eCareNotifications;
+   //private List<ECareNotification> eCareAllNotifications;
+    private Integer IDOrigin;
+    private Integer extIDInOrigin;
+    //private List<Claim> claims;
+   //private List<Rpt> rpts;
     private String extracare;
     private String dtNextIUC;
     private String dtStartNextITV;
     private String dtNextItv;
-    // private MaintenanceContract maintenanceContract;
+    //private MaintenanceContract maintenanceContract;
     private String tecnicalModel;
     private Integer indiceCSToyota;
     private String HHCCode;

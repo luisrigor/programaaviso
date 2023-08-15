@@ -4,6 +4,7 @@ package com.gsc.programaavisos.controller;
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
+import com.gsc.programaavisos.model.crm.entity.PATotals;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -65,7 +66,6 @@ public class ProgramaAvisosController {
 
     @GetMapping(ApiEndpoints.LIST_PA)
     public ResponseEntity<PAInfoDTO> paInfoList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("INFO PA controller");
         return new ResponseEntity<>(programaAvisosService.getInfoPA(userPrincipal),HttpStatus.OK);
     }
 
