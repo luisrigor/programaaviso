@@ -54,4 +54,10 @@ public class ProgramaAvisosController {
         log.info("unlockPARegister controller");
         programaAvisosService.unlockPARegister(id);
     }
+
+    @PutMapping(ApiEndpoints.ACTIVE_PA)
+    public void activePA(@RequestParam Integer id) {
+        log.info("activePA controller");
+        programaAvisosService.activatePA(id);
+    }
 }
