@@ -35,7 +35,7 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
     }
 
     @Override
-    public PATotals getPaTotals(FilterBean filterBean) throws SCErrorException {
+    public PATotals getPaTotals(FilterBean filterBean) {
         String sql = buildPATotalsQuery(filterBean);
         Query query = em.createNativeQuery(sql,"GetPATotalsMapping");
         PATotals paTotals = (PATotals) query.getSingleResult();
@@ -48,12 +48,6 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
 
         int pageStart = ((oFilter.getCurrPage() - 1) * PAGE_SIZE) + 1;
         int pageEnd = (oFilter.getCurrPage() * PAGE_SIZE);
-        boolean showAllRecords = true;
-        if (showAllRecords) {
-            pageStart = 1;
-            pageEnd = 999999999;
-        }
-
         boolean checkExpiredContracts = oFilter.getIdContactType() == ApplicationConfiguration.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS;
         boolean checkConnectivityContracts = oFilter.getIdContactType() == ApplicationConfiguration.PA_CONTACTTYPE_CONECTIVIDADE;
 
@@ -67,30 +61,26 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         calEnd.set(Calendar.MONTH, oFilter.getToMonth() - 1);
         calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
         java.sql.Date dtEnd = new java.sql.Date(calEnd.getTimeInMillis());
-
         //OFFSET de 20 em 20 comen�ando em 0. pageEnd come�a a 20.
         int offset = pageEnd - 20;
         int defaultTransactionIsolation = Integer.MIN_VALUE;
         sql.append("SELECT * FROM ( ");
 
         //Seteo Paginacion
-        System.out.println("checkConnectivityContracts "+ checkConnectivityContracts);
        if (checkConnectivityContracts) {
                 sql.append(" SELECT ROW_NUMBER() OVER( ORDER BY PA_DT_CREATED ) AS ROWNUM, ");
             } else {
                 sql.append(" SELECT ROW_NUMBER() OVER( " + oFilter.getOrderBy() + " ) AS ROWNUM, ");
             }
 
-        sql.append("SELECT ROW_NUMBER() OVER( ORDER BY PA_DT_CREATED ) AS ROWNUM, ");
-        sql.append("PA_DATA_INFO.*, ");
+       sql.append("PA_DATA_INFO.*, ");
         sql.append("HHC.PRODUCT_ID AS HHC_PRODUCT_ID, HHC.PRODUCT_DESCRIPTION AS HHC_PRODUCT_DESCRIPTION, HHC.PRODUCT_DISPLAY_NAME AS HHC_PRODUCT_DISPLAY_NAME, " +
                 "HHC.CONTRACT_START_DATE AS HHC_CONTRACT_START_DATE, HHC.CONTRACT_END_DATE AS HHC_CONTRACT_END_DATE, " +
                 "(HHC.MILEAGE_CONTRACT_CREATION + HHC.COVER_KM) AS HHC_CONTRACT_END_KM ");
         sql.append("FROM PA_DATA_INFO ");
         sql.append("LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN ");
         sql.append("AND HHC.CONTRACT_STATUS = 'Active' ");
-
-        sql.append(oFilter.getWhereClause());
+        //sql.append(oFilter.getWhereClause());
 
         if(checkExpiredContracts) {
                 sql.append(" ) WHERE MC_DT_FINISH_CONTRACT >= '" + dtStart + "' AND MC_DT_FINISH_CONTRACT < '" + dtEnd + "' ");
@@ -98,15 +88,11 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
             } else {
                 sql.append(" )WHERE ROWNUM BETWEEN " + pageStart + " AND " + pageEnd + " ");
             }
-        sql.append(") AS Subquery;");
 
-
-
-        System.out.println(String.valueOf(sql));
         return String.valueOf(sql);
     }
 
-    public String buildPATotalsQuery(FilterBean filter) throws SCErrorException {
+    public String buildPATotalsQuery(FilterBean filter) {
 
         StringBuffer sql = new StringBuffer();
 
@@ -124,7 +110,6 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
         java.sql.Date dtEnd = new java.sql.Date(calEnd.getTimeInMillis());
 
-        int defaultTransactionIsolation = Integer.MIN_VALUE;
 
         sql.append(" SELECT COUNT(*) AS TOTAL, ");
         sql.append(" COALESCE(SUM(CASE WHEN PA_ID_STATUS=1 					THEN 1 ELSE 0 END),0) AS NOT_DONE, ");
@@ -138,7 +123,6 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         sql.append(" FROM " + "PA_DATA_INFO ");
         sql.append(" LEFT JOIN VEHICLE_HHC HHC" + " ON HHC.CONTRACT_VIN = " + "PA_DATA_INFO" + ".PA_VIN AND HHC.CONTRACT_STATUS='Active' ");
 
-     //   sql.append(filter.getWhereClauseForTotals());
 
         if (checkExpiredContracts) {
             sql.append(" AND MC_DT_FINISH_CONTRACT >= '" + dtStart + "' AND MC_DT_FINISH_CONTRACT < '" + dtEnd + "' ");

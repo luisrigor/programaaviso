@@ -14,7 +14,7 @@ public interface PABeanCustomRepository {
 
     List<ProgramaAvisosBean> getProgramaAvisosBean(FilterBean filterBean) throws SCErrorException;
 
-    PATotals getPaTotals(FilterBean filterBean) throws SCErrorException;
+    PATotals getPaTotals(FilterBean filterBean);
 
 
 

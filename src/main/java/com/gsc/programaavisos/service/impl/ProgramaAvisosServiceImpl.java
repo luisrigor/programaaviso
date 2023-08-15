@@ -464,10 +464,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         try {
             FilterBean filterBean = getFilter(userPrincipal);
             PATotals paTotals = getPaTotals(filterBean);
-           // List<ProgramaAvisosBean> pAList = paBeanRepository.findAll();
+            List<ProgramaAvisosBean> pAList = paBeanRepository.getProgramaAvisosBean(filterBean);
 
             return PAInfoDTO.builder()
-                    .paInfoList(new ArrayList<>())
+                    .paInfoList(pAList)
                     .paTotals(paTotals)
                     .filterBean(filterBean)
                     .build();
