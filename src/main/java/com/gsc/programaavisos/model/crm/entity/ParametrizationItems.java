@@ -63,8 +63,10 @@ public class ParametrizationItems {
     private List<ItemsGenre> itemGenres;
     @Transient
     private List<ItemsEntityType> itemEntityTypes;
-   // protected List<ItemsModel> itemModels;
-   @Transient
-   private List<ItemsFuel> itemFuels;
-   // protected List<ItemsDealer> itemDealers;
+    @Transient
+    private List<ItemsFuel> itemFuels;
+   /* @Transient
+    private List<ItemsModel> itemModels;
+    @Transient
+    private List<ItemsDealer> itemDealers;*/
 }

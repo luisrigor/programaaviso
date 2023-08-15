@@ -41,8 +41,8 @@ public class ParametrizationController {
     }
 
     @GetMapping(ApiEndpoints.GET_PARAMETRIZATION_LIST)
-    public ResponseEntity<List<PaParameterization>> getParametrizationList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("getParametrizationList controller");
+    public ResponseEntity<List<PaParameterization>> getListParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        log.info("getListParametrization controller");
         List<PaParameterization> paParameterizationList = parametrizationService.getParametrizationsList(userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
     }
@@ -50,7 +50,7 @@ public class ParametrizationController {
     @GetMapping(ApiEndpoints.GET_NEW_PARAMETRIZATION)
     public ResponseEntity<PaParameterization> getNewParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                           @RequestParam Integer id) {
-        log.info("getParametrizationList controller");
+        log.info("getNewParametrization controller");
         PaParameterization paParameterizationList = parametrizationService.getNewParametrization(userPrincipal,id);
         return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
     }
