@@ -65,8 +65,10 @@ public class ProgramaAvisosController {
     }
 
     @GetMapping(ApiEndpoints.LIST_PA)
-    public ResponseEntity<PAInfoDTO> paInfoList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<>(programaAvisosService.getInfoPA(userPrincipal),HttpStatus.OK);
+    public ResponseEntity<?> paInfoList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Gson gson = new Gson();
+        return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(programaAvisosService.getInfoPA(userPrincipal)));
+
     }
 
 
