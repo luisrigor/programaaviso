@@ -8,4 +8,5 @@ public interface ProgramaAvisosService {
     void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
     FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO);
     void unlockPARegister(Integer id);
+    void activatePA(Integer id);
 }

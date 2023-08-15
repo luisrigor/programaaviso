@@ -14,7 +14,10 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitCategoryRepository;
 import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.SftpTasks;
+import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -118,6 +121,17 @@ public class ItemServiceImpl implements ItemService {
                     .build();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching manage items ", e);
+        }
+    }
+
+    @Override
+    public List<DocumentUnitDTO> getListManagesItems(UserPrincipal userPrincipal,String searchInput,Integer itemType) {
+        try{
+            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
+            ItemFilter oItemFilter = ItemFilter.builder().searchInput(searchInput).itemType(itemType).idBrand(idBrand).build();
+            return documentUnitRepository.getByFilter(oItemFilter);
+        }catch(Exception e){
+            throw new ProgramaAvisosException("Error fetching manage items list ", e);
         }
     }
 }

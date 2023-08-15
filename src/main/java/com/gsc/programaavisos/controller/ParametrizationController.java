@@ -39,4 +39,19 @@ public class ParametrizationController {
         log.info("deleteParametrization controller");
         parametrizationService.deleteParametrization(userPrincipal,id);
     }
+
+    @GetMapping(ApiEndpoints.GET_PARAMETRIZATION_LIST)
+    public ResponseEntity<List<PaParameterization>> getParametrizationList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        log.info("getParametrizationList controller");
+        List<PaParameterization> paParameterizationList = parametrizationService.getParametrizationsList(userPrincipal);
+        return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
+    }
+
+    @GetMapping(ApiEndpoints.GET_NEW_PARAMETRIZATION)
+    public ResponseEntity<PaParameterization> getNewParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                          @RequestParam Integer id) {
+        log.info("getParametrizationList controller");
+        PaParameterization paParameterizationList = parametrizationService.getNewParametrization(userPrincipal,id);
+        return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
+    }
 }

@@ -39,8 +39,17 @@ public class ItemsController {
     @GetMapping(ApiEndpoints.GET_MANAGE_ITEMS)
     public ResponseEntity<ManageItemsDTO> getManageItems(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                          @RequestParam int itemType, @RequestParam int itemId) {
+        log.info("getManageItems controller");
         ManageItemsDTO manageItems = itemService.getManageItems(userPrincipal, itemType, itemId);
 
         return ResponseEntity.status(HttpStatus.OK).body(manageItems);
+    }
+
+    @GetMapping(ApiEndpoints.GET_MANAGE_LIST)
+    public ResponseEntity<List<DocumentUnitDTO>> getManageItemsList(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                    @RequestParam(required = false) String searchInput, @RequestParam int itemType) {
+        log.info("getManageItemsList controller");
+        List<DocumentUnitDTO> documentUnitDTOList = itemService.getListManagesItems(userPrincipal,searchInput, itemType);
+        return ResponseEntity.status(HttpStatus.OK).body(documentUnitDTOList);
     }
 }

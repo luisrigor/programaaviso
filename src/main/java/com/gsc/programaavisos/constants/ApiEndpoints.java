@@ -3,6 +3,8 @@ package com.gsc.programaavisos.constants;
 public interface ApiEndpoints {
 
     String SEARCH_PARAMETRIZATIONS = "/search-parametrizations";
+    String GET_PARAMETRIZATION_LIST = "/get-parametrization-list";
+    String GET_NEW_PARAMETRIZATION= "/new-parametrization";
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";
@@ -17,6 +19,7 @@ public interface ApiEndpoints {
     String SAVE_PA = "/save-pa";
     String GET_DEALERS = "/dealers";
     String GET_MANAGE_ITEMS = "/manage-items";
+    String GET_MANAGE_LIST = "/manage-list";
     String REMOVE_PA = "/remove-pa";
     String SEARCH_PA = "/search-pa";
     String GET_DELEGATORS = "/delegators";
