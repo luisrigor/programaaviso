@@ -2,21 +2,25 @@ package com.gsc.programaavisos.service.impl;
 
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
+import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.model.crm.entity.ItemsKilometers;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
-import com.gsc.programaavisos.model.crm.entity.ParametrizationItems;
+import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.repository.crm.impl.ItemsModelRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.DataBaseTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 @Service
 @Log4j
@@ -30,6 +34,8 @@ public class ParametrizationServiceImpl implements ParametrizationService {
     private final ItemsEntityTypeRepository itemsEntityTypeRepository;
     private final ItemsFidelitysRepository itemsFidelitysRepository;
     private final ItemsKilometersRepository itemsKilometersRepository;
+    private final ItemsDealerRepository itemsDealerRepository;
+    private final ItemsModelRepository itemsModelRepository;
     private final ParametrizationItemsRepository parametrizationItemsRepository;
     @Override
     public List<PaParameterization> searchParametrization(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal) {
@@ -114,4 +120,107 @@ public class ParametrizationServiceImpl implements ParametrizationService {
             return parametrizationItemsRepository.getAllParametrizationItem(idParametrization);
         }
     }
+
+    private void saveParametrization(ParameterizationDTO parameterizationDTO, UserPrincipal oGSCUser) {
+        /*
+         if(request.getParameter(PARAMETRIZATION_JSON)!=null){
+                jsonObjStr = request.getParameter(PARAMETRIZATION_JSON);
+        }*/
+        PaParameterization oParameterization = PaParameterization.builder()
+                .id(parameterizationDTO.getId())
+                .dtStart(parameterizationDTO.getDtStart())
+                .dtEnd(parameterizationDTO.getDtEnd())
+                .comments(parameterizationDTO.getComments())
+                .published(parameterizationDTO.getPublished())
+                .visible(parameterizationDTO.getVisible())
+                .type(parameterizationDTO.getType())
+                .parameterizationItems(parameterizationDTO.getParametrizationItems())
+                .idBrand(ApiConstants.getIdBrand(oGSCUser.getOidNet()))
+                .createdBy("oGSCUser.getUserStamp()")
+                .build();
+
+        insertParametrization(oParameterization.getId() > 0, oParameterization, oGSCUser);
+    }
+
+    private void insertParametrization(Boolean isNotNew, PaParameterization oParameterization, UserPrincipal oGSCUser) {
+        try {
+            if (isNotNew)
+                parametrizationItemsRepository.deleteById(oParameterization.getId());
+
+            paParameterizationRepository.save(oParameterization);
+            String createdBy = "oGSCUser.getUserStamp()";
+
+            for (ParametrizationItems parameterizationItem : oParameterization.getParameterizationItems()) {
+                if (parameterizationItem!=null){
+                    parameterizationItem.setIdParameterization(oParameterization.getId());
+                    parametrizationItemsRepository.save(parameterizationItem);
+                    int parameterizationItemId = parameterizationItem.getId();
+
+/*
+                    for (ItemsAge age : parameterizationItem.getItemAges()) {
+                        age.setIdParameterizationItems(parameterizationItemId);
+                        age.setCreatedBy(createdBy);
+                        itemsAgeRepository.save(age);
+                    }
+                    for (ItemsKilometers kilometer : parameterizationItem.getItemKilometers()) {
+                        kilometer.setIdParameterizationItems(parameterizationItemId);
+                        kilometer.setCreatedBy(createdBy);
+                        itemsKilometersRepository.save(kilometer);
+                    }
+                    for (ItemsFidelitys fidelity : parameterizationItem.getItemFidelitys()) {
+                        fidelity.setIdParameterizationItems(parameterizationItemId);
+                        fidelity.setCreatedBy(createdBy);
+                        itemsFidelitysRepository.save(fidelity);
+                    }
+                    for (ItemsFuel fuel : parameterizationItem.getItemFuels()) {
+                        fuel.setIdParameterizationItems(parameterizationItemId);
+                        fuel.setCreatedBy(createdBy);
+                        itemsFuelRepository.save(fuel);
+                    }
+                    for (ItemsDealer dealer : parameterizationItem.getItemDealers()) {
+                        dealer.setIdParameterizationItems(parameterizationItemId);
+                        dealer.setCreatedBy(createdBy);
+                        itemsDealerRepository.save(dealer);
+                    }
+                    for (ItemsGenre genre : parameterizationItem.getItemGenres()) {
+                        genre.setIdParameterizationItems(parameterizationItemId);
+                        genre.setCreatedBy(createdBy);
+                        itemsGenreRepository.save(genre);                    }
+                    for (ItemsModel model : parameterizationItem.getItemModels()) {
+                        model.setIdParameterizationItems(parameterizationItemId);
+                        model.setCreatedBy(createdBy);
+                        itemsModelRepository.save(model);                    }
+                    for (ItemsEntityType entityType : parameterizationItem.getItemEntityTypes()) {
+                        entityType.setIdParameterizationItems(parameterizationItemId);
+                        entityType.setCreatedBy(createdBy);
+                        itemsEntityTypeRepository.save(entityType);
+                    }
+                    /*
+                    saveItems(parameterizationItem.getItemAges(), parameterizationItemId, createdBy, ItemsAge::setIdParameterizationItems, ItemsAge::setCreatedBy, itemsAgeRepository);
+                    saveItems(parameterizationItem.getItemKilometers(), parameterizationItemId, createdBy, ItemsKilometers::setIdParameterizationItems, ItemsKilometers::setCreatedBy, itemsKilometersRepository);
+                    saveItems(parameterizationItem.getItemFidelitys(), parameterizationItemId, createdBy, ItemsFidelitys::setIdParameterizationItems, ItemsFidelitys::setCreatedBy, itemsFidelitysRepository);
+                    saveItems(parameterizationItem.getItemFuels(), parameterizationItemId, createdBy, ItemsFuel::setIdParameterizationItems, ItemsFuel::setCreatedBy, itemsFuelRepository);
+                    saveItems(parameterizationItem.getItemDealers(), parameterizationItemId, createdBy, ItemsDealer::setIdParameterizationItems, ItemsDealer::setCreatedBy, itemsDealerRepository);
+                    saveItems(parameterizationItem.getItemGenres(), parameterizationItemId, createdBy, ItemsGenre::setIdParameterizationItems, ItemsGenre::setCreatedBy, itemsGenreRepository);
+                    saveItems(parameterizationItem.getItemModels(), parameterizationItemId, createdBy, ItemsModel::setIdParameterizationItems, ItemsModel::setCreatedBy, itemsModelRepository);
+                    saveItems(parameterizationItem.getItemEntityTypes(), parameterizationItemId, createdBy, ItemsEntityType::setIdParameterizationItems, ItemsEntityType::setCreatedBy, itemsEntityTypeRepository);
+                     */
+                }
+            }
+
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error new parametrization", e);
+        }
+
+    }
+
+    private <T> void saveItems(List<T> items, Integer parameterizationItemId, String createdBy, BiConsumer<T, Integer> idParamSetter,
+                               BiConsumer<T, String> createdBySetter, JpaRepository<T, Integer> repository) {
+        for (T item : items) {
+            idParamSetter.accept(item, parameterizationItemId);
+            createdBySetter.accept(item, createdBy);
+            repository.save(item);
+        }
+    }
+
 }
