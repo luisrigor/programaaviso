@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class ApplicationConfiguration {
 
+    public static final int PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS = 5;
+    public static final int PA_CONTACTTYPE_CONECTIVIDADE = 9;
     public static Map<String, Dealer> MAP_DEALERS = null;
 
     public static Dealer getDealer(String oidDealer) throws SCErrorException {

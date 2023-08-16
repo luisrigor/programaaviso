@@ -15,4 +15,5 @@ public interface CombustivelRepository extends JpaRepository<Combustivel, Intege
             "FROM  GamaInfo GI " +
             "INNER JOIN Combustivel C ON GI.idCombustivel = C.id WHERE GI.idMarca = :idBrand")
     List<Fuel> getFuelsByIdBrand(@Param("idBrand") int idBrand);
+
 }

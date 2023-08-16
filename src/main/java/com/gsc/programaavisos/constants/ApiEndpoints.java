@@ -19,6 +19,7 @@ public interface ApiEndpoints {
     String GET_MANAGE_ITEMS = "/manage-items";
     String REMOVE_PA = "/remove-pa";
     String SEARCH_PA = "/search-pa";
+    String LIST_PA = "/list-pa";
     String GET_DELEGATORS = "/delegators";
     String DELETE_PARAMATRIZATION = "/delete-parametrization";
     String GET_CLIENT_TYPE = "/client-type";
