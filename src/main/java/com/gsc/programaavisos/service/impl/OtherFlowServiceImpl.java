@@ -16,9 +16,6 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
-import com.sc.commons.comunications.Sms;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.*;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
@@ -61,7 +56,9 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final ClientTypeRepository clientTypeRepository;
     private final SourceRepository sourceRepository;
     private final ChannelRepository channelRepository;
-    private final ContactTypeRepository contactTypeRepository;
+
+    private final ContactTypeRepositoryCRM contactTypeRepositoryCRM;
+
 
     private final Environment env;
 
@@ -321,7 +318,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     @Override
     public List<ContactType> getContactTypeList(String userLogin) {
 
-        List<ContactType> contactTypeList = contactTypeRepository.getByState('S');
+        List<ContactType> contactTypeList = contactTypeRepositoryCRM.getByState('S');
         List<ContactType> contactTypeListWAcess = new ArrayList<>();
 
         for (ContactType contactType: contactTypeList) {

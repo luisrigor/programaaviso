@@ -25,7 +25,7 @@ public interface ApiEndpoints {
     String GET_DELEGATORS = "/delegators";
     String DELETE_PARAMATRIZATION = "/delete-parametrization";
     String IMPORT_TECHNICAL_CAMPAIGN = "/import-technical-campaign-action";
-    String GET_CONTACT_TYPE = "/contact-type";
+    String GET_ALL_CONTACT_TYPE = "/all-contact-type";
     String GET_CHANGED_LIST = "/changed-list";
     String GET_PA_CLIENT_CONTACTS = "/pa-client-plates";
     String MAP_UPDATE = "/map-update";
