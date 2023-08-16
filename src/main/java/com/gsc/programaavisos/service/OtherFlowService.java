@@ -1,8 +1,6 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.dto.DelegatorsDTO;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.GetDelegatorsDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -23,4 +21,8 @@ public interface OtherFlowService {
     List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
     DelegatorsDTO getDelegators(UserPrincipal userPrincipal, GetDelegatorsDTO delegatorsDTO);
+    List<Object[]> getChangedList(GetDelegatorsDTO delegatorsDTO);
+    List<ContactType> getContactTypeList(String userLogin);
+    ClientContactsDTO getPAClientContacts(String nif, String selPlate, int idPaData, FilterBean oPAFilterBean);
+    void mapUpdate(UserPrincipal userPrincipal);
 }

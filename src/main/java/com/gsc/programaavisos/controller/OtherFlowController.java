@@ -2,9 +2,7 @@ package com.gsc.programaavisos.controller;
 
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
-import com.gsc.programaavisos.dto.DelegatorsDTO;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.GetDelegatorsDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Log4j
@@ -114,5 +113,34 @@ public class OtherFlowController {
         DelegatorsDTO rs = otherFlowService.getDelegators(userPrincipal, delegatorsDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
+    public ResponseEntity<List<ContactType>> getContactType(@RequestParam String userLogin) {
+        List<ContactType> contactTypeList = otherFlowService.getContactTypeList(userLogin);
+
+        return ResponseEntity.status(HttpStatus.OK).body(contactTypeList);
+    }
+
+    @PostMapping(ApiEndpoints.GET_CHANGED_LIST)
+    public ResponseEntity<List<Object[]>> getChangedList(@RequestBody GetDelegatorsDTO delegatorsDTO) {
+        List<Object[]> changedList = otherFlowService.getChangedList(delegatorsDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(changedList);
+    }
+
+    @PostMapping(ApiEndpoints.GET_PA_CLIENT_CONTACTS)
+    public ResponseEntity<ClientContactsDTO> getPAClientContacts(@RequestParam(required = false) String nif,  @RequestParam(required = false) String selPlate,
+                                                                 @RequestParam int idPaData, @RequestBody FilterBean oPAFilterBean) {
+        ClientContactsDTO clientContacts = otherFlowService.getPAClientContacts(nif, selPlate, idPaData, oPAFilterBean);
+
+        return ResponseEntity.status(HttpStatus.OK).body(clientContacts);
+    }
+
+    @PostMapping(ApiEndpoints.MAP_UPDATE)
+    public ResponseEntity<String> mapUpdate(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+       otherFlowService.mapUpdate(userPrincipal);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Update");
     }
 }

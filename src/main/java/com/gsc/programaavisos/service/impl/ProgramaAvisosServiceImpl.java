@@ -6,10 +6,18 @@ import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.crm.ContactTypeB;
+import com.gsc.programaavisos.model.crm.PaDataInfoP;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
+import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
+import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
@@ -20,6 +28,9 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import com.gsc.claims.object.core.ClaimDetail;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -35,6 +46,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PARepository paRepository;
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
+    private final PaDataInfoRepository paDataInfoRepository;
+    private final PARepository programaAvisosRepository;
+    private final ProgramaAvisosUtil programaAvisosUtil;
+
+    public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
+
 
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
@@ -107,7 +124,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     sendMail(oPA,dtSchedule,hrSchedule,oidDealerSchedule);
                 }
                 oPA.setBlockedBy(StringUtils.EMPTY);
-                paRepository.save(oPA);
+                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
 
                 if(oPA.getRevisionScheduleMotive().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER) || oPA.getRevisionSchedule().equalsIgnoreCase(PaConstants.RSM_NOT_OWNER2)) {
                     dataVehicle(oPA.getLicensePlate());
@@ -126,7 +143,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(Long.valueOf(id)).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
+             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
               oPA = ProgramaAvisos.builder()
                       .successContact("N")
@@ -138,7 +155,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                       .revisionScheduleMotive2(StringUtils.EMPTY)
                       .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
                       .build();
-                paRepository.save(oPA);
+
+                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
+
             }
         } catch (Exception e) {
             log.error("An error occurred while removing a record from the list");
@@ -218,6 +237,23 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error searchPA ", e);
         }
+    }
+
+    @Override
+    public void uploadFile(UserPrincipal userPrincipal, MultipartFile file) {
+
+        String importErrors = "";
+        try {
+            //TODO Validate file
+            // validate file
+//            String importErrors = CSVUploadFileUtils.validateFile(file);
+
+            // parse file and update DB
+            importErrors = parseAndUpdateDB(file, userPrincipal, importErrors);
+        } catch(Exception e) {
+            throw new ProgramaAvisosException("An error occurred while uploading files ", e);
+        }
+
     }
 
     private ProgramaAvisos dataPA(PADTO pa){
@@ -447,5 +483,151 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 //            filter.setGSCUserLogin(oGSCUser.getLogin());
         }
         return filter;
+    }
+
+    public String parseAndUpdateDB(MultipartFile file, UserPrincipal oGSCUser, String importErrors) {
+
+        try(Reader reader = new BufferedReader(new InputStreamReader((file.getInputStream())))) {
+            CSVParser csvParser = new CSVParserBuilder().withSeparator(';').build();
+            CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(csvParser).build();
+            List<String[]> rows = csvReader.readAll();
+
+            for (String[] tokens : rows.subList(1, rows.size())) {
+                int j = 0;
+                String temp			=  tokens[j++];
+                String dealerCode	= temp.substring(0, 2);
+                String afterSalesCode	= temp.substring(3,6);
+                int year =  0, month = 0;
+                String licencePlate = "";
+                try {
+                    year			=  Integer.parseInt(tokens[j++]);
+                    month			= Integer.parseInt(tokens[j++]);
+                    licencePlate	= tokens[j++];
+                } catch (Exception e) {
+                   log.error("Error parsing csv rows ", e);
+                }
+                String delegatedTo = "";
+                if(tokens.length > 4) {
+                    delegatedTo = tokens[j++];
+                    delegatedTo = CleanDelegatedTo(delegatedTo);
+                }
+                String clientNumber = "";
+                if(tokens.length > 5) {
+                    clientNumber = tokens[j++];
+                }
+
+                //Update in DB
+                Dealer oDealer = null;
+                if (oGSCUser.getOidNet().equalsIgnoreCase(Dealer.OID_NET_TOYOTA)) {
+                    oDealer = Dealer.getToyotaHelper().getByDealerAndAfterSalesCode(dealerCode, afterSalesCode);
+                } else if (oGSCUser.getOidNet().equalsIgnoreCase(Dealer.OID_NET_LEXUS)) {
+                    oDealer = Dealer.getLexusHelper().getByDealerAndAfterSalesCode(dealerCode, afterSalesCode);
+                }
+                String oidDealer = "";
+                if (oDealer!=null)
+                    oidDealer = oDealer.getObjectId();
+                PaDataInfo oPABeanO = paDataInfoRepository.getProgramaAvisosByYearMonthPlateDealer(year, oidDealer);
+                PaDataInfoP oPABean = fillPABean(oPABeanO);
+
+
+                boolean isToUpdate = false;
+                if(oPABean != null ) {
+                    if(! StringTasks.cleanString(oPABean.getPaLicensePlate(),"").equals("")) {
+                        if(!StringTasks.cleanString(oPABean.getPaDelegatedTo(),"").equalsIgnoreCase(delegatedTo)) {
+                            isToUpdate = true;
+                        }
+                        if(!StringTasks.cleanString(oPABean.getPaClient(),"").equalsIgnoreCase(clientNumber)) {
+                            isToUpdate = true;
+                        }
+                        if(isToUpdate) {
+                            ProgramaAvisos oPA = programaAvisosRepository.findById(oPABean.getPaId()).orElse(null);
+
+                            if(oPA!=null) {
+                                oPA.setDelegatedTo(StringTasks.cleanString(delegatedTo,"").toUpperCase().trim());
+                                oPA.setClient(clientNumber.trim());
+                                programaAvisosUtil.save("", false, oPA);
+                                log.debug("Atualizar para id:" + oPA.getId());
+                            }
+                        } else {
+                            log.debug("Nao atualizar linha: ");
+                        }
+                    }
+                } else {
+                    importErrors +=  tokens + " - Linha inválida."+ "<BR/>";
+                }
+            }
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("There was an error reading the file", e);
+        }
+
+        return importErrors;
+    }
+    private static String CleanDelegatedTo(String delegatedTo) {
+
+        String delegated = delegatedTo;
+        if (delegatedTo==null)
+            delegated = "";
+        else if (delegatedTo.equalsIgnoreCase("#N/D"))
+            delegated = "";
+        else if (delegatedTo.equalsIgnoreCase("."))
+            delegated = "";
+        else if (delegatedTo.equalsIgnoreCase("0"))
+            delegated = "";
+
+        return delegated;
+    }
+
+
+    public static PaDataInfoP fillPABean(PaDataInfo oPABeanO) {
+        if(oPABeanO!=null) {
+            PaDataInfoP paDataInfoP = PaDataInfoConverter.paDataInfoToP(oPABeanO);
+            switch (paDataInfoP.getPaIdContactType()) {
+                case ContactTypeB.MAN:
+                    paDataInfoP.setDescription(paDataInfoP.getNextRevision());
+                    paDataInfoP.setExpectedDate(paDataInfoP.getMrsDtNextRevision() == null ? "" : paDataInfoP.getMrsDtNextRevision().toString());
+                    break;
+                case ContactTypeB.ITV:
+                    if (MRS_MAINTENANCE_TYPE_PRE_ITV.equalsIgnoreCase(paDataInfoP.getNextRevision()))
+                        paDataInfoP.setDescription("Pr�-ITV + Pack");
+                    else
+                        paDataInfoP.setDescription(paDataInfoP.getNextRevision());
+                    paDataInfoP.setExpectedDate(paDataInfoP.getMrsDtItv() == null ? "" : paDataInfoP.getMrsDtItv() .toString());
+                    break;
+                case ContactTypeB.MAN_ITV:
+                    paDataInfoP.setDescription(paDataInfoP.getNextRevision());
+                    paDataInfoP.setExpectedDate((paDataInfoP.getMrsDtNextRevision()== null ? "" : paDataInfoP.getMrsDtNextRevision().toString())+ "</br>" + (paDataInfoP.getMrsDtItv()  == null ? "" : paDataInfoP.getMrsDtItv().toString()));
+                    break;
+                case ContactTypeB.EXTRACARE_PLUS:
+                    paDataInfoP.setDescription("Ext. Garantia Mais");
+                    paDataInfoP.setExpectedDate(paDataInfoP.getExtracarePlusDtLimitRenovation() == null ? "" : paDataInfoP.getExtracarePlusDtLimitRenovation().toString());
+                    break;
+                case ContactTypeB.MAINTENANCE_CONTRACT:
+                    paDataInfoP.setDescription("Contrato de manuten��o Expirado");
+                    paDataInfoP.setExpectedDate(paDataInfoP.getMcDtFinishContract() == null ? "" : paDataInfoP.getMcDtFinishContract().toString());
+                    break;
+                case ContactTypeB.TECHNICAL_CAMPAIGN:
+                    paDataInfoP.setDescription("Campanha T�cnica ("+StringTasks.cleanString(paDataInfoP.getTcCampaign(),"")+")");
+                    paDataInfoP.setExpectedDate("");
+                    break;
+                case ContactTypeB.COMMERCIAL_CAMPAIGN:
+                    paDataInfoP.setDescription("Campanha Comercial");
+                    paDataInfoP.setExpectedDate("");
+                    break;
+                case ContactTypeB.COMMERCIAL_CAMPAIGN_APV_MAP:
+                    paDataInfoP.setDescription("Atualiza��o Mapas");
+                    paDataInfoP.setExpectedDate("");
+                    break;
+                case ContactTypeB.CONNECTIVITY:
+                    paDataInfoP.setDescription("Conectividade MyT");
+                    paDataInfoP.setExpectedDate(paDataInfoP.getPaDtVisible() == null ? "" : paDataInfoP.getPaDtVisible().toString());
+                    break;
+                default:
+                    break;
+            }
+
+            return paDataInfoP;
+        }
+
+        return null;
     }
 }

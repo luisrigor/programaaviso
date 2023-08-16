@@ -139,6 +139,26 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCGSCWSClient3</artifactId>
+            <version>20230308</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCEcare</artifactId>
+            <version>20230307</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>

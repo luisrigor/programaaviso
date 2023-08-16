@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 @RequiredArgsConstructor
 @Log4j
 @RequestMapping("${app.baseUrl}")
@@ -47,5 +49,13 @@ public class ProgramaAvisosController {
                          @RequestParam String removedObs) {
         log.info("removePA controller");
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
+    }
+
+    @PostMapping()
+    public ResponseEntity<String> uploadFile(@AuthenticationPrincipal UserPrincipal userPrincipal,  @RequestPart MultipartFile file) {
+        log.info("uploadFile controller");
+        programaAvisosService.uploadFile(userPrincipal, file);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Document successfully imported.");
     }
 }

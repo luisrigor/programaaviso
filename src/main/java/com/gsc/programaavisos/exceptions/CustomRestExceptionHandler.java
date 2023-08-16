@@ -21,4 +21,13 @@ public class CustomRestExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 
+    @ExceptionHandler(value = {ObjectMappingException.class})
+    public ResponseEntity<ApiError> objectMappingException(ObjectMappingException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
+        ApiError apiError = new ApiError(ApiErrorConstants.ERROR_PROCESSING_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(), request.getDescription(false), ex.getCause().getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    }
+
 }

@@ -6,6 +6,7 @@ import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
+import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.cardb.ModeloRepository;
@@ -14,17 +15,22 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
+import com.sc.commons.comunications.Sms;
+import com.sc.commons.dbconnection.ServerJDBCConnection;
 import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.StringTasks;
+import com.sc.commons.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.PrintWriter;
+import java.io.*;
+import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
+import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;
 import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
 
@@ -43,9 +49,16 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     private final FidelitysRepository fidelitysRepository;
     private final DocumentUnitRepository documentUnitRepository;
     private final PARepository paRepository;
+    private final ContactTypeMaintenanceTypeRepository maintenanceTypeRepository;
+    private final ContactTypeRepository contactTypeRepository;
+    private final PaDataInfoRepository dataInfoRepository;
+    private final CcRigorServiceRepository ccRepository;
 
 
     private static final String QUOTES = "\"";
+
+    private final Environment env;
+
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -310,5 +323,162 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching delegators ", e);
         }
+    }
+
+    @Override
+    public List<Object[]> getChangedList( GetDelegatorsDTO delegatorsDTO) {
+        Integer fromYear = Integer.valueOf(delegatorsDTO.getFromYear());
+        Integer toYear = Integer.valueOf(delegatorsDTO.getToYear());
+        Integer fromMonth = Integer.valueOf(delegatorsDTO.getFromMonth());
+        Integer toMonth = Integer.valueOf(delegatorsDTO.getToMonth());
+        List<String> arrayOidDealer = Arrays.asList(delegatorsDTO.getArrayOidDealer());
+        List<Object[]> changedList = dataInfoRepository.getDistinctChangedByNames(fromYear, fromMonth, toYear, toMonth, arrayOidDealer);
+        return changedList;
+    }
+
+    @Override
+    public List<ContactType> getContactTypeList(String userLogin) {
+
+        List<ContactType> contactTypeList = contactTypeRepository.getByState('S');
+        List<ContactType> contactTypeListWAcess = new ArrayList<>();
+
+        for (ContactType contactType: contactTypeList) {
+            if(this.getContactAcces().get(contactType.getId())!=null
+                    && !this.getContactAcces().get(contactType.getId()).isEmpty()){
+
+                String[] users = this.getContactAcces().get(contactType.getId()).split(",");
+                boolean hasAccess = false;
+                for(String user : users){
+                    if(user.trim().contentEquals(userLogin.trim())){
+                        hasAccess = true;
+                        break;
+                    }
+                }
+                // se n�o houver acesso, remove o motivo de contato da listagem de filtros
+                if(hasAccess)
+                    contactTypeListWAcess.add(contactType);
+            }
+        }
+
+        return contactTypeListWAcess;
+    }
+
+
+    @Override
+    public ClientContactsDTO getPAClientContacts(String nif, String selPlate, int idPaData, FilterBean oPAFilterBean) {
+        try {
+
+            List<ClientPropDTO> contactsForPlate = new ArrayList<>();
+            List<ClientPropDTO> contactsForClient = new ArrayList<>();
+
+            Map<Integer, List<String>> contactType = getMaintenanceTypesByContactType();
+
+
+            List<ProgramaAvisosBean> vecPABean = paRepository.getOpenContactsforClient(oPAFilterBean,nif, selPlate, contactType);
+
+
+            log.trace("vecPABean..." + vecPABean.size());
+            for (ProgramaAvisosBean oProgramaAvisosBean: vecPABean) {
+                if (oProgramaAvisosBean.getLicensePlate().equalsIgnoreCase(selPlate)
+                        && oProgramaAvisosBean.getId() != idPaData) {
+
+                    ClientPropDTO contactsDTO = ClientPropDTO.builder()
+                            .id(oProgramaAvisosBean.getId())
+                            .nextRevision(oProgramaAvisosBean.getNextRevision())
+                            .build();
+
+                    contactsForPlate.add(contactsDTO);
+
+                } else if (!oProgramaAvisosBean.getLicensePlate().equalsIgnoreCase(selPlate)) {
+                    ClientPropDTO contactsDTO = ClientPropDTO.builder()
+                            .id(oProgramaAvisosBean.getId())
+                            .nextRevision(oProgramaAvisosBean.getNextRevision())
+                            .licencePlate(CarTasks.formatPlate(oProgramaAvisosBean.getLicensePlate()))
+                            .build();
+
+                    contactsForClient.add(contactsDTO);
+                }
+            }
+
+            return ClientContactsDTO.builder()
+                    .contactsForPlate(contactsForPlate)
+                    .contactsForClient(contactsForClient)
+                    .build();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error fetching plates list for the same customer");
+        }
+    }
+
+    @Override
+    public void mapUpdate(UserPrincipal userPrincipal) {
+//        MultipartWrapper mpWrapper = null;
+//        int MAXFILESIZE = 20971520;//20*1024*1024=20 MB
+//        String msg="O ficheiro est� a ser processado, ser� notificado sobre o resultado por email.";
+//        PrintWriter pr = null;
+//
+//        try {
+//            mpWrapper = new MultipartWrapper(request,MAXFILESIZE);
+//
+//            FileItem fileAttachItem = mpWrapper.getFileItem("arquivo");
+//            PlateToSmsThread thread = new PlateToSmsThread(fileAttachItem, oGSCUser);
+//
+//            thread.start();
+//
+//            Gson gson = new Gson();
+//            String json = gson.toJson(msg);
+//            response.setCharacterEncoding("UTF-8");
+//            response.setContentType("application/json");
+//            pr = response.getWriter();
+//            pr.write(json);
+//
+//        } catch (Exception e) {
+//            throw new ProgramaAvisosException("Error reading file ", e);
+//        }
+    }
+
+    public Map<Integer, List<String>> getMaintenanceTypesByContactType() {
+        Map<Integer, List<String>> MAP_CONTACT_MAINTENANCE_TYPES = new HashMap<>();
+        try {
+            List<ContactMaintenanceTypes> maintenanceByContactType = maintenanceTypeRepository.getMaintenanceByContactType();
+
+            for (ContactMaintenanceTypes currentContact : maintenanceByContactType) {
+                Integer idContractType = currentContact.getId();
+
+                if (!MAP_CONTACT_MAINTENANCE_TYPES.containsKey(idContractType))
+                    MAP_CONTACT_MAINTENANCE_TYPES.put(idContractType, new ArrayList<String>());
+                MAP_CONTACT_MAINTENANCE_TYPES.get(idContractType).add(currentContact.getMaintenanceType());
+            }
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error querying MaintenanceTypesByContactType", e);
+        }
+        return MAP_CONTACT_MAINTENANCE_TYPES;
+    }
+
+    public Map<Integer, String> getContactAcces() {
+        Map<Integer, String> MAP_PA_CONTACT_TYPE_ACCESS = new HashMap<Integer, String>();
+
+        String USERS_CAN_VIEW_CONNECTIVITY = "";
+
+        String[] activeProfiles = env.getActiveProfiles();
+
+
+        if (!Arrays.asList(activeProfiles).contains(PRODUCTION_SERVER_STR)){
+            USERS_CAN_VIEW_CONNECTIVITY = "tcap1@tpo";
+        }else {
+            USERS_CAN_VIEW_CONNECTIVITY = "andre.dias@tpo, tiago.cardoso@tpo, antonio.calafate@tpo, "
+                    + "luciano.teixeira@tpo, joao.marques@tpo, carlos.valentim@tpo, ricardo.dinis@tpo, "
+                    + "nuno.araujo@tpo, paulo.cunha@tpo, jose.oliveira@tpo,"
+                    + "ana.fazenda@tpo.sccalisboa.pvelho, celia.bento@tpo.sccalisboa.pvelho, cr.freitas@tpo.sccaporto.circunvalacao, "
+                    + "cristina.santos@tpo.sccalisboa.pvelho, gilda.alves@tpo.scca, patricia.matias@tpo.sccalisboa.pvelho, "
+                    + "sonia.martins@tpo.casintra.riodemouro, t.lucia@tpo.cacentronorte.aveiro";
+        }
+
+        MAP_PA_CONTACT_TYPE_ACCESS.put(ContactTypeB.CONNECTIVITY, USERS_CAN_VIEW_CONNECTIVITY);
+
+        return MAP_PA_CONTACT_TYPE_ACCESS;
+    }
+
+    public void readMapUpdate(int year, int month, Integer idsContactType) {
+
     }
 }
