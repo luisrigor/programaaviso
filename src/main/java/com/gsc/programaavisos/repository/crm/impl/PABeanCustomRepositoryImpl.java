@@ -73,7 +73,6 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
                 .append("(HHC.MILEAGE_CONTRACT_CREATION + HHC.COVER_KM) AS HHC_CONTRACT_END_KM ")
                 .append("FROM PA_DATA_INFO ").append("LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN ")
                 .append("AND HHC.CONTRACT_STATUS = 'Active')");
-        //sql.append(oFilter.getWhereClause());
 
         if (checkExpiredContracts)
             sql.append(" WHERE MC_DT_FINISH_CONTRACT >= '").append(dtStart).append("' AND MC_DT_FINISH_CONTRACT < '")
