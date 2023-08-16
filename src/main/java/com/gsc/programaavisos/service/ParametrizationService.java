@@ -8,4 +8,6 @@ import java.util.List;
 public interface ParametrizationService {
     List<PaParameterization> searchParametrization(Date startDate, Date endDate, String selectedTypeParam, UserPrincipal userPrincipal);
     void deleteParametrization(UserPrincipal userPrincipal,Integer id);
+    List<PaParameterization> getParametrizationsList(UserPrincipal userPrincipal);
+    PaParameterization getNewParametrization(UserPrincipal userPrincipal,Integer id);
 }

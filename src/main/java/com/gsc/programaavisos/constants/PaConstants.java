@@ -10,7 +10,6 @@ public class PaConstants {
     public static final String RSM_NOT_OWNER2 = "Proprietário Desconhecido";
     public static final String RECEIVE_INFORMATION_NO = "Não";
     public static final String REMOVED_MANUALLY_DESC = "Removido da Listagem";
-
     public static String PA_CONTACT_CHANNEL_EPOSTAL = "E";
     public static String PA_CONTACT_CHANNEL_POSTAL = "P";
     public static String PA_CONTACT_CHANNEL_SMS = "S";
@@ -25,4 +24,5 @@ public class PaConstants {
     public static final String FTP_POSTAL_DESTAQUE = "/postais/comum";
     public static final String FTP_POSTAL_HEADER = "/postais/headers";
     public static final String ALL = "*todos*";
+    public static final String PENDING_DESC	= "Por Tratar";
 }

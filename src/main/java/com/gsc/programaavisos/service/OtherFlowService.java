@@ -17,7 +17,6 @@ public interface OtherFlowService {
     List<Fidelitys> getFidelitys();
     List<Modelo> getModels(UserPrincipal userPrincipal);
     List<Fuel> getFuels(UserPrincipal userPrincipal);
-    void getDocumentUnits(UserPrincipal userPrincipal, int type);
     List<DocumentUnitDTO> searchDocumentUnit(Integer type, UserPrincipal userPrincipal);
     List<Dealer> getDealers(UserPrincipal userPrincipal);
     DelegatorsDTO getDelegators(UserPrincipal userPrincipal, GetDelegatorsDTO delegatorsDTO);
@@ -25,4 +24,8 @@ public interface OtherFlowService {
     List<ContactType> getContactTypeList(String userLogin);
     ClientContactsDTO getPAClientContacts(String nif, String selPlate, int idPaData, FilterBean oPAFilterBean);
     void mapUpdate(UserPrincipal userPrincipal);
+    List<ClientType> getClientTypes();
+    List<Channel> getChannels();
+    List<Source> getSources();
+    List<ContactType> getAllContactTypes();
 }

@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public enum AppProfile {
 
-
     TOYOTA_LEXUS_PRF_TCAP(217, 10142),
     TOYOTA_LEXUS_PRF_MANAGER_CA(218, 10143),
     TOYOTA_LEXUS_PRF_CALLCENTER(243, 10164),

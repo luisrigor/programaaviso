@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,4 +53,7 @@ public class PaParameterization {
 
     @Column(name = "ID_BRAND")
     private Integer idBrand;
+
+    @Transient
+    private List<ParametrizationItems> parameterizationItems;
 }

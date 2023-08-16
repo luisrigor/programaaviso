@@ -29,7 +29,7 @@ public class FilterBean implements Cloneable{
     private List<Dealer> vecDealers;
     private String[] arrSelDealer;
     private String arrSelDealerToString;
-    private LinkedHashMap<String, String> changedList;
+    private LinkedHashMap<String, String> changedList;//1
     private String changedBy;
 
     private String GSCUserLogin;

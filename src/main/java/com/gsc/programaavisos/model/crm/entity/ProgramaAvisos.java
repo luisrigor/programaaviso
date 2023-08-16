@@ -80,6 +80,7 @@ public class ProgramaAvisos {
     private String removedObs;
     private String delegatedTo;
     private String client;
+    @Column(name = "BLOCKED_BY")
     private String blockedBy;
     private String visible;
     private Date dtVisible;

@@ -43,13 +43,6 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(fuels);
     }
 
-    @GetMapping(ApiEndpoints.GET_DOCUMENT_UNITS)
-    public ResponseEntity<?> getDocumentUnits(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("getDocumentUnits controller");
-        otherFlowService.getDocumentUnits(userPrincipal, 1);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
-
     @GetMapping(ApiEndpoints.GET_CONTACT_REASONS)
     public ResponseEntity<List<ContactReason>> getContactReasons() {
         log.info("getContactReasons controller");
@@ -143,4 +136,35 @@ public class OtherFlowController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Update");
     }
+    @GetMapping(ApiEndpoints.GET_CLIENT_TYPE)
+    public ResponseEntity<List<ClientType>> getClientType() {
+        log.info("getClientType controller");
+        List<ClientType> rs = otherFlowService.getClientTypes();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_CHANNEL)
+    public ResponseEntity<List<Channel>> getChannels() {
+        log.info("getChannels controller");
+        List<Channel> rs = otherFlowService.getChannels();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_SOURCE)
+    public ResponseEntity<List<Source>> getSource() {
+        log.info("getSource controller");
+        List<Source> rs = otherFlowService.getSources();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
+    public ResponseEntity<List<ContactType>> getAllContactType() {
+        log.info("getAllContactType controller");
+        List<ContactType> rs = otherFlowService.getAllContactTypes();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+
+
+
 }

@@ -9,4 +9,6 @@ public interface ProgramaAvisosService {
     void removePA(UserPrincipal userPrincipal,Integer id,String removedOption,String removedObs);
     FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO);
     void uploadFile(UserPrincipal userPrincipal, MultipartFile file);
+    void unlockPARegister(Integer id);
+    void activatePA(Integer id);
 }

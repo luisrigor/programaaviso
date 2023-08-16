@@ -11,6 +11,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.repository.crm.impl.ContactTypeRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
@@ -19,6 +20,7 @@ import com.sc.commons.comunications.Sms;
 import com.sc.commons.dbconnection.ServerJDBCConnection;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.*;
+import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +58,10 @@ public class OtherFlowServiceImpl implements OtherFlowService {
 
 
     private static final String QUOTES = "\"";
+    private final ClientTypeRepository clientTypeRepository;
+    private final SourceRepository sourceRepository;
+    private final ChannelRepository channelRepository;
+    private final ContactTypeRepository contactTypeRepository;
 
     private final Environment env;
 
@@ -99,7 +105,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
     @Override
     public List<Age> getAge() {
         try {
-            return ageRepository.getAllAge();
+             return ageRepository.getAllAge();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching age", e);
         }
@@ -147,29 +153,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error fetching fuels ", e);
         }
-    }
-
-    @Override
-    public void getDocumentUnits(UserPrincipal userPrincipal, int type) {
-//        try {
-//            int idBrand = ApiConstants.getIdBrand(userPrincipal.getOidNet());
-//
-//            ItemFilter oItemFilter = ItemFilter.builder()
-//                    .itemType(type)
-//                    .dtEnd()
-//                    .idBrand()
-//                    .build();
-//
-//
-//            oItemFilter.setItemType(type);
-//            oItemFilter.setDtEnd(new Date(Calendar.getInstance().getTime().getTime()));
-//            oItemFilter.setIdBrand(idBrand);
-//
-//            List<DocumentUnit> documentUnits = DocumentUnit.getHelper().getByFilter(oItemFilter);
-//
-//        } catch (SCErrorException e) {
-//            throw new ProgramaAvisosException("Error fetching document units ", e);
-//        }
     }
 
     @Override
@@ -265,9 +248,8 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         for (String currentOidDealer: arrayOidDealer) {
             oidsDealer += ",'" + currentOidDealer + "'";
         }
-
-        List<String> listDelegators = new ArrayList<>();
-        Map<String, String> mapLastChangedBy = new HashMap<>();
+        List<String> listDelegators;
+        Map<String, String> mapLastChangedBy;
         List<DelegatorsValues> delegators = new ArrayList<>();
         List<DelegatorsValues> changedBy = new ArrayList<>();
         try {
@@ -408,6 +390,13 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error fetching plates list for the same customer");
         }
     }
+    public List<ClientType> getClientTypes() {
+        try {
+            return clientTypeRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching clientType", e);
+        }
+    }
 
     @Override
     public void mapUpdate(UserPrincipal userPrincipal) {
@@ -478,7 +467,34 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         return MAP_PA_CONTACT_TYPE_ACCESS;
     }
 
+    public List<Channel> getChannels() {
+        try {
+            return channelRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching channel ", e);
+        }
+    }
+
+    @Override
+    public List<Source> getSources() {
+        try {
+            return sourceRepository.getByStatus("S".charAt(0));
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching source ", e);
+        }
+    }
+
+    @Override
+    public List<ContactType> getAllContactTypes() {
+        try {
+            return contactTypeRepository.findAll();
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching source ", e);
+        }
+    }
     public void readMapUpdate(int year, int month, Integer idsContactType) {
 
+
     }
+
 }

@@ -58,4 +58,15 @@ public class ProgramaAvisosController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Document successfully imported.");
     }
+    @PutMapping(ApiEndpoints.UNLOCK_PA)
+    public void unlockPARegister(@RequestParam Integer id) {
+        log.info("unlockPARegister controller");
+        programaAvisosService.unlockPARegister(id);
+    }
+
+    @PutMapping(ApiEndpoints.ACTIVE_PA)
+    public void activePA(@RequestParam Integer id) {
+        log.info("activePA controller");
+        programaAvisosService.activatePA(id);
+    }
 }

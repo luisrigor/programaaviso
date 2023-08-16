@@ -143,7 +143,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
+             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found -->: " + id));
             if(oPA.getId() > 0) {
               oPA = ProgramaAvisos.builder()
                       .successContact("N")
@@ -256,6 +256,36 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     }
 
+    public void unlockPARegister(Integer id) {
+        try {
+            paRepository.updateblockedByById("", id);
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("unlock record", e);
+        }
+    }
+
+    @Override
+    public void activatePA(Integer id) {
+        try {
+           ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
+            if(oPA.getId() > 0) {
+                oPA.setSuccessContact("N");
+                oPA.setSuccessMotive(StringUtils.EMPTY);
+                oPA.setDtScheduleContact(null);
+                oPA.setHrScheduleContact(null);
+                oPA.setRevisionSchedule(PaConstants.PENDING_DESC);
+                oPA.setRevisionScheduleMotive(StringUtils.EMPTY);
+                oPA.setRevisionScheduleMotive2(StringUtils.EMPTY);
+                oPA.setRemovedObs(StringUtils.EMPTY);
+                //oPA.save(String.valueOf(oGSCUser.getIdUser()), oGSCUser.containsRole(ApplicationConfiguration.ROLE_VIEW_CALL_CENTER_DEALERS));
+            }
+        } catch (Exception e) {
+            log.error("An error occurred while activating listing registration");
+            throw new ProgramaAvisosException("An error occurred while activating listing registration", e);
+        }
+    }
+
+
     private ProgramaAvisos dataPA(PADTO pa){
         ProgramaAvisos oPA;
         oPA = paRepository.findById(pa.getId()).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + pa.getId()));
@@ -347,7 +377,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         String to = StringTasks.cleanString(oPA.getNewEmail(), "").equals("") ? oPA.getEmail() : oPA.getNewEmail();
         String subject = "Ir à "+ (oPA.getBrand().equals("T")?"Toyota":"Lexus");
         String eventDescription = (oPA.getBrand().equals("T")?"Toyota":"Lexus")+ " " + oPA.getModel() + " " + oPA.getLicensePlate();
-
         String dateScheduledFormatted = DateTimerTasks.fmtDT2.format(dtSchedule)+"T"+hrSchedule.replace(":","")+"Z";
         Calendar oCal = Calendar.getInstance();
         String currentDateFormatted = timeZoFormat.format(oCal.getTime());

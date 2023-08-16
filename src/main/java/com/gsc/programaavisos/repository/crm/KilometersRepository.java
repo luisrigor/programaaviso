@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface KilometersRepository extends JpaRepository<Kilometers,Integer> {
-    @Query( "SELECT K FROM Kilometers K ORDER BY ID ASC")
+    @Query( "SELECT K FROM Kilometers K ORDER BY K.id ASC")
     List<Kilometers> getAllKilometers();
 }
