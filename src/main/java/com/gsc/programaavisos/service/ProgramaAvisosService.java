@@ -12,4 +12,5 @@ public interface ProgramaAvisosService {
     FilterBean searchPA(UserPrincipal userPrincipal, SearchPADTO searchPADTO);
     void unlockPARegister(Integer id);
     PAInfoDTO getInfoPA(UserPrincipal userPrincipal);
+    void activatePA(Integer id);
 }

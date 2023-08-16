@@ -25,6 +25,7 @@ public class PaConstants {
     public static final String FTP_POSTAL_DESTAQUE = "/postais/comum";
     public static final String FTP_POSTAL_HEADER = "/postais/headers";
     public static final String ALL = "*todos*";
+    public static final String PENDING_DESC	= "Por Tratar";
 
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/

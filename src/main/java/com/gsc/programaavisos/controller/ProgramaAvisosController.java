@@ -72,4 +72,10 @@ public class ProgramaAvisosController {
     }
 
 
+
+    @PutMapping(ApiEndpoints.ACTIVE_PA)
+    public void activePA(@RequestParam Integer id) {
+        log.info("activePA controller");
+        programaAvisosService.activatePA(id);
+    }
 }
