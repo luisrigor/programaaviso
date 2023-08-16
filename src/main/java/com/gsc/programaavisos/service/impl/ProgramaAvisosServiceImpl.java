@@ -465,19 +465,17 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             FilterBean filterBean = getFilter(userPrincipal);
             PATotals paTotals = getPaTotals(filterBean);
             List<ProgramaAvisosBean> pAList = paBeanRepository.getProgramaAvisosBean(filterBean);
-
             return PAInfoDTO.builder()
                     .paInfoList(pAList)
                     .paTotals(paTotals)
                     .filterBean(filterBean)
                     .build();
-
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error ListPABean ", e);
         }
     }
 
-    public PATotals getPaTotals(FilterBean filterBean) throws SCErrorException {
+    public PATotals getPaTotals(FilterBean filterBean) {
         return paBeanRepository.getPaTotals(filterBean);
     }
 

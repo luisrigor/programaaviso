@@ -135,7 +135,6 @@ public class ProgramaAvisosBean {
     private Timestamp dtChanged;
     @Column(name = "PA_NR_CALLS")
     private Integer nrCalls;
-
     @Column(name = "PA_ID_CLAIM")
     private Integer idClaim;
     @Column(name = "PA_ID_CLIENT_CHANNEL_PREFERENCE")

@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface PABeanCustomRepository {
 
-    List<ProgramaAvisosBean> getProgramaAvisosBean(FilterBean filterBean) throws SCErrorException;
+    List<ProgramaAvisosBean> getProgramaAvisosBean(FilterBean filterBean) ;
 
     PATotals getPaTotals(FilterBean filterBean);
 
