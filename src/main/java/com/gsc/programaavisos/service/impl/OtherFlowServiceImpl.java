@@ -10,7 +10,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
-import com.gsc.programaavisos.repository.crm.impl.ContactTypeRepository;
+import com.gsc.programaavisos.repository.crm.ContactTypeRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
