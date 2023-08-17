@@ -5,6 +5,7 @@ public interface ApiEndpoints {
     String SEARCH_PARAMETRIZATIONS = "/search-parametrizations";
     String GET_PARAMETRIZATION_LIST = "/get-parametrization-list";
     String GET_NEW_PARAMETRIZATION= "/new-parametrization";
+    String SAVE_PARAMETRIZATION= "/save-parametrization";
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";
@@ -31,4 +32,6 @@ public interface ApiEndpoints {
     String UNLOCK_PA = "/unlock-pa";
     String ACTIVE_PA = "/active";
     String GET_CONTACT_TYPE = "/contact-type";
+
+    String GET_MAIN_TYPE = "/main-types";
 }

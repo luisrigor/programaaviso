@@ -1,14 +1,15 @@
 package com.gsc.programaavisos.repository.crm.impl;
 
+import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.repository.crm.PACustomRepository;
+import com.sc.commons.dbconnection.ServerJDBCConnection;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.DataBaseTasks;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PACustomRepositoryImpl implements PACustomRepository {
 
@@ -70,5 +71,23 @@ public class PACustomRepositoryImpl implements PACustomRepository {
         }
 
         return mapLastChangedBy;
+    }
+
+    @Override
+    public List<MaintenanceTypeDTO> getMaintenanceTypesByContactType() {
+
+        StringBuilder sql  = new StringBuilder();
+        sql.append(" SELECT PAC.ID AS ID, PAC.NAME AS CONTRACT_TYPE, PAM.NAME AS MAINTENANCE_TYPE ");
+        sql.append(" FROM PA_CONTACTTYPE_MAINTENANCETYPES PACM ");
+        sql.append(" LEFT JOIN PA_CONTACTTYPE PAC ON PAC.ID = PACM.ID_CONTACTTYPE AND PAC.STATUS = 'S' ");
+        sql.append(" LEFT JOIN PA_MRS_MAINTENANCETYPES PAM ON PAM.ID = PACM.ID_MRS_MAINTENANCETYPES ");
+        sql.append(" ORDER BY PAC.ID, PAM.PRIORITY, PAM.NAME ");
+
+        Query query = em.createNativeQuery(sql.toString(),"MaintenanceTypeMapping");
+        List<MaintenanceTypeDTO> data = query.getResultList();
+
+        return data;
+
+
     }
 }

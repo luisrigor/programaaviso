@@ -9,6 +9,7 @@ import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.repository.crm.impl.ItemsModelRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
+import com.gsc.programaavisos.util.PAUtil;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.DataBaseTasks;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +122,8 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
     }
 
-    private void saveParametrization(ParameterizationDTO parameterizationDTO, UserPrincipal oGSCUser) {
+    @Override
+    public void saveParameterization(UserPrincipal oGSCUser, ParameterizationDTO parameterizationDTO) {
         /*
          if(request.getParameter(PARAMETRIZATION_JSON)!=null){
                 jsonObjStr = request.getParameter(PARAMETRIZATION_JSON);
@@ -142,13 +144,13 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         insertParametrization(oParameterization.getId() > 0, oParameterization, oGSCUser);
     }
 
-    private void insertParametrization(Boolean isNotNew, PaParameterization oParameterization, UserPrincipal oGSCUser) {
+    public void insertParametrization(boolean isNotNew, PaParameterization oParameterization, UserPrincipal oGSCUser) {
         try {
             if (isNotNew)
                 parametrizationItemsRepository.deleteById(oParameterization.getId());
 
             paParameterizationRepository.save(oParameterization);
-            String createdBy = "oGSCUser.getUserStamp()";
+            String createdBy = PAUtil.  getUserStamp(oGSCUser.getUsername());
 
             for (ParametrizationItems parameterizationItem : oParameterization.getParameterizationItems()) {
                 if (parameterizationItem!=null){
@@ -156,7 +158,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                     parametrizationItemsRepository.save(parameterizationItem);
                     int parameterizationItemId = parameterizationItem.getId();
 
-/*
+
                     for (ItemsAge age : parameterizationItem.getItemAges()) {
                         age.setIdParameterizationItems(parameterizationItemId);
                         age.setCreatedBy(createdBy);

@@ -10,6 +10,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
+import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
@@ -58,7 +59,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     oPA.setHrScheduleContact(null);
                 }
                 String registerClaim = StringTasks.cleanString(pa.getRegisterClaim(), "N").trim();
-                String userStamp = userPrincipal.getUsername().split("\\|\\|")[0]+"||"+userPrincipal.getUsername().split("\\|\\|")[1];
+                String userStamp = PAUtil.getUserStamp(userPrincipal.getUsername());
                 if(registerClaim.equalsIgnoreCase("S") && !oPA.getObservations().equals(StringUtils.EMPTY)) {
                     try {
                         ClaimDetail oClaim;
@@ -498,6 +499,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public PATotals getPaTotals(FilterBean filterBean) {
         return paBeanRepository.getPaTotals(filterBean);
     }
+
 
 
 

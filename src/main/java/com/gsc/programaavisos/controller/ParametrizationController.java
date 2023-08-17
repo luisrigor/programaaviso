@@ -1,6 +1,7 @@
 package com.gsc.programaavisos.controller;
 
 import com.gsc.programaavisos.constants.ApiEndpoints;
+import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
@@ -53,5 +54,11 @@ public class ParametrizationController {
         log.info("getNewParametrization controller");
         PaParameterization paParameterizationList = parametrizationService.getNewParametrization(userPrincipal,id);
         return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
+    }
+
+    @PutMapping(ApiEndpoints.SAVE_PARAMETRIZATION)
+    public void saveParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                    @RequestBody ParameterizationDTO dto) {
+        parametrizationService.saveParameterization(userPrincipal,dto);
     }
 }

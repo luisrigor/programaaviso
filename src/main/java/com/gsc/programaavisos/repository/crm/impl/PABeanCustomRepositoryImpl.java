@@ -6,8 +6,7 @@ import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.PATotals;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.PABeanCustomRepository;
-import com.gsc.programaavisos.util.FilterUtil;
-import com.sc.commons.exceptions.SCErrorException;
+import com.gsc.programaavisos.util.PAUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -56,8 +55,8 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         boolean checkExpiredContracts = oFilter.getIdContactType() == ApplicationConfiguration.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS;
         boolean checkConnectivityContracts = oFilter.getIdContactType() == ApplicationConfiguration.PA_CONTACTTYPE_CONECTIVIDADE;
 
-        Date dtStart = FilterUtil.getDateFromFilter(oFilter);
-        Date dtEnd = FilterUtil.getDateFromFilter(oFilter);
+        Date dtStart = PAUtil.getDateFromFilter(oFilter);
+        Date dtEnd = PAUtil.getDateFromFilter(oFilter);
         int offset = pageEnd - 20;
 
         sql.append("SELECT * FROM ( ");
@@ -86,8 +85,8 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
     public String buildPATotalsQuery(FilterBean filter) {
 
         boolean checkExpiredContracts = filter.getIdContactType() == PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS;
-        Date dtStart = FilterUtil.getDateFromFilter(filter);
-        Date dtEnd = FilterUtil.getDateFromFilter(filter);
+        Date dtStart = PAUtil.getDateFromFilter(filter);
+        Date dtEnd = PAUtil.getDateFromFilter(filter);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT COUNT(*) AS TOTAL, COALESCE(SUM(CASE WHEN PA_ID_STATUS=1 THEN 1 ELSE 0 END),0) AS NOT_DONE,")

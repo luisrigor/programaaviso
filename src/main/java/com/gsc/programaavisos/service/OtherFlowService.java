@@ -3,12 +3,14 @@ package com.gsc.programaavisos.service;
 import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.GetDelegatorsDTO;
+import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.rg.dealer.Dealer;
 import java.util.List;
+import java.util.Map;
 
 public interface OtherFlowService {
     List<ContactReason> getContactReasons();
@@ -26,4 +28,5 @@ public interface OtherFlowService {
     List<Channel> getChannels();
     List<Source> getSources();
     List<ContactType> getAllContactTypes();
+    List<MaintenanceTypeDTO>  getMaintenanceTypesByContactType();
 }

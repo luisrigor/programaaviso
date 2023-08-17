@@ -5,6 +5,7 @@ import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.GetDelegatorsDTO;
+import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Log4j
@@ -137,7 +139,11 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 
-
-
+    @GetMapping(ApiEndpoints.GET_MAIN_TYPE)
+    public ResponseEntity<List<MaintenanceTypeDTO>> getMaintenanceTypesByContactType() {
+        log.info("getAllContactType controller");
+        List<MaintenanceTypeDTO> rs = otherFlowService.getMaintenanceTypesByContactType();
+        return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
 
 }

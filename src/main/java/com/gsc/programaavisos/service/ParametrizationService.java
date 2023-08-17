@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.service;
 
+import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.security.UserPrincipal;
 import java.sql.Date;
@@ -10,4 +11,5 @@ public interface ParametrizationService {
     void deleteParametrization(UserPrincipal userPrincipal,Integer id);
     List<PaParameterization> getParametrizationsList(UserPrincipal userPrincipal);
     PaParameterization getNewParametrization(UserPrincipal userPrincipal,Integer id);
+    void saveParameterization(UserPrincipal userPrincipal, ParameterizationDTO parameterizationDTO);
 }

@@ -322,4 +322,12 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error fetching source ", e);
         }
     }
+    @Override
+    public List<MaintenanceTypeDTO>  getMaintenanceTypesByContactType(){
+        try {
+         return paRepository.getMaintenanceTypesByContactType();
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error fetching MainTypes ", e);
+        }
+    }
 }
