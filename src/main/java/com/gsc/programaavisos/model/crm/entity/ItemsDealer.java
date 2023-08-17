@@ -19,8 +19,8 @@ public class ItemsDealer {
     private Integer id;
     @Column(name = "ID_PARAMETERIZATION_ITEMS")
     private Integer idParameterizationItems;
-    @Column(name = "ID_DEALER")
-    private Integer idDealer;
+    @Column(name = "OID_DEALER")
+    private String idDealer;
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
