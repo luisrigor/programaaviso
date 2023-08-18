@@ -89,7 +89,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
 
     public PaParameterization getById(int idParametrization, boolean onlyActives){
         try {
-            PaParameterization parameterization = paParameterizationRepository.findById(idParametrization).get();
+            PaParameterization parameterization = paParameterizationRepository.findById(idParametrization).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + idParametrization));
             List<ParametrizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(idParametrization, onlyActives);
             if (!parameterizationItems.isEmpty()) {
                 parameterization.setParameterizationItems(parameterizationItems);
@@ -108,7 +108,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
             return parameterization;
         }catch (Exception e){
             log.error("Error new parametrization");
-            throw new ProgramaAvisosException("Error new parametrization", e);
+            throw new ProgramaAvisosException("Error new parametrization -->", e);
         }
     }
 
