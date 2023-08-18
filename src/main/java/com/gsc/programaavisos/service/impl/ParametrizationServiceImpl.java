@@ -123,10 +123,6 @@ public class ParametrizationServiceImpl implements ParametrizationService {
 
     @Override
     public void saveParameterization(UserPrincipal oGSCUser, ParameterizationDTO parameterizationDTO) {
-        /*
-         if(request.getParameter(PARAMETRIZATION_JSON)!=null){
-                jsonObjStr = request.getParameter(PARAMETRIZATION_JSON);
-        }*/
         PaParameterization oParameterization = PaParameterization.builder()
                 .id(parameterizationDTO.getId())
                 .dtStart(new java.sql.Date(parameterizationDTO.getDtStart().getTime()))

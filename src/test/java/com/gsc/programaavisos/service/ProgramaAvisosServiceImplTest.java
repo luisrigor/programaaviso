@@ -113,7 +113,7 @@ public class ProgramaAvisosServiceImplTest {
     void whenRemovePASuccessfullyCase() {
         // Arrange
         ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
+        when(paRepository.findById(any())).thenReturn(Optional.ofNullable(oPA));
         // Act
         programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
         // Assert
