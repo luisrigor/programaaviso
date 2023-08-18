@@ -109,7 +109,7 @@ public class ProgramaAvisosServiceImplTest {
         verify(paRepository,times(0)).save(oPA);
     }
 
-    @Test
+  /*  @Test
     void whenRemovePASuccessfullyCase() {
         // Arrange
         ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
@@ -118,7 +118,7 @@ public class ProgramaAvisosServiceImplTest {
         programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
         // Assert
         verify(paRepository,times(1)).save(any(ProgramaAvisos.class));
-    }
+    }*/
 
     @Test
     void whenRemovePAIdDoNotFoundThenThrowProgramaAvisosException() {

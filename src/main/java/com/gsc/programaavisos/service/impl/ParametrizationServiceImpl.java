@@ -6,7 +6,6 @@ import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
-import com.gsc.programaavisos.repository.crm.impl.ItemsModelRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.util.PAUtil;
