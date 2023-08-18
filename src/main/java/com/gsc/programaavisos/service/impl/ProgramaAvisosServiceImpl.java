@@ -128,18 +128,19 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-             ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found -->: " + id));
-            if(oPA.getId() > 0) {
-              oPA = ProgramaAvisos.builder()
-                      .successContact("N")
-                      .successMotive(StringUtils.EMPTY)
-                      .dtScheduleContact(null)
-                      .hrScheduleContact(null)
-                      .revisionSchedule(PaConstants.REMOVED_MANUALLY_DESC)
-                      .revisionScheduleMotive(StringUtils.EMPTY)
-                      .revisionScheduleMotive2(StringUtils.EMPTY)
-                      .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
-                      .build();
+            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("Id not found: " + id));
+            if (oPA.getId() > 0) {
+                oPA = ProgramaAvisos.builder()
+                        .successContact("N")
+                        .successMotive(StringUtils.EMPTY)
+                        .dtScheduleContact(null)
+                        .hrScheduleContact(null)
+                        .revisionSchedule(PaConstants.REMOVED_MANUALLY_DESC)
+                        .revisionScheduleMotive(StringUtils.EMPTY)
+                        .revisionScheduleMotive2(StringUtils.EMPTY)
+                        .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
+                        .build();
+                paRepository.save(oPA);
             }
         } catch (Exception e) {
             log.error("An error occurred while removing a record from the list");
