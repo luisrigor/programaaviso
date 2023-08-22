@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.repository.crm;
 
-import com.gsc.programaavisos.model.crm.entity.ItemsGenre;
 import com.gsc.programaavisos.model.crm.entity.ItemsKilometers;
 import org.springframework.data.jpa.repository.JpaRepository;
 
