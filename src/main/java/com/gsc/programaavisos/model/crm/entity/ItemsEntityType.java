@@ -18,7 +18,6 @@ public class ItemsEntityType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     @Column(name = "ID_PARAMETERIZATION_ITEMS")
     private Integer idParameterizationItems;
     @Column(name = "ID_ENITTY_TYPE")
@@ -27,4 +26,5 @@ public class ItemsEntityType {
     private String createdBy;
     @Column(name = "DT_CREATED")
     private LocalDateTime dtCreated;
+
 }

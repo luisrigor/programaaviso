@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Service
@@ -208,28 +209,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
             for (ParametrizationItems paramToClone : oParameterization.getParameterizationItems()) {
                 if (paramToClone!=null){
-/*
-                    ParametrizationItems cloneParaItem = ParametrizationItems.builder()
-                            .idParameterization(insertedParam.getId())
-                            .idHighlight1(paramToClone.getIdHighlight1())
-                            .idHighlight2(paramToClone.getIdHighlight2())
-                            .idHighlight3(paramToClone.getIdHighlight3())
-                            .idService1(paramToClone.getIdService1())
-                            .idService2(paramToClone.getIdService2())
-                            .idService3(paramToClone.getIdService3())
-                            .idHeader1(paramToClone.getIdHeader1())
-                            .idHeader2(paramToClone.getIdHeader2())
-                            .idHeader3(paramToClone.getIdHeader3())
-                            .parameterizationItemsType(paramToClone.getParameterizationItemsType())
-                            .idContactReason(paramToClone.getIdContactReason())
-                            .status(paramToClone.getStatus())
-                            .createdBy(createdBy)
-                            .dtCreated(LocalDateTime.now())
-                            .changedBy(paramToClone.getChangedBy())
-                            .dtChanged(paramToClone.getDtChanged())
-                            .build();
 
- */
                     ParametrizationItems cloneParaItem = paramToClone.toBuilder()
                             .id(0)
                             .idParameterization(insertedParam.getId())
@@ -240,76 +220,36 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                     int parameterizationItemId = parametrizationItemsRepository.save(cloneParaItem).getId();
 
                     for (ItemsAge age:paramToClone.getItemAges()){
-                        ItemsAge clone = ItemsAge.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idAge(age.getIdAge())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsAge clone = new ItemsAge(null,parameterizationItemId,age.getIdAge(),createdBy,LocalDateTime.now());
                         itemsAgeRepository.save(clone);
                     }
                     for (ItemsKilometers kilometers:paramToClone.getItemKilometers()){
-                        ItemsKilometers clone = ItemsKilometers.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idKilometers(kilometers.getIdKilometers())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsKilometers clone = new ItemsKilometers(null,parameterizationItemId,kilometers.getIdKilometers(),createdBy,LocalDateTime.now());
                         itemsKilometersRepository.save(clone);
                     }
                     for (ItemsFidelitys itemsFidelitys:paramToClone.getItemFidelitys()){
-                        ItemsFidelitys clone = ItemsFidelitys.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idFidelity(itemsFidelitys.getIdFidelity())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsFidelitys clone = new ItemsFidelitys(null,parameterizationItemId,itemsFidelitys.getIdFidelity(),createdBy,LocalDateTime.now());
                         itemsFidelitysRepository.save(clone);
                     }
                     for (ItemsFuel fuel:paramToClone.getItemFuels()){
-                        ItemsFuel clone = ItemsFuel.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idFuel(fuel.getIdFuel())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsFuel clone = new ItemsFuel(null,parameterizationItemId,fuel.getIdFuel(),createdBy,LocalDateTime.now());
                         itemsFuelRepository.save(clone);
                     }
                     for (ItemsDealer dealer:paramToClone.getItemDealers()){
-                        ItemsDealer clone = ItemsDealer.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idDealer(dealer.getIdDealer())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsDealer clone = new ItemsDealer(null,parameterizationItemId,dealer.getIdDealer(),createdBy,LocalDateTime.now());
                         itemsDealerRepository.save(clone);
                     }
                     for (ItemsGenre genre:paramToClone.getItemGenres()){
-                        ItemsGenre clone = ItemsGenre.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idGenre(genre.getIdGenre())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsGenre clone = new ItemsGenre(null,parameterizationItemId,genre.getIdGenre(),createdBy,LocalDateTime.now());
                         itemsGenreRepository.save(clone);
                     }
-                    for (ItemsModel model:paramToClone.getItemModels()){
-                        ItemsModel clone = ItemsModel.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idGamma(model.getIdGamma())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
-                        itemsModelRepository.save(clone);
-                    }
                     for (ItemsEntityType entityType:paramToClone.getItemEntityTypes()){
-                        ItemsEntityType clone = ItemsEntityType.builder()
-                                .idParameterizationItems(parameterizationItemId)
-                                .idEnittyType(entityType.getIdEnittyType())
-                                .createdBy(createdBy)
-                                .dtCreated(LocalDateTime.now())
-                                .build();
+                        ItemsEntityType clone = new ItemsEntityType(null,parameterizationItemId,entityType.getIdEnittyType(),createdBy,LocalDateTime.now());
                         itemsEntityTypeRepository.save(clone);
+                    }
+                    for (ItemsModel model:paramToClone.getItemModels()){
+                        ItemsModel clone = new ItemsModel(null,parameterizationItemId,model.getIdGamma(),createdBy,LocalDateTime.now());
+                        itemsModelRepository.save(clone);
                     }
                 }
             }
