@@ -43,25 +43,28 @@ public class ProgramaAvisosController {
     }
 
     @PostMapping(ApiEndpoints.SAVE_PA)
-    public void savePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<String> savePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
                        @RequestBody PADTO padto) {
         log.info("savePA controller");
         programaAvisosService.savePA(userPrincipal,padto);
+        return ResponseEntity.status(HttpStatus.OK).body("saved");
     }
 
     @PostMapping(ApiEndpoints.REMOVE_PA)
-    public void removePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                         @RequestParam Integer id,
-                         @RequestParam String removedOption,
-                         @RequestParam String removedObs) {
+    public ResponseEntity<String> removePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                           @RequestParam Integer id,
+                                           @RequestParam String removedOption,
+                                           @RequestParam String removedObs) {
         log.info("removePA controller");
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
+        return ResponseEntity.status(HttpStatus.OK).body("removed");
     }
 
     @PutMapping(ApiEndpoints.UNLOCK_PA)
-    public void unlockPARegister(@RequestParam Integer id) {
+    public ResponseEntity<String> unlockPARegister(@RequestParam Integer id) {
         log.info("unlockPARegister controller");
         programaAvisosService.unlockPARegister(id);
+        return ResponseEntity.status(HttpStatus.OK).body("unlocked");
     }
 
     @GetMapping(ApiEndpoints.LIST_PA)
@@ -71,11 +74,18 @@ public class ProgramaAvisosController {
 
     }
 
-
-
     @PutMapping(ApiEndpoints.ACTIVE_PA)
-    public void activePA(@RequestParam Integer id) {
+    public ResponseEntity<String> activePA(@RequestParam Integer id) {
         log.info("activePA controller");
         programaAvisosService.activatePA(id);
+        return ResponseEntity.status(HttpStatus.OK).body("activePA");
+    }
+
+    @GetMapping(ApiEndpoints.GET_PA_DETAIL)
+    public ResponseEntity<DetailsPADTO> getPaDetail(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                            @RequestParam Integer id,
+                            @RequestParam Integer oldId) {
+        DetailsPADTO detailsInfo = programaAvisosService.getPaDetail(userPrincipal,id,oldId);
+        return ResponseEntity.status(HttpStatus.OK).body(detailsInfo);
     }
 }

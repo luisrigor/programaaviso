@@ -1,9 +1,7 @@
 package com.gsc.programaavisos.model.crm.entity;
 
 
-import com.rg.dealer.Dealer;
 import lombok.*;
-
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -58,6 +56,11 @@ public class ProgramaAvisosBean {
     private Integer day;
     @Column(name = "PA_OID_DEALER")
     private String oidDealer;
+
+    @Column(name = "PA_OID_DEALER_SCHEDULE")
+    private String oidDealerSchedule;
+    @Column(name = "PA_VIN")
+    private String vin;
     @Column(name = "PA_LICENSE_PLATE")
     private String licensePlate;
     @Column(name = "PA_BRAND")
@@ -82,41 +85,50 @@ public class ProgramaAvisosBean {
     private String email;
     @Column(name = "PA_DATA_IS_CORRECT")
     private String dataIsCorrect;
-    /*
-    @Column(name = "PA_NEW_NIF")
-    private String newNif;
-    @Column(name = "PA_NEW_NAME")
-    private String newName;
+    @Column(name = "PA_ID_CLIENT_CHANNEL_PREFERENCE")
+    private Integer idClientChannelPreference;
+    @Column(name = "PA_ID_CLIENT_ORIGIN")
+    private Integer idClientOrigin;
+    @Column(name = "PA_ID_STATUS")
+    private Integer idStatus;
+    @Column(name = "PA_RECEIVE_INFORMATION")
+    private String receiveInformation;
+    @Column(name = "PA_SUCCESS_CONTACT")
+    private String successContact;
     @Column(name = "PA_NEW_ADDRESS")
     private String newAddress;
     @Column(name = "PA_NEW_ADDRESS_NUMBER")
     private String newAddressNumber;
-    @Column(name = "PA_NEW_FLOOR")
-    private String newFloor;
-    @Column(name = "PA_NEW_CP4")
-    private String newCp4;
-    @Column(name = "PA_NEW_CP3")
-    private String newCp3;
-    @Column(name = "PA_NEW_CPEXT")
-    private String newCpExt;
     @Column(name = "PA_NEW_CONTACTPHONE")
     private String newContactPhone;
+    @Column(name = "PA_NEW_CP3")
+    private String newCp3;
+    @Column(name = "PA_NEW_CP4")
+    private String newCp4;
+    @Column(name = "PA_NEW_CPEXT")
+    private String newCpExt;
     @Column(name = "PA_NEW_EMAIL")
     private String newEmail;
-    @Column(name = "PA_SUCCESS_CONTACT")
-    private String successContact;
+    @Column(name = "PA_NEW_FLOOR")
+    private String newFloor;
+    @Column(name = "PA_NEW_NAME")
+    private String newName;
+    @Column(name = "PA_NEW_NIF")
+    private String newNif;
+    @Column(name = "PA_BLOCKED_BY")
+    private String blockedBy;
     @Column(name = "PA_SUCCESS_MOTIVE")
     private String successMotive;
     @Column(name = "PA_DT_SCHEDULE_CONTACT")
     private Date dtScheduleContact;
-    @Column(name = "PA_HR_SCHEDULE_CONTACT")
-    private Time hrScheduleContact;
     @Column(name = "PA_REVISION_SCHEDULE")
     private String revisionSchedule;
     @Column(name = "PA_REVISION_SCHEDULE_MOTIVE")
     private String revisionScheduleMotive;
     @Column(name = "PA_REVISION_SCHEDULE_MOTIVE2")
     private String revisionScheduleMotive2;
+    @Column(name = "PA_RECOVERY_SHIPPING")
+    private String recoveryAndShipping;
     @Column(name = "PA_OBSERVATIONS")
     private String observations;
     @Column(name = "PA_REMOVED_OBS")
@@ -125,34 +137,42 @@ public class ProgramaAvisosBean {
     private String delegatedTo;
     @Column(name = "PA_CLIENT")
     private String client;
-    @Column(name = "PA_BLOCKED_BY")
-    private String blockedBy;
     @Column(name = "PA_NR_MISSED_CALLS")
     private Integer nrMissedCalls;
-    @Column(name = "PA_CHANGED_BY")
-    private String changedBy;
-    @Column(name = "PA_DT_CHANGED")
-    private Timestamp dtChanged;
     @Column(name = "PA_NR_CALLS")
     private Integer nrCalls;
+    @Column(name = "PA_ID_LAST_CALL")
+    private Integer idLastCall;
+
+    @Column(name = "PA_VISIBLE")
+    private String visible;
+    @Column(name = "PA_DT_VISIBLE")
+    private Date dtVisible;
     @Column(name = "PA_ID_CLAIM")
     private Integer idClaim;
-    @Column(name = "PA_ID_CLIENT_CHANNEL_PREFERENCE")
-    private Integer idClientChannelPreference;
-    @Column(name = "PA_RECEIVE_INFORMATION")
-    private String receiveInformation;
     @Column(name = "PA_OID_NEWSLETTER")
     private String oidNewsletter;
     @Column(name = "PA_NEWSLETTER_PERSONAL_DATA")
     private String newsletterPersonalData;
-    @Column(name = "PA_OWNER")
-    private String owner;
-    @Column(name = "PA_RECOVERY_SHIPPING")
-    private String recoveryAndShipping;
+    @Column(name = "PA_DT_SCHEDULE")
+    private Date dtSchedule;
     @Column(name = "PA_ID_ORIGIN")
-    private Integer IDOrigin;
+    private Integer IdOrigin;
     @Column(name = "PA_EXT_ID_IN_ORIGIN")
     private Integer extIDInOrigin;
+    @Column(name = "PA_CREATED_BY")
+    private String createdBy;
+    @Column(name = "PA_DT_CREATED")
+    private String DtCreated;
+    @Column(name = "PA_OWNER")
+    private String owner;
+
+    @Column(name = "PA_HR_SCHEDULE_CONTACT")
+    private Time hrScheduleContact;
+    @Column(name = "PA_CHANGED_BY")
+    private String changedBy;
+    @Column(name = "PA_DT_CHANGED")
+    private Timestamp dtChanged;
     @Column(name = "MRS_NEXT_REVISION")
     private String nextRevision;
     @Column(name = "MRS_YEAR_NEXT_REVISION")
@@ -207,9 +227,8 @@ public class ProgramaAvisosBean {
     private String maintenancePlan;
     @Column(name = "MRS_SEND_TYPE")
     private String sendType;
-    //private double extraCarePlusCostPrice;
-    // @Column(name = "EXTRACARE_PLUS_COST_PRICE")
-    //private double extraCarePlusCostPrice;
+    @Column(name = "EXTRACARE_PLUS_COST_PRICE")
+    private double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
     //private String description;
@@ -231,7 +250,6 @@ public class ProgramaAvisosBean {
     //private MaintenanceContract maintenanceContract;
     //private String tecnicalModel;
     //private Integer indiceCSToyota;
-    */
 
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
@@ -245,7 +263,9 @@ public class ProgramaAvisosBean {
     private String hHCDtEnd;
     @Column(name = "HHC_CONTRACT_END_KM")
     private String hHCKmEnd;
-    /*
+    @Column(name = "PA_WARNING_PRIORITY")
+    private int warningPriority;
+
     @Column(name = "MC_DT_FINISH_CONTRACT")
     private Date dtFinishContract;
     @Column(name = "TC_CAMPAIGN")
@@ -256,10 +276,5 @@ public class ProgramaAvisosBean {
     private Date generationDate;
     @Column(name = "TC_SEND_DATE_2")
     private Date TC_SEND_DATE_2;
-    @Column(name = "PA_DT_VISIBLE")
-    private Date dtVisible;
-    @Column(name = "PA_WARNING_PRIORITY")
-    private int warningPriority;
-    */
 
 }
