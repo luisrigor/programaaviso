@@ -14,6 +14,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "PA_DATA_INFO")
+@ToString
 @SqlResultSetMapping(
         name = "GetPATotalsMapping",
         classes = {
@@ -190,7 +191,7 @@ public class ProgramaAvisosBean {
     @Column(name = "MRS_FLAG_MAINTENANCE_CONTRACT")
     private String flagMaintenanceContract;
     @Column(name = "MRS_FLAG_HYBRID")
-    private boolean flagHybrid;
+    private Boolean flagHybrid;
     @Column(name = "MRS_ACESSORY_CODE_1")
     private String acessoryCodeOne;
     @Column(name = "MRS_ACESSORY_1")
@@ -228,7 +229,7 @@ public class ProgramaAvisosBean {
     @Column(name = "MRS_SEND_TYPE")
     private String sendType;
     @Column(name = "EXTRACARE_PLUS_COST_PRICE")
-    private double extraCarePlusCostPrice;
+    private Double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
     //private String description;
@@ -264,7 +265,7 @@ public class ProgramaAvisosBean {
     @Column(name = "HHC_CONTRACT_END_KM")
     private String hHCKmEnd;
     @Column(name = "PA_WARNING_PRIORITY")
-    private int warningPriority;
+    private Integer warningPriority;
 
     @Column(name = "MC_DT_FINISH_CONTRACT")
     private Date dtFinishContract;

@@ -263,6 +263,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         boolean isBlocked = false;
         try {
             oPABean = paBeanRepository.getProgramaAvisosBeanById(id);
+            System.out.println(oPABean);
             if (oPABean != null && oldId > 0) {
                 oPABeanOld = paBeanRepository.getProgramaAvisosBeanById(oldId);
                 if (oPABeanOld != null) {
