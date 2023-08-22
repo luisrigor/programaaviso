@@ -34,6 +34,6 @@ public interface ApiEndpoints {
     String UNLOCK_PA = "/unlock-pa";
     String ACTIVE_PA = "/active";
     String GET_CONTACT_TYPE = "/contact-type";
-
     String GET_MAIN_TYPE = "/main-types";
+    String GET_PA_DETAIL= "/details-pa";
 }

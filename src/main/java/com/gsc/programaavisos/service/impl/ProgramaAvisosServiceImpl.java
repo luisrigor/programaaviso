@@ -31,12 +31,14 @@ import static com.gsc.programaavisos.constants.AppProfile.*;
 @Log4j
 @RequiredArgsConstructor
 public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
+    private final ChannelRepository channelRepository;
 
     public final SimpleDateFormat timeZoFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
     private final PARepository paRepository;
     private final PABeanRepository paBeanRepository;
     private final VehicleRepository vehicleRepository;
     private final QuarantineRepository quarantineRepository;
+    private final  CallsRepository callsRepository;
 
 
     public void savePA(UserPrincipal userPrincipal, PADTO pa) {
@@ -128,7 +130,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public void removePA(UserPrincipal userPrincipal, Integer id, String removedOption, String removedObs) {
         log.info("removePA service");
         try {
-            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("Id not found: " + id));
+            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("Id not found -->" + id));
             if (oPA.getId() > 0) {
                 oPA = ProgramaAvisos.builder()
                         .successContact("N")
@@ -225,7 +227,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     @Override
     public void unlockPARegister(Integer id) {
         try {
-            paRepository.updateblockedByById("", id);
+            paRepository.updateBlockedByById("", id);
         } catch (Exception e) {
             throw new ProgramaAvisosException("unlock record", e);
         }
@@ -250,6 +252,63 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             log.error("An error occurred while activating listing registration");
             throw new ProgramaAvisosException("An error occurred while activating listing registration", e);
         }
+    }
+
+    @Override
+    public DetailsPADTO getPaDetail(UserPrincipal userPrincipal,Integer id,Integer oldId) {
+        log.trace("id:" + id);
+        ProgramaAvisosBean oPABean, oPABeanOld;
+        List<Channel> channelList = null;
+        List<Calls> callsList = null;
+        boolean isBlocked = false;
+        try {
+            oPABean = paBeanRepository.getProgramaAvisosBeanById(id);
+            if (oPABean != null && oldId > 0) {
+                oPABeanOld = paBeanRepository.getProgramaAvisosBeanById(oldId);
+                if (oPABeanOld != null) {
+                    oPABean = getPaInfo(oPABean, oPABeanOld);
+                }
+            }
+            if (oPABean != null && !StringUtils.EMPTY.equalsIgnoreCase(oPABean.getBlockedBy())) {
+                isBlocked = true;
+            } else {
+                paRepository.updateBlockedByById(String.valueOf(userPrincipal.getClientId()), id);
+                //  oPABean = ProgramaAvisos.getHelper().fillPAWsData(oPABean, true);
+                if (oPABean != null && oPABean.getNrCalls() > 0) {
+                    callsList = callsRepository.findByIdPaData(id);
+                }
+            }
+            channelList = channelRepository.findAll();
+            return DetailsPADTO.builder()
+                    .programaAvisosBean(oPABean)
+                    .calls(callsList)
+                    .channels(channelList)
+                    .isBlocked(isBlocked)
+                    .build();
+        } catch (Exception e) {
+            log.error("Get registration to make call");
+            throw new ProgramaAvisosException("Get registration to make call", e);
+        }
+    }
+
+    private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean,ProgramaAvisosBean oPABeanOld){
+        oPABean.setIdClientChannelPreference(oPABeanOld.getIdClientChannelPreference());
+        oPABean.setReceiveInformation(oPABeanOld.getReceiveInformation());
+        oPABean.setSuccessContact(oPABeanOld.getSuccessContact());
+        if (oPABeanOld.getDataIsCorrect() != null && oPABeanOld.getDataIsCorrect().equals("N")) {
+            oPABean.setDataIsCorrect(oPABeanOld.getDataIsCorrect());
+            oPABean.setNewAddress(oPABeanOld.getNewAddress());
+            oPABean.setNewAddressNumber(oPABeanOld.getNewAddressNumber());
+            oPABean.setNewContactPhone(oPABeanOld.getNewContactPhone());
+            oPABean.setNewCp3(oPABeanOld.getNewCp3());
+            oPABean.setNewCp4(oPABeanOld.getNewCp4());
+            oPABean.setNewCpExt(oPABeanOld.getNewCpExt());
+            oPABean.setNewEmail(oPABeanOld.getNewEmail());
+            oPABean.setNewFloor(oPABeanOld.getNewFloor());
+            oPABean.setNewName(oPABeanOld.getNewName());
+            oPABean.setNewNif(oPABeanOld.getNewNif());
+        }
+       return oPABean;
     }
 
 

@@ -13,4 +13,5 @@ public interface ProgramaAvisosService {
     void unlockPARegister(Integer id);
     PAInfoDTO getInfoPA(UserPrincipal userPrincipal);
     void activatePA(Integer id);
+    DetailsPADTO getPaDetail(UserPrincipal userPrincipal,Integer id,Integer oldId);
 }

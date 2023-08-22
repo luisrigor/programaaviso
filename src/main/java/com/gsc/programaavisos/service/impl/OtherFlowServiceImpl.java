@@ -7,10 +7,8 @@ import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
-import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
-import com.gsc.programaavisos.repository.cardb.ModeloRepository;
+import com.gsc.programaavisos.repository.cardb.*;
 import com.gsc.programaavisos.repository.crm.*;
-import com.gsc.programaavisos.repository.crm.ContactTypeRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
@@ -22,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.*;
-
 import static com.gsc.programaavisos.constants.AppProfile.*;
 import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
 
