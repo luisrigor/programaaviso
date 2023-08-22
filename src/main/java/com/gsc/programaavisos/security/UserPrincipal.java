@@ -1,9 +1,6 @@
 package com.gsc.programaavisos.security;
 
 import com.gsc.programaavisos.constants.AppProfile;
-import com.rg.dealer.Dealer;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.StringTasks;
 import lombok.Getter;
 
 import java.util.Set;
