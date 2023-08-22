@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -14,6 +15,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "PA_PARAMETERIZATION")
+@ToString
 public class PaParameterization {
 
     @Id
@@ -43,13 +45,13 @@ public class PaParameterization {
     private String createdBy;
 
     @Column(name = "DT_CREATED")
-    private Date dtCreated;
+    private LocalDateTime dtCreated;
 
     @Column(name = "CHANGED_BY")
     private String changedBy;
 
     @Column(name = "DT_CHANGED")
-    private Date dtChanged;
+    private LocalDateTime dtChanged;
 
     @Column(name = "ID_BRAND")
     private Integer idBrand;

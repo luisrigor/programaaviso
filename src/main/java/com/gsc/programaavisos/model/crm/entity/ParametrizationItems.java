@@ -3,13 +3,14 @@ package com.gsc.programaavisos.model.crm.entity;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "PA_PARAMETERIZATION_ITEMS")
 public class ParametrizationItems {
@@ -47,11 +48,11 @@ public class ParametrizationItems {
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
-    private String dtCreated;
+    private LocalDateTime dtCreated;
     @Column(name = "CHANGED_BY")
     private String changedBy;
     @Column(name = "DT_CHANGED")
-    private LocalDate dtChanged;
+    private LocalDateTime dtChanged;
 
     @Transient
     private List<ItemsAge> itemAges;

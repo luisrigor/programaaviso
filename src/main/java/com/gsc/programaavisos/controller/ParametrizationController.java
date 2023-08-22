@@ -61,4 +61,11 @@ public class ParametrizationController {
                                                                     @RequestBody ParameterizationDTO dto) {
         parametrizationService.saveParameterization(userPrincipal,dto);
     }
+
+    @PostMapping(ApiEndpoints.CLONE_PARAMETRIZATION)
+    public ResponseEntity<String> cloneParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                    @RequestParam Integer id) {
+        parametrizationService.cloneParameterization(userPrincipal,id);
+        return new ResponseEntity<>("Successfully Clone Parametrization",HttpStatus.OK);
+    }
 }

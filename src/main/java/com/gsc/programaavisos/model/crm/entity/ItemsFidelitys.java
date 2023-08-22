@@ -4,12 +4,13 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "PA_PARAMETERIZATION_ITEMS_FIDELITY")
 public class ItemsFidelitys {
@@ -24,5 +25,5 @@ public class ItemsFidelitys {
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
-    private LocalDate dtCreated;
+    private LocalDateTime dtCreated;
 }

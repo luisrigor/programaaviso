@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "PA_PARAMETERIZATION_ITEMS_ENTITY_TYPE")
+@ToString
 public class ItemsEntityType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,5 +26,5 @@ public class ItemsEntityType {
     @Column(name = "CREATED_BY")
     private String createdBy;
     @Column(name = "DT_CREATED")
-    private LocalDate dtCreated;
+    private LocalDateTime dtCreated;
 }

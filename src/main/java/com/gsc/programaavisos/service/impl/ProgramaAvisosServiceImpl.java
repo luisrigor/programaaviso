@@ -500,8 +500,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public PATotals getPaTotals(FilterBean filterBean) {
         return paBeanRepository.getPaTotals(filterBean);
     }
+/*
+    @Override
+    public ProgramaAvisosBean getPaById(Integer id){
+        return paBeanRepository.getPaById(id);
 
-
-
-
+    }
+ */
 }

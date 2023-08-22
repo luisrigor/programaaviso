@@ -12,4 +12,5 @@ public interface ParametrizationService {
     List<PaParameterization> getParametrizationsList(UserPrincipal userPrincipal);
     PaParameterization getNewParametrization(UserPrincipal userPrincipal,Integer id);
     void saveParameterization(UserPrincipal userPrincipal, ParameterizationDTO parameterizationDTO);
+    void cloneParameterization(UserPrincipal oGSCUser, Integer id);
 }

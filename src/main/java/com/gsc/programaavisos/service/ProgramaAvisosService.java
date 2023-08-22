@@ -13,4 +13,8 @@ public interface ProgramaAvisosService {
     void unlockPARegister(Integer id);
     PAInfoDTO getInfoPA(UserPrincipal userPrincipal);
     void activatePA(Integer id);
+/*
+    ProgramaAvisosBean getPaById(Integer id);
+
+ */
 }

@@ -15,11 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Service
 @Log4j
@@ -101,8 +102,8 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                     parameterizationItem.setItemFidelitys(itemsFidelitysRepository.findByIdParameterizationItems(idParameterizationItem));
                     parameterizationItem.setItemFuels(itemsFuelRepository.findByIdParameterizationItems(idParameterizationItem));
                     parameterizationItem.setItemGenres(itemsGenreRepository.findByIdParameterizationItems(idParameterizationItem));
-                    //parameterizationItem.setItemDealers(ItemsDealer.getHelper().getDealersByParameterizationItems(idParameterizationItem));
-                    //parameterizationItem.setItemModels(ItemsModel.getHelper().getModelsByParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemDealers(itemsDealerRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemModels(itemsModelRepository.findByIdParameterizationItems(idParameterizationItem));
                 }
             }
             return parameterization;
@@ -133,48 +134,187 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                 .parameterizationItems(parameterizationDTO.getParametrizationItems())
                 .idBrand(ApiConstants.getIdBrand(oGSCUser.getOidNet()))
                 .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
-                .dtCreated(new java.sql.Date(new Timestamp(System.currentTimeMillis()).getTime()))
+                .dtCreated(LocalDateTime.now())
                 .build();
         insertParametrization(oParameterization.getId() > 0, oParameterization, oGSCUser);
     }
 
-    public void insertParametrization(boolean isNotNew, PaParameterization oParameterization, UserPrincipal oGSCUser) {
+    public void insertParametrization(boolean isNotNew, PaParameterization oParameterization, UserPrincipal oGSCUser ) {
         try {
             if (isNotNew)
                 parametrizationItemsRepository.deleteById(oParameterization.getId());
-
-            paParameterizationRepository.save(oParameterization);
+            PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
-
             for (ParametrizationItems parameterizationItem : oParameterization.getParameterizationItems()) {
                 if (parameterizationItem!=null){
 
-                    if (oParameterization.getId()!=null&&oParameterization.getId()>0) parameterizationItem.setIdParameterization(oParameterization.getId());
-
+                    parameterizationItem.setIdParameterization(insertedParam.getId());
+                    parameterizationItem.setDtCreated(LocalDateTime.now());
+                    parameterizationItem.setCreatedBy(createdBy);
                     parametrizationItemsRepository.save(parameterizationItem);
                     int parameterizationItemId = parameterizationItem.getId();
 
-                    saveItemsList(parameterizationItem.getItemAges(), parameterizationItemId, createdBy, ItemsAge::setIdParameterizationItems, ItemsAge::setCreatedBy, itemsAgeRepository);
-                    saveItemsList(parameterizationItem.getItemKilometers(), parameterizationItemId, createdBy, ItemsKilometers::setIdParameterizationItems, ItemsKilometers::setCreatedBy, itemsKilometersRepository);
-                    saveItemsList(parameterizationItem.getItemFidelitys(), parameterizationItemId, createdBy, ItemsFidelitys::setIdParameterizationItems, ItemsFidelitys::setCreatedBy, itemsFidelitysRepository);
-                    saveItemsList(parameterizationItem.getItemFuels(), parameterizationItemId, createdBy, ItemsFuel::setIdParameterizationItems, ItemsFuel::setCreatedBy, itemsFuelRepository);
-                    saveItemsList(parameterizationItem.getItemDealers(), parameterizationItemId, createdBy, ItemsDealer::setIdParameterizationItems, ItemsDealer::setCreatedBy, itemsDealerRepository);
-                    saveItemsList(parameterizationItem.getItemGenres(), parameterizationItemId, createdBy, ItemsGenre::setIdParameterizationItems, ItemsGenre::setCreatedBy, itemsGenreRepository);
-                    saveItemsList(parameterizationItem.getItemModels(), parameterizationItemId, createdBy, ItemsModel::setIdParameterizationItems, ItemsModel::setCreatedBy, itemsModelRepository);
-                    saveItemsList(parameterizationItem.getItemEntityTypes(), parameterizationItemId, createdBy, ItemsEntityType::setIdParameterizationItems, ItemsEntityType::setCreatedBy, itemsEntityTypeRepository);
+                    saveItemsList(parameterizationItem.getItemAges(), parameterizationItemId, createdBy, ItemsAge::setIdParameterizationItems, ItemsAge::setCreatedBy, ItemsAge::setDtCreated, itemsAgeRepository);
+                    saveItemsList(parameterizationItem.getItemKilometers(), parameterizationItemId, createdBy, ItemsKilometers::setIdParameterizationItems, ItemsKilometers::setCreatedBy, ItemsKilometers::setDtCreated, itemsKilometersRepository);
+                    saveItemsList(parameterizationItem.getItemFidelitys(), parameterizationItemId, createdBy, ItemsFidelitys::setIdParameterizationItems, ItemsFidelitys::setCreatedBy, ItemsFidelitys::setDtCreated, itemsFidelitysRepository);
+                    saveItemsList(parameterizationItem.getItemFuels(), parameterizationItemId, createdBy, ItemsFuel::setIdParameterizationItems, ItemsFuel::setCreatedBy, ItemsFuel::setDtCreated, itemsFuelRepository);
+                    saveItemsList(parameterizationItem.getItemDealers(), parameterizationItemId, createdBy, ItemsDealer::setIdParameterizationItems, ItemsDealer::setCreatedBy, ItemsDealer::setDtCreated, itemsDealerRepository);
+                    saveItemsList(parameterizationItem.getItemGenres(), parameterizationItemId, createdBy, ItemsGenre::setIdParameterizationItems, ItemsGenre::setCreatedBy, ItemsGenre::setDtCreated, itemsGenreRepository);
+                    saveItemsList(parameterizationItem.getItemModels(), parameterizationItemId, createdBy, ItemsModel::setIdParameterizationItems, ItemsModel::setCreatedBy, ItemsModel::setDtCreated, itemsModelRepository);
+                    saveItemsList(parameterizationItem.getItemEntityTypes(), parameterizationItemId, createdBy, ItemsEntityType::setIdParameterizationItems, ItemsEntityType::setCreatedBy, ItemsEntityType::setDtCreated, itemsEntityTypeRepository);
                 }
             }
         }catch (Exception e){
-            throw new ProgramaAvisosException("Error new parametrization", e);
+            throw new ProgramaAvisosException("Error insert parametrization", e);
         }
     }
 
     public  <T> void saveItemsList(List<T> items, Integer parameterizationItemId, String createdBy, BiConsumer<T, Integer> idParamSetter,
-                                   BiConsumer<T, String> createdBySetter, JpaRepository<T, Integer> repository) {
+                                   BiConsumer<T, String> createdBySetter, BiConsumer<T, LocalDateTime> dtCreatedSetter, JpaRepository<T, Integer> repository) {
         for (T item : items) {
             idParamSetter.accept(item, parameterizationItemId);
             createdBySetter.accept(item, createdBy);
+            dtCreatedSetter.accept(item, LocalDateTime.now());
             repository.save(item);
+        }
+    }
+
+    @Override
+    public void cloneParameterization(UserPrincipal oGSCUser, Integer id) {
+        try {
+            PaParameterization paramToClone = getById(id, true);
+            PaParameterization cloneParameterization = PaParameterization.builder()
+                    .id(0)
+                    .dtStart(paramToClone.getDtStart())
+                    .dtEnd(paramToClone.getDtEnd())
+                    .comments(paramToClone.getComments())
+                    .published(paramToClone.getPublished())
+                    .visible(paramToClone.getVisible())
+                    .type(paramToClone.getType())
+                    .idBrand(paramToClone.getIdBrand())
+                    .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
+                    .dtCreated(LocalDateTime.now())
+                    .parameterizationItems(paramToClone.getParameterizationItems())
+                    .build();
+            cloneItemList(cloneParameterization,oGSCUser);
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error clone parametrization", e);
+        }
+    }
+
+    public void cloneItemList(PaParameterization oParameterization, UserPrincipal oGSCUser) {
+        try {
+            PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
+            String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
+            for (ParametrizationItems paramToClone : oParameterization.getParameterizationItems()) {
+                if (paramToClone!=null){
+/*
+                    ParametrizationItems cloneParaItem = ParametrizationItems.builder()
+                            .idParameterization(insertedParam.getId())
+                            .idHighlight1(paramToClone.getIdHighlight1())
+                            .idHighlight2(paramToClone.getIdHighlight2())
+                            .idHighlight3(paramToClone.getIdHighlight3())
+                            .idService1(paramToClone.getIdService1())
+                            .idService2(paramToClone.getIdService2())
+                            .idService3(paramToClone.getIdService3())
+                            .idHeader1(paramToClone.getIdHeader1())
+                            .idHeader2(paramToClone.getIdHeader2())
+                            .idHeader3(paramToClone.getIdHeader3())
+                            .parameterizationItemsType(paramToClone.getParameterizationItemsType())
+                            .idContactReason(paramToClone.getIdContactReason())
+                            .status(paramToClone.getStatus())
+                            .createdBy(createdBy)
+                            .dtCreated(LocalDateTime.now())
+                            .changedBy(paramToClone.getChangedBy())
+                            .dtChanged(paramToClone.getDtChanged())
+                            .build();
+
+ */
+                    ParametrizationItems cloneParaItem = paramToClone.toBuilder()
+                            .id(0)
+                            .idParameterization(insertedParam.getId())
+                            .createdBy(createdBy)
+                            .dtCreated(LocalDateTime.now())
+                            .build();
+
+                    int parameterizationItemId = parametrizationItemsRepository.save(cloneParaItem).getId();
+
+                    for (ItemsAge age:paramToClone.getItemAges()){
+                        ItemsAge clone = ItemsAge.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idAge(age.getIdAge())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsAgeRepository.save(clone);
+                    }
+                    for (ItemsKilometers kilometers:paramToClone.getItemKilometers()){
+                        ItemsKilometers clone = ItemsKilometers.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idKilometers(kilometers.getIdKilometers())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsKilometersRepository.save(clone);
+                    }
+                    for (ItemsFidelitys itemsFidelitys:paramToClone.getItemFidelitys()){
+                        ItemsFidelitys clone = ItemsFidelitys.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idFidelity(itemsFidelitys.getIdFidelity())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsFidelitysRepository.save(clone);
+                    }
+                    for (ItemsFuel fuel:paramToClone.getItemFuels()){
+                        ItemsFuel clone = ItemsFuel.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idFuel(fuel.getIdFuel())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsFuelRepository.save(clone);
+                    }
+                    for (ItemsDealer dealer:paramToClone.getItemDealers()){
+                        ItemsDealer clone = ItemsDealer.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idDealer(dealer.getIdDealer())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsDealerRepository.save(clone);
+                    }
+                    for (ItemsGenre genre:paramToClone.getItemGenres()){
+                        ItemsGenre clone = ItemsGenre.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idGenre(genre.getIdGenre())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsGenreRepository.save(clone);
+                    }
+                    for (ItemsModel model:paramToClone.getItemModels()){
+                        ItemsModel clone = ItemsModel.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idGamma(model.getIdGamma())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsModelRepository.save(clone);
+                    }
+                    for (ItemsEntityType entityType:paramToClone.getItemEntityTypes()){
+                        ItemsEntityType clone = ItemsEntityType.builder()
+                                .idParameterizationItems(parameterizationItemId)
+                                .idEnittyType(entityType.getIdEnittyType())
+                                .createdBy(createdBy)
+                                .dtCreated(LocalDateTime.now())
+                                .build();
+                        itemsEntityTypeRepository.save(clone);
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw new ProgramaAvisosException("Error clone parametrization", e);
         }
     }
 
