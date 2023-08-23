@@ -1,11 +1,25 @@
 package com.gsc.programaavisos.model.crm.entity;
 
 
+import com.gsc.ws.core.Campaign;
 import lombok.*;
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.gsc.ecare.core.ECareNotification;
+import com.gsc.programaavisos.constants.PAInfo;
+import com.gsc.programaavisos.model.crm.ContactTypeB;
+import com.gsc.ws.core.*;
+import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
+import com.rg.dealer.Dealer;
+import com.sc.commons.utils.DateTimerTasks;
+import com.sc.commons.utils.StringTasks;
+import com.sc.commons.validations.Validate;
 
 @Getter
 @Setter
@@ -144,7 +158,6 @@ public class ProgramaAvisosBean {
     private Integer nrCalls;
     @Column(name = "PA_ID_LAST_CALL")
     private Integer idLastCall;
-
     @Column(name = "PA_VISIBLE")
     private String visible;
     @Column(name = "PA_DT_VISIBLE")
@@ -167,7 +180,6 @@ public class ProgramaAvisosBean {
     private String DtCreated;
     @Column(name = "PA_OWNER")
     private String owner;
-
     @Column(name = "PA_HR_SCHEDULE_CONTACT")
     private Time hrScheduleContact;
     @Column(name = "PA_CHANGED_BY")
@@ -186,6 +198,8 @@ public class ProgramaAvisosBean {
     private Date dtItv;
     @Column(name = "MRS_MAINTENANCE_PRICE")
     private Double maintenancePrice;
+    @Transient
+    private String euroCare;
     @Column(name = "MRS_FLAG_5_PLUS")
     private String flag5Plus;
     @Column(name = "MRS_FLAG_MAINTENANCE_CONTRACT")
@@ -232,26 +246,35 @@ public class ProgramaAvisosBean {
     private Double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
-    //private String description;
-    //private String expectedDate;
-    //private Dealer dealer;
-    //private List<Campaign> technicalCampaigns;
-    //private List<Revision> revisions;
-    //private List<Warranty> warranties;
-    //private List<ECareNotification> eCareNotifications;
-    //private List<ECareNotification> eCareAllNotifications;
-    //private Integer IDOrigin;
-    //private Integer extIDInOrigin;
-    //private List<Claim> claims;
-    //private List<Rpt> rpts;
-    //private String extracare;
-    //private String dtNextIUC;
-    //private String dtStartNextITV;
-    //private String dtNextItv;
-    //private MaintenanceContract maintenanceContract;
-    //private String tecnicalModel;
-    //private Integer indiceCSToyota;
-
+    @Transient
+    private String description;
+    @Transient
+    private String expectedDate;
+    @Transient
+    private Dealer dealer;
+    @Transient
+    private List<Campaign> technicalCampaigns;
+    @Transient
+    private List<Revision> revisions;
+    @Transient
+    private List<Warranty> warranties;
+    @Transient
+    private List<ECareNotification> eCareNotifications;
+    @Transient
+    private List<ECareNotification> eCareAllNotifications;
+    @Transient
+    private List<Claim> claims;
+    @Transient
+    private List<Rpt> rpts;
+    /*
+    private String extracare;
+    private String dtNextIUC;
+    private String dtStartNextITV;
+    private String dtNextItv;
+    private MaintenanceContract maintenanceContract;
+    private String tecnicalModel;
+    private Integer indiceCSToyota;
+     */
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
     @Column(name = "HHC_PRODUCT_DESCRIPTION")
@@ -277,5 +300,4 @@ public class ProgramaAvisosBean {
     private Date generationDate;
     @Column(name = "TC_SEND_DATE_2")
     private Date TC_SEND_DATE_2;
-
 }

@@ -29,4 +29,7 @@ public class PaConstants {
 
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
+    public static String WS_CAR_LOCATION;
+
+    public static final int ECARE = 1;
 }
