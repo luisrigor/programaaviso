@@ -7,7 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+public interface ContactTypeRepositoryCRM extends JpaRepository<ContactType, Integer> {
 
-public interface ContactTypeRepository extends JpaRepository<ContactType,Integer> {
-
+    @Query("SELECT C FROM ContactType C WHERE UPPER(C.status) = :status ORDER BY C.name")
+    List<ContactType> getByState(@Param("status") Character status);
 }

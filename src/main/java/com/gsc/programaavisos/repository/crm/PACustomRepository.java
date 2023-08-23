@@ -1,5 +1,8 @@
 package com.gsc.programaavisos.repository.crm;
 
+import com.gsc.programaavisos.dto.FilterBean;
+import com.gsc.programaavisos.dto.ProgramaAvisosBean;
+
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 
 import java.util.List;
@@ -11,5 +14,7 @@ public interface PACustomRepository {
 
     Map<String, String> getLastChangedBy(int fromYear, int fromMonth, int toYear, int toMonth, String oidDealer);
 
-    List<MaintenanceTypeDTO>  getMaintenanceTypesByContactType();
+    List<MaintenanceTypeDTO> getMaintenanceTypes();
+
+    List<ProgramaAvisosBean> getOpenContactsforClient(FilterBean oFilter, String nif, String licencePlate,Map<Integer, List<String>> getMaintenanceTypesByContactType);
 }

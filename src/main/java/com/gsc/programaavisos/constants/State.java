@@ -6,7 +6,7 @@ public class State {
     public static final String PENDING_DESC							= "Por Tratar";
 
     public final static int HAS_SCHEDULE							= 2;		//Aberto com agendamento
-    public static final String HAS_SCHEDULE_DESC				= "Novo Agendamento";
+    public static final String HAS_SCHEDULE_DESC					= "Novo Agendamento";
 
     public final static int SCHEDULE_DONE							= 3;
     public static final String SCHEDULE_DONE_DESC					= "Marca��o Efetuada";

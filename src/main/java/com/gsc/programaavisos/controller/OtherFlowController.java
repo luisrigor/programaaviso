@@ -6,6 +6,7 @@ import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -20,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Log4j
@@ -111,6 +111,34 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 
+    @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
+    public ResponseEntity<List<ContactType>> getContactType(@RequestParam String userLogin) {
+        List<ContactType> contactTypeList = otherFlowService.getContactTypeList(userLogin);
+
+        return ResponseEntity.status(HttpStatus.OK).body(contactTypeList);
+    }
+
+    @PostMapping(ApiEndpoints.GET_CHANGED_LIST)
+    public ResponseEntity<List<Object[]>> getChangedList(@RequestBody GetDelegatorsDTO delegatorsDTO) {
+        List<Object[]> changedList = otherFlowService.getChangedList(delegatorsDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(changedList);
+    }
+
+    @PostMapping(ApiEndpoints.GET_PA_CLIENT_CONTACTS)
+    public ResponseEntity<ClientContactsDTO> getPAClientContacts(@RequestParam(required = false) String nif,  @RequestParam(required = false) String selPlate,
+                                                                 @RequestParam int idPaData, @RequestBody FilterBean oPAFilterBean) {
+        ClientContactsDTO clientContacts = otherFlowService.getPAClientContacts(nif, selPlate, idPaData, oPAFilterBean);
+
+        return ResponseEntity.status(HttpStatus.OK).body(clientContacts);
+    }
+
+    @PostMapping(ApiEndpoints.MAP_UPDATE)
+    public ResponseEntity<String> mapUpdate(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+       otherFlowService.mapUpdate(userPrincipal);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Update");
+    }
     @GetMapping(ApiEndpoints.GET_CLIENT_TYPE)
     public ResponseEntity<List<ClientType>> getClientType() {
         log.info("getClientType controller");
@@ -132,7 +160,7 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 
-    @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
+    @GetMapping(ApiEndpoints.GET_ALL_CONTACT_TYPE)
     public ResponseEntity<List<ContactType>> getAllContactType() {
         log.info("getAllContactType controller");
         List<ContactType> rs = otherFlowService.getAllContactTypes();
@@ -140,9 +168,9 @@ public class OtherFlowController {
     }
 
     @GetMapping(ApiEndpoints.GET_MAIN_TYPE)
-    public ResponseEntity<List<MaintenanceTypeDTO>> getMaintenanceTypesByContactType() {
+    public ResponseEntity<List<MaintenanceTypeDTO>> getMaintenanceTypes() {
         log.info("getAllContactType controller");
-        List<MaintenanceTypeDTO> rs = otherFlowService.getMaintenanceTypesByContactType();
+        List<MaintenanceTypeDTO> rs = otherFlowService.getMaintenanceTypes();
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 

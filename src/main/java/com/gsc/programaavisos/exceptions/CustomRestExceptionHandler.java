@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.exceptions;
 
 import com.gsc.programaavisos.constants.ApiErrorConstants;
-import com.sc.commons.exceptions.SCErrorException;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,8 @@ public class CustomRestExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 
-    @ExceptionHandler(value = {SCErrorException.class})
-    public ResponseEntity<ApiError> sqlQueryException(RuntimeException ex, WebRequest request) {
+    @ExceptionHandler(value = {ObjectMappingException.class})
+    public ResponseEntity<ApiError> objectMappingException(ObjectMappingException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         ApiError apiError = new ApiError(ApiErrorConstants.ERROR_PROCESSING_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage(), request.getDescription(false), ex.getCause().getMessage());

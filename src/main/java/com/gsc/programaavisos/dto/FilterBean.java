@@ -1,26 +1,24 @@
 package com.gsc.programaavisos.dto;
 
 
-import com.gsc.programaavisos.config.ApplicationConfiguration;
-import com.gsc.programaavisos.constants.PaConstants;
+import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.State;
+import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.DateTimerTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FilterBean {
+public class FilterBean implements Cloneable{
 
     //1� Linha
     private int fromYear;
@@ -81,6 +79,10 @@ public class FilterBean {
     // OWNER
     private String owner;
 
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     public void clearState() {
         setStatePending(0);
         setStateHasSchedule(0);
@@ -94,15 +96,13 @@ public class FilterBean {
         setStateShowRemovedAutoByPeriod(0);
     }
 
-    public String getWhereClause() throws SCErrorException {
-        return createWhereClause(true);
+
+
+    public String getWhereClause(Map<Integer, List<String>> getMaintenanceTypesByContactType) throws Exception {
+        return createWhereClause(true, getMaintenanceTypesByContactType);
     }
 
-    public String getWhereClauseForTotals() throws SCErrorException {
-        return createWhereClause(false);
-    }
-
-    private String createWhereClause(boolean withStateCondition) throws SCErrorException {
+    private String createWhereClause(boolean withStateCondition, Map<Integer, List<String>> getMaintenanceTypesByContactType) throws Exception {
 
         StringBuffer filter = new StringBuffer();
         filter.append (" WHERE PA_VISIBLE = 'S' AND PA_DT_VISIBLE <= CURRENT DATE ");
@@ -110,31 +110,28 @@ public class FilterBean {
         //Excluir registos marcados como estado 12 "carregamento duplicado"
         filter.append (" AND PA_ID_STATUS != 12 ");
 
-        Calendar calStart = Calendar.getInstance();
-        calStart.clear();
-        calStart.set(Calendar.YEAR, getFromYear());
-        calStart.set(Calendar.MONTH, getFromMonth()-1);
-        calStart.set(Calendar.DAY_OF_MONTH, 1);
+        //---------------------  1� Linha
 
-        Calendar calTo 	= Calendar.getInstance();
-        calTo.clear();
-        calTo.set(Calendar.YEAR, getToYear());
-        calTo.set(Calendar.MONTH, getToMonth());
-        calTo.set(Calendar.DAY_OF_MONTH, 1);
+        Calendar calStart = Calendar.getInstance();		calStart.clear();
+        calStart.set(Calendar.YEAR, getFromYear());		calStart.set(Calendar.MONTH, getFromMonth()-1);			calStart.set(Calendar.DAY_OF_MONTH, 1);
+
+        Calendar calTo 	= Calendar.getInstance();		calTo.clear();
+        calTo.set(Calendar.YEAR, getToYear());		calTo.set(Calendar.MONTH, getToMonth());					calTo.set(Calendar.DAY_OF_MONTH, 1);
         calTo.add(Calendar.DAY_OF_MONTH, -1);
 
+        //FT - Corrigido em 29/Maio
         filter.append(" AND ( ");
-        filter.append(" ( PA_ID_CONTACTTYPE != " + ApplicationConfiguration.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS + " AND "
+        filter.append(" ( PA_ID_CONTACTTYPE != " + ApiConstants.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS + " AND "
                 + "DATE(PA_YEAR ||'-' || RIGHT('00'||PA_MONTH, 2) || '-01') BETWEEN {d '"+ DateTimerTasks.fmtDT.format(calStart.getTime())+"'} AND {d '"+DateTimerTasks.fmtDT.format(calTo.getTime())+"'}"
                 + ")" );
 
-        filter.append(" or ( PA_ID_CONTACTTYPE = " + ApplicationConfiguration.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS + " AND "
+        filter.append(" or ( PA_ID_CONTACTTYPE = " + ApiConstants.PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS + " AND "
                 + " DATE(MC_DT_FINISH_CONTRACT) BETWEEN {d '"+DateTimerTasks.fmtDT.format(calStart.getTime())+"'} AND {d '"+DateTimerTasks.fmtDT.format(calTo.getTime())+"'}"
                 + " )"
                 + ")");
 
         if(getArrSelDealer() != null)
-            filter.append(" AND PA_OID_DEALER IN (" + arrSelDealerToString() + ") ");
+            filter.append(" AND PA_OID_DEALER IN (" + arrSelDealerToStringM() + ") ");
 
         if(getChangedBy() != null )
             if(!getChangedBy().equalsIgnoreCase("*todos*")) {
@@ -156,8 +153,8 @@ public class FilterBean {
             filter.append(" AND PA_ID_CONTACTTYPE = " + getIdContactType() + " ");
         } else {
             filter.append(" AND ("
-                    + "	PA_ID_CONTACTTYPE != " + PaConstants.COMMERCIAL_CAMPAIGN + " "
-                    + "	AND PA_ID_CONTACTTYPE != " + PaConstants.COMMERCIAL_CAMPAIGN_APV_MAP + " "
+                    + "	PA_ID_CONTACTTYPE != " + ContactTypeB.COMMERCIAL_CAMPAIGN + " "
+                    + "	AND PA_ID_CONTACTTYPE != " + ContactTypeB.COMMERCIAL_CAMPAIGN_APV_MAP + " "
                     + " ) ");
         }
 
@@ -178,6 +175,8 @@ public class FilterBean {
 
         //---------------------  3� Linha
         if (withStateCondition) {
+            // Checkboxes
+            //NOTA: Qualquer altera��o aqui tem de ser efetuada na view BI_PADATA
             if(	statePending + stateHasSchedule + stateScheduleDone + stateScheduleRejected + stateNotOwner + stateAstContactsClient + stateClientScheduledAtWorkshop + stateShowRemovedManually + stateShowRemovedAutoByManut + stateShowRemovedAutoByPeriod > 0) {
                 StringBuffer stateCondition = new StringBuffer("-1,");
                 if(statePending > 0) {
@@ -218,11 +217,10 @@ public class FilterBean {
                 filter.append(" AND 1 = 2 ");
             }
         }
-/*
-        if(getIdContactType() > 0 && ApplicationConfiguration.getInstance().getMaintenanceTypesByContactType().containsKey(new Integer(getIdContactType())))
 
-            filter.append(" AND MRS_NEXT_REVISION IN (" + arrSelMaintenanceTypesToString() + ") ");
-*/
+        if(getIdContactType() > 0 && getMaintenanceTypesByContactType.containsKey(new Integer(getIdContactType())))
+            filter.append(" AND MRS_NEXT_REVISION IN (" + arrSelMaintenanceTypesToStringM() + ") ");
+
         if(! StringTasks.cleanString(getHasMaintenanceContract(), "").equals(""))
             filter.append(" AND MRS_FLAG_MAINTENANCE_CONTRACT = '" + getHasMaintenanceContract() + "' ");
 
@@ -247,15 +245,16 @@ public class FilterBean {
             filter.append(" AND PA_ID_CLIENT_TYPE = " + getIdClientType() + " ");
 
         // Search the type of consent
-        if(!"".equals(getOwner()))
+        if(!StringUtils.isEmpty(getOwner()))
             filter.append(" AND PA_DATA_INFO.PA_OWNER = '" + getOwner() + "' ");
 
         //---------------------
         return filter.toString();
     }
 
-    private String arrSelDealerToString() {
-        if (arrSelDealer==null) {
+
+    private String arrSelDealerToStringM() {
+        if (arrSelDealerToString==null) {
             StringBuffer strOIDs = new StringBuffer("'DUMMY'");
             if(arrSelDealer!= null) {
                 for (int i = 0; i < arrSelDealer.length; i++) {
@@ -267,7 +266,7 @@ public class FilterBean {
         return arrSelDealerToString;
     }
 
-    private String arrSelMaintenanceTypesToString() {
+    private String arrSelMaintenanceTypesToStringM() {
         if (arrSelMaintenanceTypesToString==null) {
             StringBuffer strMaintenanceTypes = new StringBuffer("' '");
             if(arrSelMaintenanceTypes!= null) {
@@ -298,4 +297,8 @@ public class FilterBean {
         }
         return orderBy;
     }
+
+
+
+
 }
