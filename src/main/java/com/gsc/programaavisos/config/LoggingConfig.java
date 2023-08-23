@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @Configuration
 public class LoggingConfig {
-/*
+
     @Value("${log4j.configuration.path}")
     private String log4jConfigPath;
 
@@ -22,7 +22,7 @@ public class LoggingConfig {
         ClassPathResource log4jResource = new ClassPathResource(log4jConfigPath);
         PropertyConfigurator.configure(log4jResource.getInputStream());
     }
- */
+
 }
 
 
