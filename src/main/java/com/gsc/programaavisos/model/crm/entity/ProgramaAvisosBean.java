@@ -1,11 +1,17 @@
 package com.gsc.programaavisos.model.crm.entity;
 
 
+import com.gsc.ws.core.Campaign;
 import lombok.*;
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
+
+import com.gsc.ecare.core.ECareNotification;
+import com.gsc.ws.core.*;
+import com.rg.dealer.Dealer;
 
 @Getter
 @Setter
@@ -57,7 +63,6 @@ public class ProgramaAvisosBean {
     private Integer day;
     @Column(name = "PA_OID_DEALER")
     private String oidDealer;
-
     @Column(name = "PA_OID_DEALER_SCHEDULE")
     private String oidDealerSchedule;
     @Column(name = "PA_VIN")
@@ -144,7 +149,6 @@ public class ProgramaAvisosBean {
     private Integer nrCalls;
     @Column(name = "PA_ID_LAST_CALL")
     private Integer idLastCall;
-
     @Column(name = "PA_VISIBLE")
     private String visible;
     @Column(name = "PA_DT_VISIBLE")
@@ -158,16 +162,15 @@ public class ProgramaAvisosBean {
     @Column(name = "PA_DT_SCHEDULE")
     private Date dtSchedule;
     @Column(name = "PA_ID_ORIGIN")
-    private Integer IdOrigin;
+    private Integer idOrigin;
     @Column(name = "PA_EXT_ID_IN_ORIGIN")
     private Integer extIDInOrigin;
     @Column(name = "PA_CREATED_BY")
     private String createdBy;
     @Column(name = "PA_DT_CREATED")
-    private String DtCreated;
+    private String dtCreated;
     @Column(name = "PA_OWNER")
     private String owner;
-
     @Column(name = "PA_HR_SCHEDULE_CONTACT")
     private Time hrScheduleContact;
     @Column(name = "PA_CHANGED_BY")
@@ -186,12 +189,14 @@ public class ProgramaAvisosBean {
     private Date dtItv;
     @Column(name = "MRS_MAINTENANCE_PRICE")
     private Double maintenancePrice;
+    @Transient
+    private String euroCare;
     @Column(name = "MRS_FLAG_5_PLUS")
-    private String flag5Plus;
+    private Character flag5Plus;
     @Column(name = "MRS_FLAG_MAINTENANCE_CONTRACT")
-    private String flagMaintenanceContract;
+    private Character flagMaintenanceContract;
     @Column(name = "MRS_FLAG_HYBRID")
-    private Boolean flagHybrid;
+    private Character flagHybrid;
     @Column(name = "MRS_ACESSORY_CODE_1")
     private String acessoryCodeOne;
     @Column(name = "MRS_ACESSORY_1")
@@ -232,26 +237,35 @@ public class ProgramaAvisosBean {
     private Double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
-    //private String description;
-    //private String expectedDate;
-    //private Dealer dealer;
-    //private List<Campaign> technicalCampaigns;
-    //private List<Revision> revisions;
-    //private List<Warranty> warranties;
-    //private List<ECareNotification> eCareNotifications;
-    //private List<ECareNotification> eCareAllNotifications;
-    //private Integer IDOrigin;
-    //private Integer extIDInOrigin;
-    //private List<Claim> claims;
-    //private List<Rpt> rpts;
-    //private String extracare;
-    //private String dtNextIUC;
-    //private String dtStartNextITV;
-    //private String dtNextItv;
-    //private MaintenanceContract maintenanceContract;
-    //private String tecnicalModel;
-    //private Integer indiceCSToyota;
-
+    @Transient
+    private String description;
+    @Transient
+    private String expectedDate;
+    @Transient
+    private Dealer dealer;
+    @Transient
+    private List<Campaign> technicalCampaigns;
+    @Transient
+    private List<Revision> revisions;
+    @Transient
+    private List<Warranty> warranties;
+    @Transient
+    private List<ECareNotification> eCareNotifications;
+    @Transient
+    private List<ECareNotification> eCareAllNotifications;
+    @Transient
+    private List<Claim> claims;
+    @Transient
+    private List<Rpt> rpts;
+    /*
+    private String extracare;
+    private String dtNextIUC;
+    private String dtStartNextITV;
+    private String dtNextItv;
+    private MaintenanceContract maintenanceContract;
+    private String tecnicalModel;
+    private Integer indiceCSToyota;
+     */
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
     @Column(name = "HHC_PRODUCT_DESCRIPTION")
@@ -266,7 +280,6 @@ public class ProgramaAvisosBean {
     private String hHCKmEnd;
     @Column(name = "PA_WARNING_PRIORITY")
     private Integer warningPriority;
-
     @Column(name = "MC_DT_FINISH_CONTRACT")
     private Date dtFinishContract;
     @Column(name = "TC_CAMPAIGN")
@@ -276,6 +289,5 @@ public class ProgramaAvisosBean {
     @Column(name = "TC_GENERATION_DATE")
     private Date generationDate;
     @Column(name = "TC_SEND_DATE_2")
-    private Date TC_SEND_DATE_2;
-
+    private Date tcSendDate2;
 }
