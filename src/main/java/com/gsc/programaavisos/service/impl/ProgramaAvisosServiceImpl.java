@@ -527,31 +527,23 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             List<Campaign> lstCampaigns = null;
             if (oCampaignResponse != null && oCampaignResponse.getCampaign() != null) {
                 lstCampaigns = oCampaignResponse.getCampaign();
-                sortCampaigns("CarExecuteCampaign", lstCampaigns);
+                sortCampaigns(lstCampaigns);
             }
             return lstCampaigns;
         }
     }
 
-    public static void sortCampaigns(final String field, List<Campaign> lstCampaigns) {
-        lstCampaigns.sort((Comparator) (o1, o2) -> {
-            if (field.equalsIgnoreCase("CarExecuteCampaign")) {
-                Campaign c1 = (Campaign) o1;
-                Campaign c2 = (Campaign) o2;
-                if (c1.getCarExecuteCampaign().equals("I") && c2.getCarExecuteCampaign().equals("N"))
-                    return 10;
-
-                if (c1.getCarExecuteCampaign().equals("N") && c2.getCarExecuteCampaign().equals("I"))
-                    return 0;
-
-                return c1.getCarExecuteCampaign().compareTo(c2.getCarExecuteCampaign());
-            }
-            return 0;
+    public static void sortCampaigns(List<Campaign> lstCampaigns) {
+        lstCampaigns.sort( (o1, o2) -> {
+            if (o1.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_I) && o2.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_N))
+                return 10;
+            if (o1.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_N) && o2.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_I))
+                return 0;
+            return o1.getCarExecuteCampaign().compareTo(o2.getCarExecuteCampaign());
         });
     }
 
-
-        private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
+    private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
         oPABean.setIdClientChannelPreference(oPABeanOld.getIdClientChannelPreference());
         oPABean.setReceiveInformation(oPABeanOld.getReceiveInformation());
         oPABean.setSuccessContact(oPABeanOld.getSuccessContact());
