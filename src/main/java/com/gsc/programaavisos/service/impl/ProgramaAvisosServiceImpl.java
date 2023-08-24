@@ -447,7 +447,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         oPABean.setClaims(listClaims);
         oPABean.setRpts(listRpts);
         //oPABean.setExtracare(extracareText);
-        oPABean.setEuroCare(eurocareText);
+        //oPABean.setEuroCare(eurocareText);
         //oPABean.setDtNextIUC(dtNextIUC);
         //oPABean.setDtNextItv(dtNextITV);
         //oPABean.setDtStartNextITV(dtStartNextITV);

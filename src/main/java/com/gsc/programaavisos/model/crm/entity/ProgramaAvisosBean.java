@@ -6,20 +6,12 @@ import lombok.*;
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.gsc.ecare.core.ECareNotification;
-import com.gsc.programaavisos.constants.PAInfo;
-import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.ws.core.*;
-import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import com.rg.dealer.Dealer;
-import com.sc.commons.utils.DateTimerTasks;
-import com.sc.commons.utils.StringTasks;
-import com.sc.commons.validations.Validate;
 
 @Getter
 @Setter
@@ -71,7 +63,6 @@ public class ProgramaAvisosBean {
     private Integer day;
     @Column(name = "PA_OID_DEALER")
     private String oidDealer;
-
     @Column(name = "PA_OID_DEALER_SCHEDULE")
     private String oidDealerSchedule;
     @Column(name = "PA_VIN")
@@ -171,13 +162,13 @@ public class ProgramaAvisosBean {
     @Column(name = "PA_DT_SCHEDULE")
     private Date dtSchedule;
     @Column(name = "PA_ID_ORIGIN")
-    private Integer IdOrigin;
+    private Integer idOrigin;
     @Column(name = "PA_EXT_ID_IN_ORIGIN")
     private Integer extIDInOrigin;
     @Column(name = "PA_CREATED_BY")
     private String createdBy;
     @Column(name = "PA_DT_CREATED")
-    private String DtCreated;
+    private String dtCreated;
     @Column(name = "PA_OWNER")
     private String owner;
     @Column(name = "PA_HR_SCHEDULE_CONTACT")
@@ -186,6 +177,7 @@ public class ProgramaAvisosBean {
     private String changedBy;
     @Column(name = "PA_DT_CHANGED")
     private Timestamp dtChanged;
+
     @Column(name = "MRS_NEXT_REVISION")
     private String nextRevision;
     @Column(name = "MRS_YEAR_NEXT_REVISION")
@@ -198,14 +190,19 @@ public class ProgramaAvisosBean {
     private Date dtItv;
     @Column(name = "MRS_MAINTENANCE_PRICE")
     private Double maintenancePrice;
+
+
     @Transient
     private String euroCare;
     @Column(name = "MRS_FLAG_5_PLUS")
     private String flag5Plus;
     @Column(name = "MRS_FLAG_MAINTENANCE_CONTRACT")
     private String flagMaintenanceContract;
+
     @Column(name = "MRS_FLAG_HYBRID")
-    private Boolean flagHybrid;
+    private String flagHybrid;
+
+
     @Column(name = "MRS_ACESSORY_CODE_1")
     private String acessoryCodeOne;
     @Column(name = "MRS_ACESSORY_1")
@@ -230,6 +227,8 @@ public class ProgramaAvisosBean {
     private String cmkDmv1;
     @Column(name = "MRS_CMK_DMV_1_DT_END")
     private Date cmkDmv1DtEnd;
+
+
     @Column(name = "MRS_CMK_DMV_1_IMAGE")
     private String cmkDmv1Image;
     @Column(name = "MRS_CMK_DAV_2")
@@ -240,12 +239,16 @@ public class ProgramaAvisosBean {
     private String cmkDav2Image;
     @Column(name = "MRS_MAINTENANCE_PLAN")
     private String maintenancePlan;
+
+
     @Column(name = "MRS_SEND_TYPE")
     private String sendType;
     @Column(name = "EXTRACARE_PLUS_COST_PRICE")
     private Double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
+
+
     @Transient
     private String description;
     @Transient
@@ -275,6 +278,7 @@ public class ProgramaAvisosBean {
     private String tecnicalModel;
     private Integer indiceCSToyota;
      */
+
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
     @Column(name = "HHC_PRODUCT_DESCRIPTION")
@@ -287,9 +291,10 @@ public class ProgramaAvisosBean {
     private String hHCDtEnd;
     @Column(name = "HHC_CONTRACT_END_KM")
     private String hHCKmEnd;
+
+
     @Column(name = "PA_WARNING_PRIORITY")
     private Integer warningPriority;
-
     @Column(name = "MC_DT_FINISH_CONTRACT")
     private Date dtFinishContract;
     @Column(name = "TC_CAMPAIGN")
@@ -299,5 +304,5 @@ public class ProgramaAvisosBean {
     @Column(name = "TC_GENERATION_DATE")
     private Date generationDate;
     @Column(name = "TC_SEND_DATE_2")
-    private Date TC_SEND_DATE_2;
+    private Date tcSendDate2;
 }
