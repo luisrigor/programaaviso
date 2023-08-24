@@ -2,6 +2,7 @@ package com.gsc.programaavisos.model.crm.entity;
 
 
 import com.gsc.ws.core.Campaign;
+import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import lombok.*;
 import javax.persistence.*;
 import java.sql.Time;
@@ -257,15 +258,21 @@ public class ProgramaAvisosBean {
     private List<Claim> claims;
     @Transient
     private List<Rpt> rpts;
-    /*
+    @Transient
     private String extracare;
+    @Transient
     private String dtNextIUC;
+    @Transient
     private String dtStartNextITV;
+    @Transient
     private String dtNextItv;
+    @Transient
     private MaintenanceContract maintenanceContract;
+    @Transient
     private String tecnicalModel;
+    @Transient
     private Integer indiceCSToyota;
-     */
+
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
     @Column(name = "HHC_PRODUCT_DESCRIPTION")
