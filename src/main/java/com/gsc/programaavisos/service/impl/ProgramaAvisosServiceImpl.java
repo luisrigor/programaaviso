@@ -2,6 +2,7 @@ package com.gsc.programaavisos.service.impl;
 
 import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
+import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
@@ -15,6 +16,10 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.ws.core.*;
+import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
+import com.gsc.ws.core.objects.response.*;
+import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -23,6 +28,7 @@ import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.CarTasks;
 import com.sc.commons.utils.DateTimerTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import static com.gsc.programaavisos.constants.AppProfile.*;
@@ -270,7 +277,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public void activatePA(Integer id) {
+    public void activatePA(UserPrincipal userPrincipal,Integer id) {
         try {
            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
@@ -282,7 +289,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 oPA.setRevisionScheduleMotive(StringUtils.EMPTY);
                 oPA.setRevisionScheduleMotive2(StringUtils.EMPTY);
                 oPA.setRemovedObs(StringUtils.EMPTY);
-                //oPA.save(String.valueOf(oGSCUser.getIdUser()), oGSCUser.containsRole(ApplicationConfiguration.ROLE_VIEW_CALL_CENTER_DEALERS));
+                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
             }
         } catch (Exception e) {
             log.error("An error occurred while activating listing registration");
@@ -299,7 +306,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         boolean isBlocked = false;
         try {
             oPABean = paBeanRepository.getProgramaAvisosBeanById(id);
-            System.out.println(oPABean);
             if (oPABean != null && oldId > 0) {
                 oPABeanOld = paBeanRepository.getProgramaAvisosBeanById(oldId);
                 if (oPABeanOld != null) {
@@ -310,7 +316,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 isBlocked = true;
             } else {
                 paRepository.updateBlockedByById(String.valueOf(userPrincipal.getClientId()), id);
-                //  oPABean = ProgramaAvisos.getHelper().fillPAWsData(oPABean, true);
+                oPABean = fillPAWsData(oPABean,true);
                 if (oPABean != null && oPABean.getNrCalls() > 0) {
                     callsList = callsRepository.findByIdPaData(id);
                 }
@@ -328,7 +334,213 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
+    public ProgramaAvisosBean fillPAWsData(ProgramaAvisosBean oPABean, boolean completedData) throws SCErrorException {
+        String plate = oPABean.getLicensePlate();
+        if (plate == null || StringUtils.EMPTY.equals(plate))
+            return oPABean;
+
+        String model = StringUtils.EMPTY;
+        CarInfo oCarInfo = new CarInfo();
+        String eurocare = StringUtils.EMPTY, eurocareText = StringUtils.EMPTY, extracareText = StringUtils.EMPTY, extracareDate = StringUtils.EMPTY;
+        String dtNextIUC = StringUtils.EMPTY, dtNextITV = StringUtils.EMPTY, dtStartNextITV = StringUtils.EMPTY;
+        String dtInvoice = StringUtils.EMPTY, tecnicalModel = StringUtils.EMPTY;
+        MaintenanceContract maintenanceContract = new MaintenanceContract();
+        WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+
+        CarInfoResponse oCarInfoResponse = WS_INFO.getCarByPlate(plate);
+        if(oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null){
+            oCarInfo = oCarInfoResponse.getCarInfo();
+        }
+
+        if (oCarInfo != null)
+            model = oCarInfo.getComercialModelDesig();
+
+        List<Campaign> listCampaigns = getCampaigns(plate);
+        List<Claim> listClaims = new ArrayList<>();
+        List<Rpt> listRpts = new ArrayList<>();
+        List<Revision> listRevisions = new ArrayList<>();
+        List<Warranty> listWarranties = new ArrayList<>();
+        List<ECareNotification> listNotifications = new ArrayList<>();
+        List<ECareNotification> allNotifications = new ArrayList<>();
+
+        if (completedData) {
+            if (oCarInfo != null) {
+                tecnicalModel = oCarInfo.getTecnicalModel();
+
+                MaintenanceContractResponse oMaintenanceContractResponse = WS_INFO.getMaintenanceContractByPlate(plate);
+                if(oMaintenanceContractResponse != null && oMaintenanceContractResponse.getMaintenanceContract() != null){
+                    maintenanceContract = oMaintenanceContractResponse.getMaintenanceContract();
+                }
+
+                allNotifications = ECareNotification.getHelper().listAllNotificationsByVIN(PaConstants.ECARE, oCarInfo.getVin());
+                listRevisions = getRevisions(plate);
+                listWarranties = getWarranties(plate);
+                listClaims = getClaims(plate);
+                listRpts = getRpts(plate);
+                extracareDate = StringTasks.cleanString(oCarInfo.getDtStartWarrantyExtension(), StringUtils.EMPTY).trim();
+                eurocare = StringTasks.cleanString(oCarInfo.getDtEndEurocare(), StringUtils.EMPTY).trim();
+                dtInvoice = StringTasks.cleanString(oCarInfo.getDtInvoice(), StringUtils.EMPTY).trim();
+                dtNextIUC = oCarInfo.getDtNextIUC();
+                dtNextITV = oCarInfo.getDtNextITV();
+                dtStartNextITV = CarTasks.getNextStartITVDate(oCarInfo.getCategory(), oCarInfo.getDtPlate());
+            }
+
+            Calendar calNow = Calendar.getInstance();
+            if (!dtInvoice.equals(StringUtils.EMPTY)) {
+                if (!eurocare.equals(StringUtils.EMPTY)) {
+                    Calendar calEurocare = Calendar.getInstance();
+                    Calendar calInvoice = Calendar.getInstance();
+                    try {
+                        calEurocare.setTime(new Date(DateTimerTasks.fmtDT.parse(eurocare).getTime()));
+                        calInvoice.setTime(new Date(DateTimerTasks.fmtDT.parse(dtInvoice).getTime()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (calEurocare.after(calNow)) {
+                        eurocareText = eurocare;
+                    } else {
+                        calInvoice.add(Calendar.YEAR, 10);
+                        if (calInvoice.after(calNow)) {
+                            eurocareText = PaConstants.EURO_CARE_TEXT;
+                        } else {
+                            eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                        }
+                    }
+                } else {
+                    Calendar calInvoice = Calendar.getInstance();
+                    try {
+                        calInvoice.setTime(new Date(DateTimerTasks.fmtDT.parse(dtInvoice).getTime()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    calInvoice.add(Calendar.YEAR, 10);
+                    if (calInvoice.after(calNow)) {
+                        eurocareText = PaConstants.EURO_CARE_TEXT;
+                    } else {
+                        eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                    }
+                }
+            }
+            if (!extracareDate.equals(StringUtils.EMPTY)) {
+                Calendar cal = Calendar.getInstance();
+                try {
+                    cal.setTime(new Date(DateTimerTasks.fmtDT.parse(extracareDate).getTime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                cal.add(Calendar.MONTH, 24);
+                if (cal.after(calNow)) {
+                    eurocareText = PaConstants.EURO_CARE_TEXT;
+                } else {
+                    eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                }
+            }
+        }
+        oPABean.setModel(model);
+        oPABean.setTechnicalCampaigns(listCampaigns);
+        oPABean.setRevisions(listRevisions);
+        oPABean.setWarranties(listWarranties);
+        oPABean.setClaims(listClaims);
+        oPABean.setRpts(listRpts);
+        oPABean.setECareNotifications(listNotifications);
+        oPABean.setECareAllNotifications(allNotifications);
+        return oPABean;
+    }
+
+    public List<Revision> getRevisions(String plate) {
+        if(plate == null || "".equals(plate)){
+            return null;
+        } else {
+            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Revision> lstRevisions = null;
+            RevisionResponse oRevisionResponse = WS_INFO.getCarRevisionsByPlate(plate);
+            if(oRevisionResponse != null && oRevisionResponse.getRevision() != null){
+                lstRevisions = oRevisionResponse.getRevision();
+            }
+            return lstRevisions;
+        }
+    }
+
+    public List<Warranty> getWarranties(String plate) {
+        if(plate == null || "".equals(plate)){
+            return null;
+        } else {
+            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Warranty> lstWarranty = null;
+            WarrantyResponse oWarrantyResponse = WS_INFO.getCarWarrantiesByPlate(plate);
+            if(oWarrantyResponse != null && oWarrantyResponse.getWarranty() != null){
+                lstWarranty = oWarrantyResponse.getWarranty();
+            }
+            return lstWarranty;
+        }
+    }
+
+    public List<Claim> getClaims(String plate) {
+        if(plate == null || "".equals(plate)){
+            return null;
+        } else {
+            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Claim> lstClaim = null;
+            ClaimResponse oClaimResponse = WS_INFO.getCarClaimsByPlate(plate);
+            if(oClaimResponse != null && oClaimResponse.getClaim() != null){
+                lstClaim = oClaimResponse.getClaim();
+            }
+            return lstClaim;
+        }
+    }
+
+    public List<Rpt> getRpts(String plate) {
+
+        if(plate == null || "".equals(plate)){
+            return null;
+        } else {
+            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Rpt> lstRpt = null;
+            RptResponse oRptResponse = WS_INFO.getCarRptsByPlate(plate);
+            if(oRptResponse != null && oRptResponse.getRpt() != null){
+                lstRpt = oRptResponse.getRpt();
+            }
+            return lstRpt;
+        }
+    }
+
+    public List<Campaign> getCampaigns(String plate) {
+
+        if (plate == null || "".equals(plate)) {
+            return null;
+        } else {
+            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            CampaignResponse oCampaignResponse = WS_INFO.getCarCampaignsByPlate(plate);
+            List<Campaign> lstCampaigns = null;
+            if (oCampaignResponse != null && oCampaignResponse.getCampaign() != null) {
+                lstCampaigns = oCampaignResponse.getCampaign();
+                sortCampaigns("CarExecuteCampaign", lstCampaigns);
+            }
+            return lstCampaigns;
+        }
+    }
+
+    public static void sortCampaigns(final String field, List<Campaign> lstCampaigns) {
+        Collections.sort(lstCampaigns, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                if(field.equalsIgnoreCase("CarExecuteCampaign")) {
+                    Campaign c1 = (Campaign)o1;
+                    Campaign c2 = (Campaign)o2;
+                    if (c1.getCarExecuteCampaign().equals("I") && c2.getCarExecuteCampaign().equals("N"))
+                        return 10;
+
+                    if (c1.getCarExecuteCampaign().equals("N") && c2.getCarExecuteCampaign().equals("I"))
+                        return 0;
+
+                    return c1.getCarExecuteCampaign().compareTo(c2.getCarExecuteCampaign());
+                }
+                return 0;
+            }
+        });
+    }
+
+
+        private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
         oPABean.setIdClientChannelPreference(oPABeanOld.getIdClientChannelPreference());
         oPABean.setReceiveInformation(oPABeanOld.getReceiveInformation());
         oPABean.setSuccessContact(oPABeanOld.getSuccessContact());

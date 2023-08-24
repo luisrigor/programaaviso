@@ -84,9 +84,10 @@ public class ProgramaAvisosController {
     }
 
     @PutMapping(ApiEndpoints.ACTIVE_PA)
-    public ResponseEntity<String> activePA(@RequestParam Integer id) {
+    public ResponseEntity<String> activePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                           @RequestParam Integer id) {
         log.info("activePA controller");
-        programaAvisosService.activatePA(id);
+        programaAvisosService.activatePA(userPrincipal,id);
         return ResponseEntity.status(HttpStatus.OK).body("activePA");
     }
 
