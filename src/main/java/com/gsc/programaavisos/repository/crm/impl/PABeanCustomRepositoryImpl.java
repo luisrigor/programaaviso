@@ -60,7 +60,7 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         int offset = pageEnd - 20;
 
         sql.append("SELECT * FROM ( ");
-       // sql.append(" SELECT ROW_NUMBER() OVER( ORDER BY PA_DT_CREATED ) AS ROWNUM, ");
+
 
         if (checkConnectivityContracts)
             sql.append(" SELECT ROW_NUMBER() OVER( ORDER BY PA_DT_CREATED ) AS ROWNUM, ");

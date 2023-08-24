@@ -177,7 +177,6 @@ public class ProgramaAvisosBean {
     private String changedBy;
     @Column(name = "PA_DT_CHANGED")
     private Timestamp dtChanged;
-
     @Column(name = "MRS_NEXT_REVISION")
     private String nextRevision;
     @Column(name = "MRS_YEAR_NEXT_REVISION")
@@ -190,19 +189,14 @@ public class ProgramaAvisosBean {
     private Date dtItv;
     @Column(name = "MRS_MAINTENANCE_PRICE")
     private Double maintenancePrice;
-
-
     @Transient
     private String euroCare;
     @Column(name = "MRS_FLAG_5_PLUS")
-    private String flag5Plus;
+    private Character flag5Plus;
     @Column(name = "MRS_FLAG_MAINTENANCE_CONTRACT")
-    private String flagMaintenanceContract;
-
+    private Character flagMaintenanceContract;
     @Column(name = "MRS_FLAG_HYBRID")
-    private String flagHybrid;
-
-
+    private Character flagHybrid;
     @Column(name = "MRS_ACESSORY_CODE_1")
     private String acessoryCodeOne;
     @Column(name = "MRS_ACESSORY_1")
@@ -227,8 +221,6 @@ public class ProgramaAvisosBean {
     private String cmkDmv1;
     @Column(name = "MRS_CMK_DMV_1_DT_END")
     private Date cmkDmv1DtEnd;
-
-
     @Column(name = "MRS_CMK_DMV_1_IMAGE")
     private String cmkDmv1Image;
     @Column(name = "MRS_CMK_DAV_2")
@@ -239,16 +231,12 @@ public class ProgramaAvisosBean {
     private String cmkDav2Image;
     @Column(name = "MRS_MAINTENANCE_PLAN")
     private String maintenancePlan;
-
-
     @Column(name = "MRS_SEND_TYPE")
     private String sendType;
     @Column(name = "EXTRACARE_PLUS_COST_PRICE")
     private Double extraCarePlusCostPrice;
     @Column(name = "EXTRACARE_PLUS_DT_LIMIT_RENOVATION")
     private Date extraCarePlusDateLimit;
-
-
     @Transient
     private String description;
     @Transient
@@ -278,7 +266,6 @@ public class ProgramaAvisosBean {
     private String tecnicalModel;
     private Integer indiceCSToyota;
      */
-
     @Column(name = "HHC_PRODUCT_ID")
     private String hHCProductId;
     @Column(name = "HHC_PRODUCT_DESCRIPTION")
@@ -291,8 +278,6 @@ public class ProgramaAvisosBean {
     private String hHCDtEnd;
     @Column(name = "HHC_CONTRACT_END_KM")
     private String hHCKmEnd;
-
-
     @Column(name = "PA_WARNING_PRIORITY")
     private Integer warningPriority;
     @Column(name = "MC_DT_FINISH_CONTRACT")
