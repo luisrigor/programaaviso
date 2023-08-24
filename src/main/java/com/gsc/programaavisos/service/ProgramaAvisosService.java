@@ -14,6 +14,6 @@ public interface ProgramaAvisosService {
     void uploadFile(UserPrincipal userPrincipal, MultipartFile file);
     void unlockPARegister(Integer id);
     PAInfoDTO getInfoPA(UserPrincipal userPrincipal);
-    void activatePA(Integer id);
+    void activatePA(UserPrincipal userPrincipal,Integer id);
     DetailsPADTO getPaDetail(UserPrincipal userPrincipal,Integer id,Integer oldId);
 }

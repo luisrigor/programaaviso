@@ -277,7 +277,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public void activatePA(Integer id) {
+    public void activatePA(UserPrincipal userPrincipal,Integer id) {
         try {
            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
@@ -289,7 +289,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 oPA.setRevisionScheduleMotive(StringUtils.EMPTY);
                 oPA.setRevisionScheduleMotive2(StringUtils.EMPTY);
                 oPA.setRemovedObs(StringUtils.EMPTY);
-                //oPA.save(String.valueOf(oGSCUser.getIdUser()), oGSCUser.containsRole(ApplicationConfiguration.ROLE_VIEW_CALL_CENTER_DEALERS));
+                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
             }
         } catch (Exception e) {
             log.error("An error occurred while activating listing registration");
