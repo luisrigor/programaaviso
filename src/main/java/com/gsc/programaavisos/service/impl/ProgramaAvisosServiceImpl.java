@@ -341,13 +341,19 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
         String model = StringUtils.EMPTY;
         CarInfo oCarInfo = new CarInfo();
-        String eurocare = StringUtils.EMPTY, eurocareText = StringUtils.EMPTY, extracareText = StringUtils.EMPTY, extracareDate = StringUtils.EMPTY;
-        String dtNextIUC = StringUtils.EMPTY, dtNextITV = StringUtils.EMPTY, dtStartNextITV = StringUtils.EMPTY;
-        String dtInvoice = StringUtils.EMPTY, tecnicalModel = StringUtils.EMPTY;
+        String eurocare = StringUtils.EMPTY;
+        String eurocareText = StringUtils.EMPTY;
+        String extracareText = StringUtils.EMPTY;
+        String extracareDate = StringUtils.EMPTY;
+        String dtNextIUC = StringUtils.EMPTY;
+        String dtNextITV = StringUtils.EMPTY;
+        String dtStartNextITV = StringUtils.EMPTY;
+        String dtInvoice = StringUtils.EMPTY;
+        String tecnicalModel = StringUtils.EMPTY;
         MaintenanceContract maintenanceContract = new MaintenanceContract();
-        WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+        WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
 
-        CarInfoResponse oCarInfoResponse = WS_INFO.getCarByPlate(plate);
+        CarInfoResponse oCarInfoResponse = wsInfo.getCarByPlate(plate);
         if(oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null){
             oCarInfo = oCarInfoResponse.getCarInfo();
         }
@@ -367,7 +373,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             if (oCarInfo != null) {
                 tecnicalModel = oCarInfo.getTecnicalModel();
 
-                MaintenanceContractResponse oMaintenanceContractResponse = WS_INFO.getMaintenanceContractByPlate(plate);
+                MaintenanceContractResponse oMaintenanceContractResponse = wsInfo.getMaintenanceContractByPlate(plate);
                 if(oMaintenanceContractResponse != null && oMaintenanceContractResponse.getMaintenanceContract() != null){
                     maintenanceContract = oMaintenanceContractResponse.getMaintenanceContract();
                 }
@@ -444,16 +450,23 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         oPABean.setRpts(listRpts);
         oPABean.setECareNotifications(listNotifications);
         oPABean.setECareAllNotifications(allNotifications);
+        oPABean.setExtracare(extracareText);
+        oPABean.setEuroCare(eurocareText);
+        oPABean.setDtNextIUC(dtNextIUC);
+        oPABean.setDtNextItv(dtNextITV);
+        oPABean.setDtStartNextITV(dtStartNextITV);
+        oPABean.setMaintenanceContract(maintenanceContract);
+        oPABean.setTecnicalModel(tecnicalModel);
         return oPABean;
     }
 
     public List<Revision> getRevisions(String plate) {
-        if(plate == null || "".equals(plate)){
-            return null;
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
             List<Revision> lstRevisions = null;
-            RevisionResponse oRevisionResponse = WS_INFO.getCarRevisionsByPlate(plate);
+            RevisionResponse oRevisionResponse = wsInfo.getCarRevisionsByPlate(plate);
             if(oRevisionResponse != null && oRevisionResponse.getRevision() != null){
                 lstRevisions = oRevisionResponse.getRevision();
             }
@@ -462,12 +475,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public List<Warranty> getWarranties(String plate) {
-        if(plate == null || "".equals(plate)){
-            return null;
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
             List<Warranty> lstWarranty = null;
-            WarrantyResponse oWarrantyResponse = WS_INFO.getCarWarrantiesByPlate(plate);
+            WarrantyResponse oWarrantyResponse = wsInfo.getCarWarrantiesByPlate(plate);
             if(oWarrantyResponse != null && oWarrantyResponse.getWarranty() != null){
                 lstWarranty = oWarrantyResponse.getWarranty();
             }
@@ -476,12 +489,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public List<Claim> getClaims(String plate) {
-        if(plate == null || "".equals(plate)){
-            return null;
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
             List<Claim> lstClaim = null;
-            ClaimResponse oClaimResponse = WS_INFO.getCarClaimsByPlate(plate);
+            ClaimResponse oClaimResponse = wsInfo.getCarClaimsByPlate(plate);
             if(oClaimResponse != null && oClaimResponse.getClaim() != null){
                 lstClaim = oClaimResponse.getClaim();
             }
@@ -491,12 +504,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public List<Rpt> getRpts(String plate) {
 
-        if(plate == null || "".equals(plate)){
-            return null;
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
             List<Rpt> lstRpt = null;
-            RptResponse oRptResponse = WS_INFO.getCarRptsByPlate(plate);
+            RptResponse oRptResponse = wsInfo.getCarRptsByPlate(plate);
             if(oRptResponse != null && oRptResponse.getRpt() != null){
                 lstRpt = oRptResponse.getRpt();
             }
@@ -506,11 +519,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public List<Campaign> getCampaigns(String plate) {
 
-        if (plate == null || "".equals(plate)) {
-            return null;
+        if (plate == null || plate.isEmpty()) {
+            return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
-            CampaignResponse oCampaignResponse = WS_INFO.getCarCampaignsByPlate(plate);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            CampaignResponse oCampaignResponse = wsInfo.getCarCampaignsByPlate(plate);
             List<Campaign> lstCampaigns = null;
             if (oCampaignResponse != null && oCampaignResponse.getCampaign() != null) {
                 lstCampaigns = oCampaignResponse.getCampaign();
@@ -521,21 +534,19 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public static void sortCampaigns(final String field, List<Campaign> lstCampaigns) {
-        Collections.sort(lstCampaigns, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                if(field.equalsIgnoreCase("CarExecuteCampaign")) {
-                    Campaign c1 = (Campaign)o1;
-                    Campaign c2 = (Campaign)o2;
-                    if (c1.getCarExecuteCampaign().equals("I") && c2.getCarExecuteCampaign().equals("N"))
-                        return 10;
+        lstCampaigns.sort((Comparator) (o1, o2) -> {
+            if (field.equalsIgnoreCase("CarExecuteCampaign")) {
+                Campaign c1 = (Campaign) o1;
+                Campaign c2 = (Campaign) o2;
+                if (c1.getCarExecuteCampaign().equals("I") && c2.getCarExecuteCampaign().equals("N"))
+                    return 10;
 
-                    if (c1.getCarExecuteCampaign().equals("N") && c2.getCarExecuteCampaign().equals("I"))
-                        return 0;
+                if (c1.getCarExecuteCampaign().equals("N") && c2.getCarExecuteCampaign().equals("I"))
+                    return 0;
 
-                    return c1.getCarExecuteCampaign().compareTo(c2.getCarExecuteCampaign());
-                }
-                return 0;
+                return c1.getCarExecuteCampaign().compareTo(c2.getCarExecuteCampaign());
             }
+            return 0;
         });
     }
 
