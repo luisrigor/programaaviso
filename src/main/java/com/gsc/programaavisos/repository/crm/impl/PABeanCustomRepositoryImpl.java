@@ -61,13 +61,11 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
 
         sql.append("SELECT * FROM ( ");
 
-
         if (checkConnectivityContracts)
             sql.append(" SELECT ROW_NUMBER() OVER( ORDER BY PA_DT_CREATED ) AS ROWNUM, ");
         else
             sql.append(" SELECT ROW_NUMBER() OVER( ").append(oFilter.getOrderBy()).append(" ) AS ROWNUM, ");
 
-      //  sql.append("SELECT ");
         sql.append("PA_DATA_INFO.*, HHC.PRODUCT_ID AS HHC_PRODUCT_ID, ")
                 .append("HHC.PRODUCT_DESCRIPTION AS HHC_PRODUCT_DESCRIPTION, HHC.PRODUCT_DISPLAY_NAME AS HHC_PRODUCT_DISPLAY_NAME, ")
                 .append("HHC.CONTRACT_START_DATE AS HHC_CONTRACT_START_DATE, HHC.CONTRACT_END_DATE AS HHC_CONTRACT_END_DATE, " )
@@ -75,14 +73,12 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
                 .append("FROM PA_DATA_INFO ").append("LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN ")
                 .append("AND HHC.CONTRACT_STATUS = 'Active'");
         sql.append(")");
-        //sql.append("limit 10 ");
 
         if (checkExpiredContracts)
             sql.append(" WHERE MC_DT_FINISH_CONTRACT >= '").append(dtStart).append("' AND MC_DT_FINISH_CONTRACT < '")
                     .append(dtEnd).append("' ").append(" OFFSET ").append(offset).append(" ROWS FETCH NEXT 20 ROWS ONLY");
         else
             sql.append(" WHERE ROWNUM BETWEEN ").append(pageStart).append(" AND ").append(pageEnd).append(" ");
-
 
         return String.valueOf(sql);
     }

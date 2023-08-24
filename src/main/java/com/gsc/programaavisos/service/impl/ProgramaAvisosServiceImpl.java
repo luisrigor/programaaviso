@@ -306,7 +306,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         boolean isBlocked = false;
         try {
             oPABean = paBeanRepository.getProgramaAvisosBeanById(id);
-            System.out.println(oPABean);
             if (oPABean != null && oldId > 0) {
                 oPABeanOld = paBeanRepository.getProgramaAvisosBeanById(oldId);
                 if (oPABeanOld != null) {
@@ -337,20 +336,18 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     public ProgramaAvisosBean fillPAWsData(ProgramaAvisosBean oPABean, boolean completedData) throws SCErrorException {
         String plate = oPABean.getLicensePlate();
-        if (plate == null || "".equals(plate))
+        if (plate == null || StringUtils.EMPTY.equals(plate))
             return oPABean;
 
-        String model = "";
+        String model = StringUtils.EMPTY;
         CarInfo oCarInfo = new CarInfo();
-        String eurocare = "", eurocareText = "", extracareText = "", extracareDate = "";
-        String dtNextIUC = "", dtNextITV = "", dtStartNextITV = "";
-        String dtInvoice = "", tecnicalModel = "";
-        System.out.println( "right 1");
+        String eurocare = StringUtils.EMPTY, eurocareText = StringUtils.EMPTY, extracareText = StringUtils.EMPTY, extracareDate = StringUtils.EMPTY;
+        String dtNextIUC = StringUtils.EMPTY, dtNextITV = StringUtils.EMPTY, dtStartNextITV = StringUtils.EMPTY;
+        String dtInvoice = StringUtils.EMPTY, tecnicalModel = StringUtils.EMPTY;
         MaintenanceContract maintenanceContract = new MaintenanceContract();
         WsInvokeCarServiceTCAP WS_INFO = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
 
         CarInfoResponse oCarInfoResponse = WS_INFO.getCarByPlate(plate);
-        System.out.println( "right 2");
         if(oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null){
             oCarInfo = oCarInfoResponse.getCarInfo();
         }
@@ -375,23 +372,22 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     maintenanceContract = oMaintenanceContractResponse.getMaintenanceContract();
                 }
 
-                //listNotifications = ECareNotification.getHelper().listNotificationsByNotificationId(oPABean.getExtIDInOrigin());
                 allNotifications = ECareNotification.getHelper().listAllNotificationsByVIN(PaConstants.ECARE, oCarInfo.getVin());
                 listRevisions = getRevisions(plate);
                 listWarranties = getWarranties(plate);
                 listClaims = getClaims(plate);
                 listRpts = getRpts(plate);
-                extracareDate = StringTasks.cleanString(oCarInfo.getDtStartWarrantyExtension(), "").trim();
-                eurocare = StringTasks.cleanString(oCarInfo.getDtEndEurocare(), "").trim();
-                dtInvoice = StringTasks.cleanString(oCarInfo.getDtInvoice(), "").trim();
+                extracareDate = StringTasks.cleanString(oCarInfo.getDtStartWarrantyExtension(), StringUtils.EMPTY).trim();
+                eurocare = StringTasks.cleanString(oCarInfo.getDtEndEurocare(), StringUtils.EMPTY).trim();
+                dtInvoice = StringTasks.cleanString(oCarInfo.getDtInvoice(), StringUtils.EMPTY).trim();
                 dtNextIUC = oCarInfo.getDtNextIUC();
                 dtNextITV = oCarInfo.getDtNextITV();
                 dtStartNextITV = CarTasks.getNextStartITVDate(oCarInfo.getCategory(), oCarInfo.getDtPlate());
             }
 
             Calendar calNow = Calendar.getInstance();
-            if (!dtInvoice.equals("")) {
-                if (!eurocare.equals("")) {
+            if (!dtInvoice.equals(StringUtils.EMPTY)) {
+                if (!eurocare.equals(StringUtils.EMPTY)) {
                     Calendar calEurocare = Calendar.getInstance();
                     Calendar calInvoice = Calendar.getInstance();
                     try {
@@ -405,9 +401,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     } else {
                         calInvoice.add(Calendar.YEAR, 10);
                         if (calInvoice.after(calNow)) {
-                            eurocareText = "Eleg�vel";
+                            eurocareText = PaConstants.EURO_CARE_TEXT;
                         } else {
-                            eurocareText = "N�o eleg�vel";
+                            eurocareText = PaConstants.EURO_CARE_TEXT_NO;
                         }
                     }
                 } else {
@@ -419,13 +415,13 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                     }
                     calInvoice.add(Calendar.YEAR, 10);
                     if (calInvoice.after(calNow)) {
-                        eurocareText = "Eleg�vel";
+                        eurocareText = PaConstants.EURO_CARE_TEXT;
                     } else {
-                        eurocareText = "N�o eleg�vel";
+                        eurocareText = PaConstants.EURO_CARE_TEXT_NO;
                     }
                 }
             }
-            if (!extracareDate.equals("")) {
+            if (!extracareDate.equals(StringUtils.EMPTY)) {
                 Calendar cal = Calendar.getInstance();
                 try {
                     cal.setTime(new Date(DateTimerTasks.fmtDT.parse(extracareDate).getTime()));
@@ -434,9 +430,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
                 cal.add(Calendar.MONTH, 24);
                 if (cal.after(calNow)) {
-                    extracareText = "Eleg�vel";
+                    eurocareText = PaConstants.EURO_CARE_TEXT;
                 } else {
-                    extracareText = "N�o eleg�vel";
+                    eurocareText = PaConstants.EURO_CARE_TEXT_NO;
                 }
             }
         }
@@ -446,13 +442,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         oPABean.setWarranties(listWarranties);
         oPABean.setClaims(listClaims);
         oPABean.setRpts(listRpts);
-        //oPABean.setExtracare(extracareText);
-        //oPABean.setEuroCare(eurocareText);
-        //oPABean.setDtNextIUC(dtNextIUC);
-        //oPABean.setDtNextItv(dtNextITV);
-        //oPABean.setDtStartNextITV(dtStartNextITV);
-        //oPABean.setMaintenanceContract(maintenanceContract);
-        //oPABean.setTecnicalModel(tecnicalModel);
         oPABean.setECareNotifications(listNotifications);
         oPABean.setECareAllNotifications(allNotifications);
         return oPABean;
