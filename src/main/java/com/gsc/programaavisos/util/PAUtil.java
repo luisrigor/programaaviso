@@ -1,9 +1,12 @@
 package com.gsc.programaavisos.util;
 
 import com.gsc.programaavisos.dto.FilterBean;
+import org.apache.tomcat.util.http.fileupload.FileItem;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 public class PAUtil {
 
@@ -17,6 +20,11 @@ public class PAUtil {
 
     public static String getUserStamp(String userName){
         return userName.split("\\|\\|")[0]+"||"+userName.split("\\|\\|")[1];
+    }
+
+    public static FileItem getFileItem(String field_name) {
+        HashMap<String, FileItem[]> hstFileItems=new HashMap<>();
+        return hstFileItems.containsKey(field_name) ? ((FileItem[])hstFileItems.get(field_name))[0] : null;
     }
 
 

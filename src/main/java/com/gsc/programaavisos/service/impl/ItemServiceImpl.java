@@ -7,6 +7,7 @@ import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnitCategory;
@@ -14,14 +15,23 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitCategoryRepository;
 import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
+import com.gsc.programaavisos.util.PAUtil;
 import com.sc.commons.dbconnection.ServerJDBCConnection;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.stereotype.Service;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
@@ -134,4 +144,108 @@ public class ItemServiceImpl implements ItemService {
             throw new ProgramaAvisosException("Error fetching manage items list ", e);
         }
     }
+
+    @Override
+    public void saveManageItems(UserPrincipal oGSCUser, SaveManageItemDTO saveManageItemDTO) {
+
+        int idBrand = ApiConstants.getIdBrand(oGSCUser.getOidNet());
+
+        String uplodadDir = System.getProperty("java.io.tmpdir");
+
+        File fileAttach1;
+        File fileAttach2;
+
+        try {
+            // PortletMultipartWrapper portletMpWrapper = new PortletMultipartWrapper(request, 0, MAXFILESIZE,
+            // MAXFILESIZE,uplodadDir);
+            Integer idItemType = saveManageItemDTO.getIdItemType();
+            String name = StringTasks.cleanString(saveManageItemDTO.getServiceName(), StringUtils.EMPTY);
+            String code = StringTasks.cleanString(saveManageItemDTO.getServiceCode(), StringUtils.EMPTY);
+            String link = StringTasks.cleanString(saveManageItemDTO.getServiceLink(), StringUtils.EMPTY);
+            Integer categoryId = saveManageItemDTO.getCategory();
+            Integer id = StringTasks.cleanInteger(saveManageItemDTO.getIdTpaItem().toString(), 0);
+
+            LocalDate dtEnd = saveManageItemDTO.getEndDateInput() == null ? LocalDate.now() : saveManageItemDTO.getEndDateInput();
+
+            String description = StringTasks.cleanString(saveManageItemDTO.getDescription(), StringUtils.EMPTY)
+                    .replaceAll("[\\t\\n\\r]+", StringUtils.EMPTY);
+
+            DocumentUnit documentUnit;
+
+            if (id > 0) {
+                documentUnit = documentUnitRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("itemId not found " + id));
+                documentUnit.setIdDocumentUnitCategory(categoryId);
+                documentUnit.setLink(link);
+                documentUnit.setName(name);
+                documentUnit.setDescription(description);
+                documentUnit.setDtEnd(dtEnd);
+                documentUnitRepository.save(documentUnit);
+            } else {
+
+                String fiel1dInputName = "img1";
+                String fiel2dInputName = "img2";
+
+                /**
+                 *
+                 *  // PortletMultipartWrapper portletMpWrapper = new PortletMultipartWrapper(request, 0, MAXFILESIZE,
+                 *             // MAXFILESIZE,uplodadDir);
+                 */
+                FileItem file1AttachItem = PAUtil.getFileItem(fiel1dInputName);
+                FileItem file2AttachItem = PAUtil.getFileItem(fiel2dInputName);
+
+                documentUnit = new DocumentUnit();
+                documentUnit.setStatus("S");
+                documentUnit.setIdDocumentUnitType(idItemType);
+                documentUnit.setIdDocumentUnitCategory(categoryId);
+                documentUnit.setLink(link);
+                documentUnit.setCode(code);
+                documentUnit.setName(name);
+                documentUnit.setDescription(description);
+                documentUnit.setIdBrand(idBrand);
+                documentUnit.setDtEnd(dtEnd);
+
+                String extension;
+
+                if (file1AttachItem != null) {
+                    BufferedImage image = ImageIO.read(file1AttachItem.getInputStream());
+                    extension = file1AttachItem.getName().substring(file1AttachItem.getName().indexOf(".") + 1,
+                            file1AttachItem.getName().length());
+                    documentUnit.setImgPostal(code + "." + extension);
+                    fileAttach1 = new File(uplodadDir + PaConstants.BACKSLASH + code + "." + extension);
+                    ImageIO.write(image, extension, fileAttach1);
+
+                    if (idItemType == 1) {
+                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
+                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
+                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_SERVICE);
+                    } else if (idItemType == 2) {
+                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
+                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
+                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_DESTAQUE);
+                    } else if (idItemType == 3) {
+                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
+                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
+                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_HEADER);
+                    }
+                }
+                if (file2AttachItem != null) {
+                    BufferedImage image = ImageIO.read(file2AttachItem.getInputStream());
+                    extension = file2AttachItem.getName().substring(file2AttachItem.getName().indexOf(".") + 1,
+                            file2AttachItem.getName().length());
+                    documentUnit.setImgEPostal(code + "." + extension);
+                    fileAttach2 = new File(uplodadDir + "/" + code + "." + extension);
+                    ImageIO.write(image, extension, fileAttach2);
+
+                    SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
+                            PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach2,
+                            PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_EPOSTAL_PATH);
+                }
+                documentUnitRepository.save(documentUnit);
+            }
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error saving manage items ", e);
+        }
+    }
+
+
 }

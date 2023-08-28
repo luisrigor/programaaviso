@@ -3,6 +3,7 @@ package com.gsc.programaavisos.controller;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
 import io.swagger.annotations.Api;
@@ -51,5 +52,13 @@ public class ItemsController {
         log.info("getManageItemsList controller");
         List<DocumentUnitDTO> documentUnitDTOList = itemService.getListManagesItems(userPrincipal,searchInput, itemType);
         return ResponseEntity.status(HttpStatus.OK).body(documentUnitDTOList);
+    }
+
+    @GetMapping(ApiEndpoints.SAVE_MANAGE_ITEMS)
+    public ResponseEntity<String> saveManageItem(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                 @RequestBody SaveManageItemDTO saveManageItemDTO) {
+        log.info("getManageItemsList controller");
+        itemService.saveManageItems(userPrincipal,saveManageItemDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Successfully Save");
     }
 }
