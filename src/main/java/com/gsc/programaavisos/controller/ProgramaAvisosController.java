@@ -4,23 +4,17 @@ package com.gsc.programaavisos.controller;
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
-import com.gsc.programaavisos.model.crm.entity.PATotals;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 
+import com.gsc.programaavisos.dto.TpaSimulation;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import io.swagger.annotations.Api;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Filter;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,5 +91,12 @@ public class ProgramaAvisosController {
                             @RequestParam Integer oldId) {
         DetailsPADTO detailsInfo = programaAvisosService.getPaDetail(userPrincipal,id,oldId);
         return ResponseEntity.status(HttpStatus.OK).body(detailsInfo);
+    }
+
+    @GetMapping(ApiEndpoints.GET_PA_DETAIL)
+    public ResponseEntity<TpaSimulation> getPaDetail(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                     @RequestBody TpaDTO tpaDTO) {
+        TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);
     }
 }

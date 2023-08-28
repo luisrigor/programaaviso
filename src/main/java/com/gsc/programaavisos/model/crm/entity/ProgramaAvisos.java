@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.model.crm.entity;
 
+import com.sc.commons.exceptions.SCErrorException;
 import lombok.*;
 
 import javax.persistence.*;
@@ -104,5 +105,14 @@ public class ProgramaAvisos {
     private int idOrigin;
     private int extIDInOrigin;
     private int warningPriority;
+
+    /*
+    public Mrs getMRS() throws SCErrorException {
+        if (ivMRS == null && (getIdContactType() == ContactType.MAN || getIdContactType() == ContactType.MAN_ITV || getIdContactType() == ContactType.ITV))
+            ivMRS = Mrs.getHelper().getByIdPaData(getId());
+
+        return ivMRS;
+    }
+     */
 
 }
