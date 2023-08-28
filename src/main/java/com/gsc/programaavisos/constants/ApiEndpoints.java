@@ -41,4 +41,5 @@ public interface ApiEndpoints {
     String GET_CONTACT_TYPE = "/contact-type";
     String GET_MAIN_TYPE = "/main-types";
     String GET_PA_DETAIL= "/details-pa";
+    String GET_TPA_SIMULATOR= "/tpa-simulation";
 }

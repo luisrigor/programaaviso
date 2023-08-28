@@ -42,6 +42,7 @@ import java.io.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import static com.gsc.programaavisos.constants.AppProfile.*;
 
@@ -956,4 +957,21 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public PATotals getPaTotals(FilterBean filterBean) {
         return paBeanRepository.getPaTotals(filterBean);
     }
+
+    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
+            {
+
+        String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
+        String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
+        LocalDate localDate = tpaDTO.getDate();
+        Calendar calDate = Calendar.getInstance();
+
+        try {
+            return new TpaSimulation();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
+        }
+    }
+
+
 }
