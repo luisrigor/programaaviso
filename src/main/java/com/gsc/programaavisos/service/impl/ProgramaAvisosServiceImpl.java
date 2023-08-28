@@ -967,6 +967,23 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         Calendar calDate = Calendar.getInstance();
 
         try {
+
+            TpaSimulation simulation = TPAInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
+            simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
+            simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
+
+            simulation.setAccessory1Code(simulation.getPaData().getMRS().getAcessoryCode1());
+            simulation.setAccessory2Code(simulation.getPaData().getMRS().getAcessoryCode2());
+
+            simulation.setAccessory1Link(simulation.getPaData().getMRS().getAcessory1Link());
+            simulation.setAccessory2Link(simulation.getPaData().getMRS().getAcessory2Link());
+
+            simulation.setAccessory1ImgPostal(simulation.getPaData().getMRS().getAcessory1ImgPostal());
+            simulation.setAccessory2ImgPostal(simulation.getPaData().getMRS().getAcessory2ImgPostal());
+
+            simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAcessory1ImgEPostal());
+            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal())
+
             return new TpaSimulation();
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);

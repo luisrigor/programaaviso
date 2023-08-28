@@ -2,7 +2,6 @@ package com.gsc.programaavisos.model.crm.entity;
 
 import lombok.*;
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "PA_PARAMETERIZATION_ITEMS")
-public class ParametrizationItems {
+public class ParameterizationItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
