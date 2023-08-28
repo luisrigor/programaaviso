@@ -93,7 +93,7 @@ public class ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body(detailsInfo);
     }
 
-    @GetMapping(ApiEndpoints.GET_PA_DETAIL)
+    @GetMapping(ApiEndpoints.GET_TPA_SIMULATOR)
     public ResponseEntity<TpaSimulation> getPaDetail(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
