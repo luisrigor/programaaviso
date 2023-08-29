@@ -44,7 +44,7 @@ public class ApplicationConfiguration {
         }
         return ivInstance;
     }
-
+/*
     public List<PaParameterization> getParameterizationsByClient(int idClient, ParameterizationFilter filter) throws SCErrorException {
 
         if((PARAM_CHANGE)||(DT_START == null && MAP_PARAMETERIZATIONS == null && DT_END == null) ||   (filter.getDtStart().before(DT_START) || filter.getDtStart().after(DT_START) || filter.getDtEnd().before(DT_END) || filter.getDtEnd().after(DT_END) || MAP_PARAMETERIZATIONS==null)){
@@ -55,4 +55,5 @@ public class ApplicationConfiguration {
         }
         return MAP_PARAMETERIZATIONS.containsKey(idClient) ? MAP_PARAMETERIZATIONS.get(idClient): null;
     }
+ */
 }

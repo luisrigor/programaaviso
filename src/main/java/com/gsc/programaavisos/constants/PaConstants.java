@@ -44,4 +44,7 @@ public class PaConstants {
     public final static String PARAMETRIZATION_ITEM_TYPE_DEFAULT = "D";
     public final static String PARAMETRIZATION_ITEM_TYPE_SPECIFIC = "S";
     public static final int ID_PA_PARAMETRIZATION_AGE_7_PLUS = 8;
+    public static final int MAN	= 1;
+    public static final int ITV	= 2;
+    public static final int MAN_ITV	= 3;
 }

@@ -967,7 +967,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         Calendar calDate = Calendar.getInstance();
 
         try {
-
+/*
             TpaSimulation simulation = TPAInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
@@ -984,11 +984,25 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAcessory1ImgEPostal());
             simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal())
 
+*/
             return new TpaSimulation();
+
+
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
         }
     }
+
+    @Override
+    public ProgramaAvisos getPAData(){
+        /*
+        return programaAvisosRepository.getPADataByNifData("511106432",PaConstants.BUSINESS_PLUS_ID,2023,8,
+                new ArrayList<>(Arrays.asList(PaConstants.MAN,PaConstants.ITV,PaConstants.MAN_ITV)));
+
+         */
+        return programaAvisosRepository.getPADataByNifData();
+    }
+
 
 
 }

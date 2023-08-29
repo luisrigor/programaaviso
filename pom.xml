@@ -67,6 +67,11 @@
         <artifactId>SCGSCWSAuthentication</artifactId>
         <version>20230726</version>
     </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCCarDB</artifactId>
+            <version>20230209</version>
+        </dependency>
     <dependency>
         <groupId>GSC</groupId>
         <artifactId>SCWSCARDB</artifactId>

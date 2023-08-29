@@ -90,10 +90,10 @@ public class ParametrizationServiceImpl implements ParametrizationService {
     public PaParameterization getById(int idParametrization, boolean onlyActives){
         try {
             PaParameterization parameterization = paParameterizationRepository.findById(idParametrization).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + idParametrization));
-            List<ParameterizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(idParametrization, onlyActives);
-            if (!parameterizationItems.isEmpty()) {
-                parameterization.setParameterizationItems(parameterizationItems);
-                for (ParameterizationItems parameterizationItem : parameterization.getParameterizationItems()) {
+            List<ParametrizationItems> parametrizationItems = getParameterizationItemsByParameterizationId(idParametrization, onlyActives);
+            if (!parametrizationItems.isEmpty()) {
+                parameterization.setParametrizationItems(parametrizationItems);
+                for (ParametrizationItems parameterizationItem : parameterization.getParametrizationItems()) {
                     Integer idParameterizationItem = parameterizationItem.getId();
                     parameterizationItem.setItemEntityTypes(itemsEntityTypeRepository.findByIdParameterizationItems(idParameterizationItem));
                     parameterizationItem.setItemAges(itemsAgeRepository.findByIdParameterizationItems(idParameterizationItem));
@@ -112,7 +112,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
     }
 
-    private List<ParameterizationItems> getParameterizationItemsByParameterizationId(Integer idParametrization, boolean onlyActives){
+    private List<ParametrizationItems> getParameterizationItemsByParameterizationId(Integer idParametrization, boolean onlyActives){
         if(onlyActives){
             return parametrizationItemsRepository.getAllParametrizationItemOnlyActive(idParametrization);
         }else{
@@ -130,7 +130,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                 .published(parameterizationDTO.getPublished())
                 .visible(parameterizationDTO.getVisible())
                 .type(parameterizationDTO.getType())
-                .parameterizationItems(parameterizationDTO.getParameterizationItems())
+                .parametrizationItems(parameterizationDTO.getParametrizationItems())
                 .idBrand(ApiConstants.getIdBrand(oGSCUser.getOidNet()))
                 .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
                 .dtCreated(LocalDateTime.now())
@@ -144,7 +144,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                 parametrizationItemsRepository.deleteById(oParameterization.getId());
             PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
-            for (ParameterizationItems parameterizationItem : oParameterization.getParameterizationItems()) {
+            for (ParametrizationItems parameterizationItem : oParameterization.getParametrizationItems()) {
                 if (parameterizationItem!=null){
 
                     parameterizationItem.setIdParameterization(insertedParam.getId());
@@ -193,7 +193,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                     .idBrand(paramToClone.getIdBrand())
                     .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
                     .dtCreated(LocalDateTime.now())
-                    .parameterizationItems(paramToClone.getParameterizationItems())
+                    .parametrizationItems(paramToClone.getParametrizationItems())
                     .build();
             cloneItemList(cloneParameterization,oGSCUser);
         }catch (Exception e){
@@ -205,10 +205,10 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         try {
             PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
-            for (ParameterizationItems paramToClone : oParameterization.getParameterizationItems()) {
+            for (ParametrizationItems paramToClone : oParameterization.getParametrizationItems()) {
                 if (paramToClone!=null){
 
-                    ParameterizationItems cloneParaItem = paramToClone.toBuilder()
+                    ParametrizationItems cloneParaItem = paramToClone.toBuilder()
                             .id(0)
                             .idParameterization(insertedParam.getId())
                             .createdBy(createdBy)

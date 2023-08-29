@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "PA_PARAMETERIZATION_ITEMS")
-public class ParameterizationItems {
+public class ParametrizationItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

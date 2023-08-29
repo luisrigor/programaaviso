@@ -6,6 +6,7 @@ import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
 
 import com.gsc.programaavisos.dto.TpaSimulation;
+import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import io.swagger.annotations.Api;
@@ -98,5 +99,11 @@ public class ProgramaAvisosController {
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
         return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);
+    }
+
+    @GetMapping(ApiEndpoints.TESTS)
+    public ResponseEntity<ProgramaAvisos> getTestEntity(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(programaAvisosService.getPAData());
     }
 }

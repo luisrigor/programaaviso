@@ -12,8 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "PA_MRS")
 public class Mrs {
     private final static Logger logger = Logger.getLogger(Mrs.class.getName());
 

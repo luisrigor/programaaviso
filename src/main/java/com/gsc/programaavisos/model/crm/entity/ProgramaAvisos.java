@@ -52,6 +52,7 @@ public class ProgramaAvisos {
     private String model;
     @Column(name = "NIF")
     private String nif;
+    @Column(name = "NAME")
     private String name;
     private String address;
     private String cp4;
@@ -105,6 +106,8 @@ public class ProgramaAvisos {
     private int idOrigin;
     private int extIDInOrigin;
     private int warningPriority;
+
+
     @Transient
     private Mrs MRS;
 /*

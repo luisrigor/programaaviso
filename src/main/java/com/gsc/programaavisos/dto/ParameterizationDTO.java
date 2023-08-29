@@ -1,7 +1,7 @@
 package com.gsc.programaavisos.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gsc.programaavisos.model.crm.entity.ParameterizationItems;
+import com.gsc.programaavisos.model.crm.entity.ParametrizationItems;
 import lombok.*;
 
 
@@ -24,5 +24,5 @@ public class ParameterizationDTO {
     private Character published;
     private Character visible;
     private Character type;
-    private List<ParameterizationItems> parameterizationItems;
+    private List<ParametrizationItems> parametrizationItems;
 }
