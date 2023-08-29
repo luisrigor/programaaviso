@@ -1,10 +1,17 @@
 package com.gsc.programaavisos.util;
 
+import com.gsc.programaavisos.config.ApplicationConfiguration;
+import com.gsc.programaavisos.constants.ApiConstants;
+import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.TpaSimulation;
+import com.gsc.programaavisos.model.cardb.Fuel;
+import com.gsc.programaavisos.model.cardb.entity.Acessories;
+import com.gsc.programaavisos.model.cardb.entity.AcessorioGrupo;
+import com.gsc.programaavisos.model.cardb.entity.Car;
+import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.ws.core.AccessoryInstalled;
-import com.gsc.ws.core.CarInfo;
 import com.gsc.ws.core.Repair;
 import com.gsc.ws.core.objects.response.AccessoryInstalledResponse;
 import com.gsc.ws.core.objects.response.CarInfoResponse;
@@ -15,10 +22,9 @@ import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.StringTasks;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class TPAInvokerSimulator {
 
@@ -90,18 +96,18 @@ public class TPAInvokerSimulator {
         TpaSimulation simulation = new TpaSimulation();
         ParameterizationFilter filter = new ParameterizationFilter();
         List<PaParameterization> parameterizations = null;
-        CarInfo carInfo = null;
+        CarInfo carInfo = new CarInfo();
         List<CarInfo> businessCarInfo = new ArrayList<>();
 
         ProgramaAvisos paData = null;
-        Mrs mrs = null;
+        Mrs mrs = new Mrs();
 
         int year = calDate.get(Calendar.YEAR);
         int month = calDate.get(Calendar.MONTH) +1;
         logger.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
         if((numberplate==null || numberplate.equals("")) && nif!=null && !nif.equals("")){
             logger.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
-            paData = ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);
+            paData = ProgramaAvisos.getHelper().getPADataByNif(nif, PaConstants.BUSINESS_PLUS_ID,month,year);
             logger.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
 
             if(paData!=null){
@@ -113,7 +119,7 @@ public class TPAInvokerSimulator {
             }
             simulation.setPaData(paData);
             isBusinessPlus = true;
-            List<String> plates = ProgramaAvisos.getHelper().getPlateByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);
+            List<String> plates = ProgramaAvisos.getHelper().getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year);
             if(plates!=null && plates.size() > 0){
                 numberplate = plates.get(0);
             }
@@ -124,7 +130,7 @@ public class TPAInvokerSimulator {
                         businessCarInfo.add(carInfo);
                     }
                 }
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate+" ->paDate:"+ calDate.getTime(),e);
             }
         }
@@ -132,7 +138,7 @@ public class TPAInvokerSimulator {
             if(paData == null){
 
                 if(idClientType == null){
-                    idClientType = ClientType.NORMAL_ID;
+                    idClientType = PaConstants.NORMAL_ID;
                 }
                 logger.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
                 paData = ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);
@@ -152,7 +158,7 @@ public class TPAInvokerSimulator {
                 logger.trace("*****TPA_MRS******PRE ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
                 carInfo = getCarInfo(numberplate,  calDate.getTime(), wsCarLocation,paData,isTPAImportFromBi);
                 logger.trace("*****TPA_MRS******POS ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate+" ->paDate:"+calDate.getTime(),e);
             }
 
@@ -165,9 +171,9 @@ public class TPAInvokerSimulator {
                     idBrand = carInfo.getCar().getIdBrand();
                 } else{
                     if(paData.getBrand() != null && BRAND_TOYOTA.equalsIgnoreCase(paData.getBrand())){
-                        idBrand = ApplicationConfiguration.ID_BRAND_TOYOTA;
+                        idBrand = ApiConstants.ID_BRAND_TOYOTA;
                     } else if(paData.getBrand() != null && BRAND_LEXUS.equalsIgnoreCase(paData.getBrand())){
-                        idBrand = ApplicationConfiguration.ID_BRAND_LEXUS;
+                        idBrand = ApiConstants.ID_BRAND_LEXUS;
                     } else {
                         logger.error("A matricula "+numberplate+" n�o tem dados suficiente (vers�o, brand ou cod. local) na CarDB ou DBCRMTCP para fazer simula��o.");
                         return null;
@@ -200,11 +206,11 @@ public class TPAInvokerSimulator {
                     for (ParameterizationItems paramItem : paramItems) {
                         boolean isToCheck = true;
                         if(isBusinessPlus){
-                            isToCheck = paramItem.getIdContactReason() == ContactReason.ID_CONTACT_TYPE_BUS;
+                            isToCheck = paramItem.getIdContactReason() == PaConstants.ID_CONTACT_TYPE_BUS;
                         }else{
                             isToCheck = paramItem.getIdContactReason() == carInfo.getIdContactReason();
                         }
-                        if(paramItem.getParameterizationItemsType().equals(ParameterizationItems.PARAMETRIZATION_ITEM_TYPE_SPECIFIC) && isToCheck ){
+                        if(paramItem.getParameterizationItemsType().equals(PaConstants.PARAMETRIZATION_ITEM_TYPE_SPECIFIC) && isToCheck ){
                             List<ItemsEntityType> entityTypes = paramItem.getItemEntityTypes();
                             List<ItemsAge> ages = paramItem.getItemAges();
                             List<ItemsDealer> dealers = paramItem.getItemDealers();
@@ -424,12 +430,12 @@ public class TPAInvokerSimulator {
 
                             boolean isToCheck = true;
                             if(isBusinessPlus){
-                                isToCheck = paramItem.getIdContactReason() == ContactReason.ID_CONTACT_TYPE_BUS;
+                                isToCheck = paramItem.getIdContactReason() == PaConstants.ID_CONTACT_TYPE_BUS;
                             }else{
                                 isToCheck = paramItem.getIdContactReason() == carInfo.getIdContactReason();
                             }
 
-                            if (paramItem.getParameterizationItemsType().equals(ParameterizationItems.PARAMETRIZATION_ITEM_TYPE_DEFAULT) && isToCheck) {
+                            if (paramItem.getParameterizationItemsType().equals(PaConstants.PARAMETRIZATION_ITEM_TYPE_DEFAULT) && isToCheck) {
                                 if (parametrization.getType().equals("H") && selectedHeaderParam == null) {
                                     selectedHeaderParam = paramItem;
                                     headerOriginParameterization = parametrization.getComments();
@@ -827,11 +833,11 @@ public class TPAInvokerSimulator {
     private static boolean dealerIsInParametrization(List<ItemsDealer> dealers, String oidDealer) {
         boolean dealerIsInParametrization = false;
         for (ItemsDealer oItemsDealer : dealers) {
-            if(oItemsDealer.getOidDealer().equalsIgnoreCase("99")){
+            if(oItemsDealer.getIdDealer().equalsIgnoreCase("99")){
                 dealerIsInParametrization = true;
                 break;
             }
-            if (oidDealer!= null && !oidDealer.equalsIgnoreCase("") && oItemsDealer.getOidDealer().equalsIgnoreCase(oidDealer)) {
+            if (oidDealer!= null && !oidDealer.equalsIgnoreCase("") && oItemsDealer.getIdDealer().equalsIgnoreCase(oidDealer)) {
                 dealerIsInParametrization = true;
                 break;
             }
@@ -851,7 +857,7 @@ public class TPAInvokerSimulator {
         //Se n�o tiver encontrado, verificar se o carro tem 7+ e verificar se o parametro 7+ est� parametrizado
         if(ageIsInParametrization == false && idAge > 7){
             for (ItemsAge age:ages) {
-                if(age.getId() == ItemsAge.ID_PA_PARAMETRIZATION_AGE_7_PLUS){
+                if(age.getId() == PaConstants.ID_PA_PARAMETRIZATION_AGE_7_PLUS){
                     ageIsInParametrization = true;
                     break;
                 }
@@ -918,7 +924,7 @@ public class TPAInvokerSimulator {
 
         boolean fidelityIsInParametrization = false;
         for (ItemsFidelitys oItemsFidelity : fidelitys) {
-            if(oItemsFidelity.getIdFidelitys() == idFidelity){
+            if(oItemsFidelity.getIdFidelity() == idFidelity){
                 fidelityIsInParametrization = true;
                 break;
             }
@@ -1003,6 +1009,234 @@ public class TPAInvokerSimulator {
         return priorityAcessories;
     }
 
-}
+    public static CarInfo getCarInfo(String numberplate, Date date, String wsCarLocation, ProgramaAvisos paData, boolean isTPAImportFromBi) throws SCErrorException, ParseException {
+
+        CarInfo carInfo = new CarInfo();
+
+        com.gsc.ws.core.CarInfo as400Car = null;
+        Car carDBInfo1 = null;
+
+        WsInvokeCarServiceTCAP oWsInfo = new WsInvokeCarServiceTCAP(wsCarLocation);
+
+        CarInfoResponse oCarInfoResponse = oWsInfo.getCarByPlate(numberplate);
+
+        RepairResponse repairs = null;
+        if(isTPAImportFromBi){
+            repairs = oWsInfo.getCarRepairsByPlate(numberplate);
+        }
+        List<Repair> listRepairs = null;
+
+        if(repairs != null){
+            listRepairs = repairs.getRepairInfo();
+        }
+
+        if (oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null) {
+            as400Car = oCarInfoResponse.getCarInfo();
+        }
+
+        if(listRepairs!=null && listRepairs.size()>0){
+            Repair lastRepair = listRepairs.get(listRepairs.size()-1);
+            Dealer oDealer = ApplicationConfiguration.getDealerByDealerAndAfterSalesCode(Dealer.OID_NET_TOYOTA, lastRepair.getDealerCode(),  StringTasks.cleanString(lastRepair.getAfterSalesCode(), ""));
+            if(oDealer!=null){
+                String dealerName = oDealer.getDesig();
+
+                String dealerLocal = "";
+                if(oDealer.getCpExt() != null && !oDealer.getCpExt().equals("")){
+                    dealerLocal = "("+oDealer.getCpExt()+")";
+                }
+                carInfo.setLastServiceDealer(dealerName+" "+ dealerLocal);
+                carInfo.setLastServiceDealerContact(oDealer.getEmail() + " " + oDealer.getTel());
+            }
+        }
+
+        if (as400Car != null) {
+            carInfo.setAs400CarInfo(as400Car);
+            String comercialModelCode = StringTasks.cleanString(as400Car.getComercialModelCode(), "");
+            String versionCode = StringTasks.cleanString(as400Car.getVersionCode(), "");
+            String dataMatricula = StringTasks.cleanString(as400Car.getDtPlate(), "");
+            if (!dataMatricula.equals("")) {
+                Date date1 = new SimpleDateFormat("yyyy").parse(dataMatricula);
+                Date today = new Date();
+
+                Calendar a = getCalendar(date1);
+                Calendar b = getCalendar(today);
+                int carAge = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
+                if(carAge==1){
+                    carInfo.setIdAge(1);
+                }else if(carAge==2){
+                    carInfo.setIdAge(2);
+                }else if(carAge==3){
+                    carInfo.setIdAge(3);
+                }else if(carAge==4){
+                    carInfo.setIdAge(4);
+                }else if(carAge==5){
+                    carInfo.setIdAge(5);
+                }else if(carAge==6){
+                    carInfo.setIdAge(6);
+                }else if(carAge==7){
+                    carInfo.setIdAge(7);
+                }else if(carAge==7){
+                    carInfo.setIdAge(8);
+                }else if(carAge==9){
+                    carInfo.setIdAge(9);
+                }else if(carAge==10){
+                    carInfo.setIdAge(10);
+                }
+                else if(carAge>10){
+                    carInfo.setIdAge(11);
+                }
+                carInfo.setPlateDate(dataMatricula);
+            }else{
+                carInfo.setIdAge(99);
+            }
+
+            carDBInfo1 = CarHelper.getCarInfo(comercialModelCode, versionCode);
+            if (carDBInfo1 != null) {
+                Fuel fuel = CarHelper.getFuelsByIdVc(carDBInfo1.getIdVc());
+
+                if(fuel!=null){
+                    carInfo.setIdFuel(fuel.getId());
+                    carInfo.setFuel(fuel.getDescription());
+                }
+
+                carInfo.setIdVc(carDBInfo1.getIdVc());
+                carInfo.setIdModel(carDBInfo1.getModel().getId());
+                carInfo.setCar(carDBInfo1);
+            }
+
+            if (paData != null) {
+                Dealer dealer = null;
+                if(paData.getBrand().equalsIgnoreCase("L") && paData.getOidDealer()!=null && !paData.getOidDealer().equals("")){
+                    dealer = Dealer.getLexusHelper().getByObjectId(paData.getOidDealer());
+                }else if(paData.getBrand().equalsIgnoreCase("T") && paData.getOidDealer()!=null && !paData.getOidDealer().equals("")){
+                    dealer = Dealer.getToyotaHelper().getByObjectId(paData.getOidDealer());
+                }
+
+
+                if(dealer!=null){
+                    String dealerName = dealer.getDesig();
+                    String dealerLocal = "";
+                    if(dealer.getCpExt() != null && !dealer.getCpExt().equals("")){
+                        dealerLocal = "("+dealer.getCpExt()+")";
+                    }
+                    paData.setOidDealer(dealer.getObjectId());
+                    carInfo.setDealer(dealerName +" "+ dealerLocal);
+                }else{
+                    carInfo.setDealer("N/D");
+                    paData.setOidDealer("99");
+                }
+
+
+                Calendar calDate = getCalendar(date);
+
+                int year = calDate.get(Calendar.YEAR);
+                int month = calDate.get(Calendar.MONTH);
+
+                if (paData.getYear() != year) {
+                    return null;
+                } else if (paData.getMonth() != (month + 1)) {
+                    return null;
+                }
+
+                Mrs mrs = paData.getMRS();
+
+                if (paData.getNif().length() > 0) {
+                    String nif = paData.getNif();
+                    carInfo.setNif(nif);
+                    if (nif.startsWith("1") || nif.startsWith("2")) {
+                        carInfo.setIdentity(2);
+                    } else if (nif.startsWith("5") || nif.startsWith("6") || nif.startsWith("9")) {
+                        carInfo.setIdentity(1);
+                    }
+                }else{
+                    carInfo.setIdentity(99);
+                }
+
+                carInfo.setIdContactReason(paData.getIdContactType());
+                if (mrs != null) {
+                    if (mrs.getDtItv() != null ) {
+                        carInfo.setDtItv(mrs.getDtItv());
+                    }else{
+                        if(as400Car.getDtNextITV() != null){
+                            String sDate1=as400Car.getDtNextITV();
+                            Date date1=new SimpleDateFormat("yyyy-MM-dd").parse(sDate1);
+                            carInfo.setDtItv(date1);
+                        }
+                    }
+
+                    if (mrs.getDtNextRevision() != null) {
+                        carInfo.setDtNextRevision(mrs.getDtNextRevision());
+                    }
+
+                    if(mrs.getDtLastRevision()!=null){
+                        carInfo.setDtLastRevision((java.sql.Date) mrs.getDtLastRevision());
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        carInfo.setDtLastRevisionString(sdf.format(mrs.getDtLastRevision()));
+
+                        java.sql.Date dateLastRevision = (java.sql.Date) mrs.getDtLastRevision();
+                        Calendar c = Calendar.getInstance();
+                        c.roll(Calendar.YEAR, -2);
+                        java.sql.Date dateToCompare1 = new java.sql.Date(c.getTimeInMillis());
+                        c = Calendar.getInstance();
+                        c.roll(Calendar.YEAR, -3);
+                        java.sql.Date dateToCompare2 = new java.sql.Date(c.getTimeInMillis());
+                        if(dateLastRevision.compareTo(dateToCompare1)>0){
+                            carInfo.setIdFidelity(1);
+                        }else if(dateLastRevision.compareTo(dateToCompare1)<=0 && dateLastRevision.compareTo(dateToCompare2)>=0){
+                            carInfo.setIdFidelity(2);
+                        }else if(dateLastRevision.compareTo(dateToCompare2)<0){
+                            carInfo.setIdFidelity(3);
+                        }
+                    }else{
+                        carInfo.setIdFidelity(99);
+                    }
+
+                    if(mrs.getGenre() != null && !mrs.getGenre().trim().equals("")){
+                        Genre genre = Genre.getHelper().getGenderByDesc(mrs.getGenre());
+                        carInfo.setGender(mrs.getGenre());
+                        if(genre!=null){
+                            carInfo.setIdGender(genre.getId());
+                        }
+                    }else{
+                        carInfo.setIdGender(99);
+                    }
+                    if(mrs.getExpectedKm()!=null && !mrs.getExpectedKm().equals("")){
+                        double expected = Double.valueOf(mrs.getExpectedKm());
+                        carInfo.setKilometers(mrs.getExpectedKm());
+                        if(expected <= 100000){
+                            carInfo.setIdKilometers(1);
+                        }else if(expected > 100000 && expected <= 130000){
+                            carInfo.setIdKilometers(2);
+                        }else if(expected > 130000 && expected <= 160000){
+                            carInfo.setIdKilometers(3);
+                        }else if(expected > 160000 && expected <= 185000){
+                            carInfo.setIdKilometers(4);
+                        }else if(expected > 185000 && expected <= 195000){
+                            carInfo.setIdKilometers(5);
+                        }else if(expected > 195000 && expected <= 200000){
+                            carInfo.setIdKilometers(6);
+                        }else if(expected > 200000 ){
+                            carInfo.setIdKilometers(7);
+                        }
+                    }else{
+                        carInfo.setIdKilometers(99);
+                    }
+                }
+            }
+
+            carInfo.setNumberPlate(numberplate);
+        }
+
+        return carInfo;
+    }
+
+    private static Calendar getCalendar(Date date) {
+        Calendar cal = Calendar.getInstance(Locale.getDefault());
+        cal.setTime(date);
+        return cal;
+    }
+
+
 
 }

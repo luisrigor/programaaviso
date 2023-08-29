@@ -34,6 +34,14 @@ public class PaConstants {
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static String WS_CAR_LOCATION;
-
     public static final int ECARE = 1;
+    public final static int BUSINESS_PLUS_ID	= 2;
+    public final static int NORMAL_ID	= 1;
+    public static final int ID_CONTACT_TYPE_MAN = 1;
+    public static final int ID_CONTACT_TYPE_ITV = 2;
+    public static final int ID_CONTACT_TYPE_MAN_ITV = 3;
+    public static final int ID_CONTACT_TYPE_BUS = 4;
+    public final static String PARAMETRIZATION_ITEM_TYPE_DEFAULT = "D";
+    public final static String PARAMETRIZATION_ITEM_TYPE_SPECIFIC = "S";
+    public static final int ID_PA_PARAMETRIZATION_AGE_7_PLUS = 8;
 }

@@ -105,14 +105,18 @@ public class ProgramaAvisos {
     private int idOrigin;
     private int extIDInOrigin;
     private int warningPriority;
+    @Transient
+    private Mrs MRS;
+/*
 
-    /*
     public Mrs getMRS() throws SCErrorException {
         if (ivMRS == null && (getIdContactType() == ContactType.MAN || getIdContactType() == ContactType.MAN_ITV || getIdContactType() == ContactType.ITV))
             ivMRS = Mrs.getHelper().getByIdPaData(getId());
 
         return ivMRS;
     }
-     */
+
+ */
+
 
 }
