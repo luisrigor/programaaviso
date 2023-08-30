@@ -1,14 +1,11 @@
 package com.gsc.programaavisos.util;
 
+import com.gsc.cardb.car.*;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.TpaSimulation;
-import com.gsc.programaavisos.model.cardb.Fuel;
-import com.gsc.programaavisos.model.cardb.entity.Acessories;
-import com.gsc.programaavisos.model.cardb.entity.AcessorioGrupo;
-import com.gsc.programaavisos.model.cardb.entity.Car;
 import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.ws.core.AccessoryInstalled;
@@ -20,12 +17,14 @@ import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.StringTasks;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Log4j
 public class TPAInvokerSimulator {
 
     public static final int CAR_DB_COMBUSTIVEL_SEM_INFO = 4;
@@ -51,7 +50,7 @@ public class TPAInvokerSimulator {
     private static final String TOYOTA_ACCESSORY_DEFAULT_IMG_E_POSTAL_2 = "toyota_acessory_default_img_e_postal_2.jpg";
 
     private static final String LEXUS_ACCESSORY_DEFAULT_IMG_POSTAL_2 = "lexus_acessory_default_img_postal_1.jpg";
-    private static final String LEXUS_ACCESSORY_DEFAULT_IMG_E_POSTAL_2 = "lexus_acessory_default_img_e_postal_1.jpg";;
+    private static final String LEXUS_ACCESSORY_DEFAULT_IMG_E_POSTAL_2 = "lexus_acessory_default_img_e_postal_1.jpg";
 
     private static final String LEXUS_ACCESSORY_DEFAULT_IMG_POSTAL_1 = "lexus_acessory_default_img_postal_2.jpg";
     private static final String LEXUS_ACCESSORY_DEFAULT_IMG_E_POSTAL_1 = "lexus_acessory_default_img_e_postal_2.jpg";
@@ -73,13 +72,10 @@ public class TPAInvokerSimulator {
     private static final String TOYOTA_ACCESSORY_DEFAULT_REF_2 = "T2";
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_2 = "L2";
 
-    private final static Logger logger = Logger.getLogger(TPAInvokerSimulator.class.getName());
-
-
     public static TpaSimulation getTpaSimulation(String nif,String numberplate, Calendar calDate, boolean isTPAImportFromBi)
             throws SCErrorException{
 
-        return getTpaSimulation(nif,numberplate, calDate, null, MainInitServlet.WS_CAR_LOCATION,isTPAImportFromBi);
+        return getTpaSimulation(nif,numberplate, calDate, null, PaConstants.WS_CAR_LOCATION,isTPAImportFromBi);
     }
 
     public static TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
@@ -100,27 +96,27 @@ public class TPAInvokerSimulator {
         List<CarInfo> businessCarInfo = new ArrayList<>();
 
         ProgramaAvisos paData = null;
-        Mrs mrs = new Mrs();
+        Mrs mrs;
 
         int year = calDate.get(Calendar.YEAR);
         int month = calDate.get(Calendar.MONTH) +1;
-        logger.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
-        if((numberplate==null || numberplate.equals("")) && nif!=null && !nif.equals("")){
-            logger.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
+        log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+        if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
+            log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
             paData = ProgramaAvisos.getHelper().getPADataByNif(nif, PaConstants.BUSINESS_PLUS_ID,month,year);
-            logger.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
+            log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
 
             if(paData!=null){
-                logger.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
+                log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
                 mrs = Mrs.getHelper().getByIdPaData(paData.getId());
-                logger.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
+                log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                 paData.setMRS(mrs);
             }
             simulation.setPaData(paData);
             isBusinessPlus = true;
             List<String> plates = ProgramaAvisos.getHelper().getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year);
-            if(plates!=null && plates.size() > 0){
+            if(plates!=null && !plates.isEmpty()){
                 numberplate = plates.get(0);
             }
             try {
@@ -134,66 +130,71 @@ public class TPAInvokerSimulator {
                 throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate+" ->paDate:"+ calDate.getTime(),e);
             }
         }
-        if(numberplate != null && !numberplate.equals("") &&  calDate.getTime() != null && wsCarLocation != null){
-            if(paData == null){
+        if(numberplate != null && !numberplate.isEmpty()) {
+            calDate.getTime();
+            if (wsCarLocation != null) {
 
-                if(idClientType == null){
-                    idClientType = PaConstants.NORMAL_ID;
-                }
-                logger.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
-                paData = ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);
-                logger.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
 
-                if(paData!=null){
-                    logger.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-                    mrs = Mrs.getHelper().getByIdPaData(paData.getId());
-                    logger.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
+                if (paData == null) {
 
-                    paData.setMRS(mrs);
-                }
+                    if (idClientType == null) {
+                        idClientType = PaConstants.NORMAL_ID;
+                    }
+                    log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
+                    paData = ProgramaAvisos.getHelper().getPADataByPlate(numberplate, idClientType, month, year);
+                    log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
 
-            }
-            simulation.setPaData(paData);
-            try {
-                logger.trace("*****TPA_MRS******PRE ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
-                carInfo = getCarInfo(numberplate,  calDate.getTime(), wsCarLocation,paData,isTPAImportFromBi);
-                logger.trace("*****TPA_MRS******POS ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
-            } catch (Exception e) {
-                throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate+" ->paDate:"+calDate.getTime(),e);
-            }
+                    if (paData != null) {
+                        log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
+                        mrs = Mrs.getHelper().getByIdPaData(paData.getId());
+                        log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
-            if(carInfo!=null){
-                java.sql.Date date = new java.sql.Date(calDate.getTime().getTime());
-                filter.setDtStart(date);
-                filter.setDtEnd(date);
-                int idBrand = 0;
-                if(carInfo.getCar()!= null && carInfo.getCar().getIdBrand() > 0){
-                    idBrand = carInfo.getCar().getIdBrand();
-                } else{
-                    if(paData.getBrand() != null && BRAND_TOYOTA.equalsIgnoreCase(paData.getBrand())){
-                        idBrand = ApiConstants.ID_BRAND_TOYOTA;
-                    } else if(paData.getBrand() != null && BRAND_LEXUS.equalsIgnoreCase(paData.getBrand())){
-                        idBrand = ApiConstants.ID_BRAND_LEXUS;
-                    } else {
-                        logger.error("A matricula "+numberplate+" n�o tem dados suficiente (vers�o, brand ou cod. local) na CarDB ou DBCRMTCP para fazer simula��o.");
-                        return null;
+                        paData.setMRS(mrs);
                     }
 
                 }
-                logger.trace("*****TPA_MRS******PRE ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
-                parameterizations = ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);
-                logger.trace("*****TPA_MRS******POS ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
+                simulation.setPaData(paData);
+                try {
+                    log.trace("*****TPA_MRS******PRE ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
+                    carInfo = getCarInfo(numberplate, calDate.getTime(), wsCarLocation, paData, isTPAImportFromBi);
+                    log.trace("*****TPA_MRS******POS ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
+                } catch (Exception e) {
+                    throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation" + "->numberplate: " + numberplate + " ->paDate:" + calDate.getTime(), e);
+                }
 
+                if (carInfo != null) {
+                    java.sql.Date date = new java.sql.Date(calDate.getTime().getTime());
+                    filter.setDtStart(date);
+                    filter.setDtEnd(date);
+                    int idBrand = 0;
+                    if (carInfo.getCar() != null && carInfo.getCar().getIdBrand() > 0) {
+                        idBrand = carInfo.getCar().getIdBrand();
+                    } else {
+                        if (paData.getBrand() != null && BRAND_TOYOTA.equalsIgnoreCase(paData.getBrand())) {
+                            idBrand = ApiConstants.ID_BRAND_TOYOTA;
+                        } else if (paData.getBrand() != null && BRAND_LEXUS.equalsIgnoreCase(paData.getBrand())) {
+                            idBrand = ApiConstants.ID_BRAND_LEXUS;
+                        } else {
+                            log.error("A matricula " + numberplate + " n�o tem dados suficiente (vers�o, brand ou cod. local) na CarDB ou DBCRMTCP para fazer simula��o.");
+                            return null;
+                        }
+
+                    }
+                    log.trace("*****TPA_MRS******PRE ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
+                    parameterizations = ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);
+                    log.trace("*****TPA_MRS******POS ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
+
+                }
             }
         }
 
-        if (parameterizations != null && parameterizations.size()>0) {
-            logger.trace("*****TPA_MRS******PRE ->  ContactReason.getHelper().getAllContactReasons();");
+        if (parameterizations != null && !parameterizations.isEmpty()) {
+            log.trace("*****TPA_MRS******PRE ->  ContactReason.getHelper().getAllContactReasons();");
             LinkedHashMap<Integer, ContactReason> contactReasonsMap = ContactReason.getHelper().getAllContactReasons();
-            logger.trace("*****TPA_MRS******POS ->  ContactReason.getHelper().getAllContactReasons();");
-            logger.trace("*****TPA_MRS******PRE ->  DocumentUnit.getHelper().getAllDocumentUnits();");
+            log.trace("*****TPA_MRS******POS ->  ContactReason.getHelper().getAllContactReasons();");
+            log.trace("*****TPA_MRS******PRE ->  DocumentUnit.getHelper().getAllDocumentUnits();");
             LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = DocumentUnit.getHelper().getAllDocumentUnits();
-            logger.trace("*****TPA_MRS******POS ->  DocumentUnit.getHelper().getAllDocumentUnits();");
+            log.trace("*****TPA_MRS******POS ->  DocumentUnit.getHelper().getAllDocumentUnits();");
 
             simulation.setContactReason(contactReasonsMap.get(carInfo.getIdContactReason()).getContactReason());
             simulation.setCarInfo(carInfo);
@@ -562,12 +563,12 @@ public class TPAInvokerSimulator {
 
                 simulation.setHeaderOriginParameterization(headerOriginParameterization);
             }
-            logger.trace("*****TPA_MRS******PRE ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
+            log.trace("*****TPA_MRS******PRE ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
             List<Acessories> acessories = null;
             if(isTPAImportFromBi){
                 acessories = getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);
             }
-            logger.trace("*****TPA_MRS******POS ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
+            log.trace("*****TPA_MRS******POS ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
 
             Acessories accessory = null;
             AcessorioGrupo kit = null;
@@ -575,30 +576,30 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(0) != null) {
                     accessory = acessories.get(0);
-                    logger.trace("*****TPA_MRS******PRE ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******PRE ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    logger.trace("*****TPA_MRS******POS ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******POS ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
 
                     simulation.setAccessory1Link(accessoryLink.getLink());
-                    logger.trace("*****TPA_MRS******PRE ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******PRE ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    logger.trace("*****TPA_MRS******POS ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******POS ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     simulation.setAccessory1Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory1Link(TOYOTA_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalToyota()!=null && kit.getImgPostalToyota()!=null){
                             simulation.setAccessory1ImgPostal(kit.getImgPostalToyota());
                             simulation.setAccessory1ImgEPostal(kit.getImgEPostalToyota());
                             simulation.setAccessory1Code(kit.getReferencia());
-                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("")?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty()?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory1Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalToyota()!=null && accessory.getImgEPostalToyota()!=null){
                             simulation.setAccessory1ImgPostal(accessory.getImgPostalToyota());
                             simulation.setAccessory1ImgEPostal(accessory.getImgEPostalToyota());
                             simulation.setAccessory1Code(accessory.getReferencia());
-                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory1Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory1Link(TOYOTA_ACCESSORY_DEFAULT_LINK_1);
@@ -609,20 +610,20 @@ public class TPAInvokerSimulator {
                             simulation.setAccessory1Desc(TOYOTA_ACCESSORY_DEFAULT_DESCRIPTION_1);
                         }
                     }else if(simulation.getPaData().getBrand().equals(BRAND_LEXUS)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory1Link(LEXUS_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalLexus()!=null && kit.getImgPostalLexus()!=null){
                             simulation.setAccessory1ImgPostal(kit.getImgPostalLexus());
                             simulation.setAccessory1ImgEPostal(kit.getImgEPostalLexus());
                             simulation.setAccessory1Code(kit.getReferencia());
-                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("") ?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty() ?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory1Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalLexus()!=null && accessory.getImgEPostalLexus()!=null){
                             simulation.setAccessory1ImgPostal(accessory.getImgPostalLexus());
                             simulation.setAccessory1ImgEPostal(accessory.getImgEPostalLexus());
                             simulation.setAccessory1Code(accessory.getReferencia());
-                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory1Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory1Link(LEXUS_ACCESSORY_DEFAULT_LINK_1);
@@ -637,31 +638,31 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(1) != null) {
                     accessory = acessories.get(1);
-                    logger.trace("*****TPA_MRS******PRE -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******PRE -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    logger.trace("*****TPA_MRS******POS -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******POS -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
 
                     simulation.setAccessory2Link(accessoryLink.getLink());
-                    logger.trace("*****TPA_MRS******PRE -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******PRE -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    logger.trace("*****TPA_MRS******POS -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******POS -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
 
                     simulation.setAccessory2Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory2Link(TOYOTA_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalToyota()!=null && kit.getImgPostalToyota()!=null){
                             simulation.setAccessory2ImgPostal(kit.getImgPostalToyota());
                             simulation.setAccessory2ImgEPostal(kit.getImgEPostalToyota());
                             simulation.setAccessory2Code(kit.getReferencia());
-                            simulation.setAccessory2Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("")?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory2Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty()?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory2Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalToyota()!=null && accessory.getImgEPostalToyota()!=null){
                             simulation.setAccessory2ImgPostal(accessory.getImgPostalToyota());
                             simulation.setAccessory2ImgEPostal(accessory.getImgEPostalToyota());
                             simulation.setAccessory2Code(accessory.getReferencia());
-                            simulation.setAccessory2Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory2Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory2Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory2Link(TOYOTA_ACCESSORY_DEFAULT_LINK_2);
@@ -672,20 +673,20 @@ public class TPAInvokerSimulator {
                             simulation.setAccessory2Name(TOYOTA_ACCESSORY_DEFAULT_NAME_2);
                         }
                     }else if(simulation.getPaData().getBrand().equals(BRAND_LEXUS)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory2Link(LEXUS_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalLexus()!=null && kit.getImgPostalLexus()!=null){
                             simulation.setAccessory2ImgPostal(kit.getImgPostalLexus());
                             simulation.setAccessory2ImgEPostal(kit.getImgEPostalLexus());
                             simulation.setAccessory2Code(kit.getReferencia());
-                            simulation.setAccessory2Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("")?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory2Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty()?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory2Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalLexus()!=null && accessory.getImgEPostalLexus()!=null){
                             simulation.setAccessory2ImgPostal(accessory.getImgPostalLexus());
                             simulation.setAccessory2ImgEPostal(accessory.getImgEPostalLexus());
                             simulation.setAccessory2Code(accessory.getReferencia());
-                            simulation.setAccessory2Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory2Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory2Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory2Link(LEXUS_ACCESSORY_DEFAULT_LINK_2);
@@ -702,29 +703,29 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(0) != null) {
                     accessory = acessories.get(0);
-                    logger.trace("*****TPA_MRS******PRE -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******PRE -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    logger.trace("*****TPA_MRS******POS -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
+                    log.trace("*****TPA_MRS******POS -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     simulation.setAccessory1Link(accessoryLink.getLink());
-                    logger.trace("*****TPA_MRS******PRE -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******PRE -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    logger.trace("*****TPA_MRS******POS -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
+                    log.trace("*****TPA_MRS******POS -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     simulation.setAccessory1Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory1Link(TOYOTA_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalToyota()!=null && kit.getImgPostalToyota()!=null){
                             simulation.setAccessory1ImgPostal(kit.getImgPostalToyota());
                             simulation.setAccessory1ImgEPostal(kit.getImgEPostalToyota());
                             simulation.setAccessory1Code(kit.getReferencia());
-                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("")?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty()?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory1Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalToyota()!=null && accessory.getImgEPostalToyota()!=null){
                             simulation.setAccessory1ImgPostal(accessory.getImgPostalToyota());
                             simulation.setAccessory1ImgEPostal(accessory.getImgEPostalToyota());
                             simulation.setAccessory1Code(accessory.getReferencia());
-                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory1Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory1Link(TOYOTA_ACCESSORY_DEFAULT_LINK_1);
@@ -741,20 +742,20 @@ public class TPAInvokerSimulator {
                         simulation.setAccessory2ImgPostal(TOYOTA_ACCESSORY_DEFAULT_IMG_POSTAL_2);
                         simulation.setAccessory2ImgEPostal(TOYOTA_ACCESSORY_DEFAULT_IMG_E_POSTAL_2);
                     }else if(simulation.getPaData().getBrand().equals(BRAND_LEXUS)){
-                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().equals("")){
+                        if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
                             simulation.setAccessory1Link(LEXUS_ACCESSORY_DEFAULT_LINK);
                         }
                         if(kit!=null && kit.getImgEPostalLexus()!=null && kit.getImgPostalLexus()!=null){
                             simulation.setAccessory1ImgPostal(kit.getImgPostalLexus());
                             simulation.setAccessory1ImgEPostal(kit.getImgEPostalLexus());
                             simulation.setAccessory1Code(kit.getReferencia());
-                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().equals("")?kit.getDescricaoMarketing():kit.getDescricao());
+                            simulation.setAccessory1Name(kit.getDescricaoMarketing()!=null && !kit.getDescricaoMarketing().trim().isEmpty()?kit.getDescricaoMarketing():kit.getDescricao());
                             simulation.setAccessory1Desc(kit.getObservacoes());
                         }else if(accessory.getImgPostalLexus()!=null && accessory.getImgEPostalLexus()!=null){
                             simulation.setAccessory1ImgPostal(accessory.getImgPostalLexus());
                             simulation.setAccessory1ImgEPostal(accessory.getImgEPostalLexus());
                             simulation.setAccessory1Code(accessory.getReferencia());
-                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().equals("")?accessory.getDescricaoMarketing():accessory.getDescricao());
+                            simulation.setAccessory1Name(accessory.getDescricaoMarketing()!=null && !accessory.getDescricaoMarketing().trim().isEmpty()?accessory.getDescricaoMarketing():accessory.getDescricao());
                             simulation.setAccessory1Desc(accessory.getLongDescription());
                         }else{
                             simulation.setAccessory1Link(LEXUS_ACCESSORY_DEFAULT_LINK_1);
@@ -772,7 +773,7 @@ public class TPAInvokerSimulator {
                         simulation.setAccessory2ImgEPostal(LEXUS_ACCESSORY_DEFAULT_IMG_E_POSTAL_2);
                     }
                 }
-            }else if(acessories == null || acessories.size() == 0){
+            }else {
                 if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
                     simulation.setAccessory1Link(TOYOTA_ACCESSORY_DEFAULT_LINK_1);
                     simulation.setAccessory1Desc(TOYOTA_ACCESSORY_DEFAULT_DESCRIPTION_1);
@@ -809,21 +810,21 @@ public class TPAInvokerSimulator {
 
     private static void validateDocumentUnit(String name, String imgPostal, String imgEPostal, String type, String numberplate) throws SCErrorException {
 
-        if(name==null || name.equals("")){
+        if(name==null || name.isEmpty()){
             SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Nome n�o definido para o "+type+" do carro com a matricula "+numberplate);
-            logger.error(ex.getErrorMessage(), ex);
+            log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
 
-        if(imgPostal==null || imgPostal.equals("")){
+        if(imgPostal==null || imgPostal.isEmpty()){
             SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Imagem Postal n�o definida para o "+type+" do carro com a matricula "+numberplate);
-            logger.error(ex.getErrorMessage(), ex);
+            log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
 
-        if(imgEPostal==null || imgEPostal.equals("")){
+        if(imgEPostal==null || imgEPostal.isEmpty()){
             SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Imagem e-Postal n�odefinida para o "+type+" do carro com a matricula "+numberplate);
-            logger.error(ex.getErrorMessage(), ex);
+            log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
 
@@ -965,7 +966,7 @@ public class TPAInvokerSimulator {
             installedAccessories = oAccessoryInstalledResponse.getAcessoryInstalled();
         }
 
-        if (lstIdsModel.size() > 0) {
+        if (!lstIdsModel.isEmpty()) {
 
             List<Integer> lstIdsAcessories = new ArrayList<Integer>();
             List<String> lstIdsInstalledAcessories = new ArrayList<String>();
@@ -991,7 +992,7 @@ public class TPAInvokerSimulator {
                 if (!priorityAccessories.isEmpty()) {
                     int i = 0;
 
-                    for (Entry<Integer, String> entry : priorityAccessories.entrySet()) {
+                    for (Map.Entry<Integer, String> entry : priorityAccessories.entrySet()) {
                         i++;
                         if (i <= 2) {
                             priorityAcessories.add(AcessoriesHelper.getAcessory(entry.getKey()));
@@ -1036,12 +1037,12 @@ public class TPAInvokerSimulator {
 
         if(listRepairs!=null && listRepairs.size()>0){
             Repair lastRepair = listRepairs.get(listRepairs.size()-1);
-            Dealer oDealer = ApplicationConfiguration.getDealerByDealerAndAfterSalesCode(Dealer.OID_NET_TOYOTA, lastRepair.getDealerCode(),  StringTasks.cleanString(lastRepair.getAfterSalesCode(), ""));
+            Dealer oDealer = ApplicationConfiguration.getDealerByDealerAndAfterSalesCode(Dealer.OID_NET_TOYOTA, lastRepair.getDealerCode(),  StringTasks.cleanString(lastRepair.getAfterSalesCode(), StringUtils.EMPTY));
             if(oDealer!=null){
                 String dealerName = oDealer.getDesig();
 
                 String dealerLocal = "";
-                if(oDealer.getCpExt() != null && !oDealer.getCpExt().equals("")){
+                if(oDealer.getCpExt() != null && !oDealer.getCpExt().isEmpty()){
                     dealerLocal = "("+oDealer.getCpExt()+")";
                 }
                 carInfo.setLastServiceDealer(dealerName+" "+ dealerLocal);
@@ -1054,7 +1055,7 @@ public class TPAInvokerSimulator {
             String comercialModelCode = StringTasks.cleanString(as400Car.getComercialModelCode(), "");
             String versionCode = StringTasks.cleanString(as400Car.getVersionCode(), "");
             String dataMatricula = StringTasks.cleanString(as400Car.getDtPlate(), "");
-            if (!dataMatricula.equals("")) {
+            if (!dataMatricula.isEmpty()) {
                 Date date1 = new SimpleDateFormat("yyyy").parse(dataMatricula);
                 Date today = new Date();
 
@@ -1106,9 +1107,9 @@ public class TPAInvokerSimulator {
 
             if (paData != null) {
                 Dealer dealer = null;
-                if(paData.getBrand().equalsIgnoreCase("L") && paData.getOidDealer()!=null && !paData.getOidDealer().equals("")){
+                if(paData.getBrand().equalsIgnoreCase("L") && paData.getOidDealer()!=null && !paData.getOidDealer().isEmpty()){
                     dealer = Dealer.getLexusHelper().getByObjectId(paData.getOidDealer());
-                }else if(paData.getBrand().equalsIgnoreCase("T") && paData.getOidDealer()!=null && !paData.getOidDealer().equals("")){
+                }else if(paData.getBrand().equalsIgnoreCase("T") && paData.getOidDealer()!=null && !paData.getOidDealer().isEmpty()){
                     dealer = Dealer.getToyotaHelper().getByObjectId(paData.getOidDealer());
                 }
 
@@ -1116,7 +1117,7 @@ public class TPAInvokerSimulator {
                 if(dealer!=null){
                     String dealerName = dealer.getDesig();
                     String dealerLocal = "";
-                    if(dealer.getCpExt() != null && !dealer.getCpExt().equals("")){
+                    if(dealer.getCpExt() != null && !dealer.getCpExt().isEmpty()){
                         dealerLocal = "("+dealer.getCpExt()+")";
                     }
                     paData.setOidDealer(dealer.getObjectId());
@@ -1132,15 +1133,13 @@ public class TPAInvokerSimulator {
                 int year = calDate.get(Calendar.YEAR);
                 int month = calDate.get(Calendar.MONTH);
 
-                if (paData.getYear() != year) {
-                    return null;
-                } else if (paData.getMonth() != (month + 1)) {
+                if (paData.getYear() != year || paData.getMonth() != (month + 1)) {
                     return null;
                 }
 
                 Mrs mrs = paData.getMRS();
 
-                if (paData.getNif().length() > 0) {
+                if (!paData.getNif().isEmpty()) {
                     String nif = paData.getNif();
                     carInfo.setNif(nif);
                     if (nif.startsWith("1") || nif.startsWith("2")) {
@@ -1192,7 +1191,7 @@ public class TPAInvokerSimulator {
                         carInfo.setIdFidelity(99);
                     }
 
-                    if(mrs.getGenre() != null && !mrs.getGenre().trim().equals("")){
+                    if(mrs.getGenre() != null && !mrs.getGenre().trim().isEmpty()){
                         Genre genre = Genre.getHelper().getGenderByDesc(mrs.getGenre());
                         carInfo.setGender(mrs.getGenre());
                         if(genre!=null){
@@ -1201,7 +1200,7 @@ public class TPAInvokerSimulator {
                     }else{
                         carInfo.setIdGender(99);
                     }
-                    if(mrs.getExpectedKm()!=null && !mrs.getExpectedKm().equals("")){
+                    if(mrs.getExpectedKm()!=null && !mrs.getExpectedKm().isEmpty()){
                         double expected = Double.valueOf(mrs.getExpectedKm());
                         carInfo.setKilometers(mrs.getExpectedKm());
                         if(expected <= 100000){
@@ -1236,7 +1235,5 @@ public class TPAInvokerSimulator {
         cal.setTime(date);
         return cal;
     }
-
-
 
 }

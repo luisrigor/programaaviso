@@ -12,14 +12,10 @@ public class ApplicationConfiguration {
     public static final int PA_CONTACTTYPE_CONTRATOS_MANUTENCAO_EXPIRADOS = 5;
     public static final int PA_CONTACTTYPE_CONECTIVIDADE = 9;
     public static Map<String, Dealer> MAP_DEALERS = null;
+    private static Map<String, Dealer> MAP_DEALERS_DEALER_AFTERSALESCODE = null;
 
     public static Dealer getDealer(String oidDealer) throws SCErrorException {
-        if (MAP_DEALERS==null) {
-            // Get all information about Dealers
-            MAP_DEALERS = new Hashtable<String, Dealer>();
-            MAP_DEALERS.putAll(Dealer.getHelper().getAllDealers(Dealer.OID_NET_TOYOTA));
-            MAP_DEALERS.putAll(Dealer.getHelper().getAllDealers(Dealer.OID_NET_LEXUS));
-        }
+        initializeDealerCodeMap();
         return MAP_DEALERS.containsKey(oidDealer) ? MAP_DEALERS.get(oidDealer): null;
     }
 
@@ -30,6 +26,7 @@ public class ApplicationConfiguration {
     private Date DT_START = null;
     private Date DT_END = null;
     private static Map<Integer, List<PaParameterization>> MAP_PARAMETERIZATIONS = null;
+    public static final String CHAR_SEPARATOR = "#";
 
     public synchronized static ApplicationConfiguration getInstance() {
         if (ivInstance == null || ivDtLastGeneratedValues==null) {
@@ -55,4 +52,33 @@ public class ApplicationConfiguration {
         }
         return MAP_PARAMETERIZATIONS.containsKey(idClient) ? MAP_PARAMETERIZATIONS.get(idClient): null;
     }
+
+
+
+    public static Dealer getDealerByDealerAndAfterSalesCode(String oidNet, String dealerCode, String afterSalesCode) throws SCErrorException {
+        String key = oidNet + CHAR_SEPARATOR + dealerCode + CHAR_SEPARATOR + afterSalesCode;
+        Dealer dealer = MAP_DEALERS_DEALER_AFTERSALESCODE.get(key);
+        if (dealer == null) {
+            initializeDealerCodeMap();
+            dealer = MAP_DEALERS_DEALER_AFTERSALESCODE.get(key);
+        }
+        return dealer;
+    }
+
+
+    private static void initializeDealerCodeMap() throws SCErrorException {
+        if (MAP_DEALERS_DEALER_AFTERSALESCODE == null) {
+            MAP_DEALERS_DEALER_AFTERSALESCODE = new Hashtable<>();
+            if (MAP_DEALERS == null) {
+                MAP_DEALERS = new Hashtable<>();
+                MAP_DEALERS.putAll(Dealer.getHelper().getAllDealers(Dealer.OID_NET_TOYOTA));
+                MAP_DEALERS.putAll(Dealer.getHelper().getAllDealers(Dealer.OID_NET_LEXUS));
+            }
+            MAP_DEALERS.forEach((s, oDealer) -> MAP_DEALERS_DEALER_AFTERSALESCODE.put(
+                    oDealer.getOIdNet() + CHAR_SEPARATOR + oDealer.getDealerCode() + CHAR_SEPARATOR + oDealer.getAfterSalesCode(),
+                    oDealer));
+        }
+    }
+
+
 }
