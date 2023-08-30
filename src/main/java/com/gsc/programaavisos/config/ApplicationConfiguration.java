@@ -1,11 +1,18 @@
 package com.gsc.programaavisos.config;
 
 import com.gsc.programaavisos.dto.ParameterizationFilter;
+import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
+import com.gsc.programaavisos.repository.crm.ItemsKilometersRepository;
+import com.gsc.programaavisos.service.impl.ParametrizationServiceImpl;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+
 
 public class ApplicationConfiguration {
 
@@ -13,6 +20,8 @@ public class ApplicationConfiguration {
     public static final int PA_CONTACTTYPE_CONECTIVIDADE = 9;
     public static Map<String, Dealer> MAP_DEALERS = null;
     private static Map<String, Dealer> MAP_DEALERS_DEALER_AFTERSALESCODE = null;
+    
+    private static ParametrizationServiceImpl parametrizationService;
 
     public static Dealer getDealer(String oidDealer) throws SCErrorException {
         initializeDealerCodeMap();
@@ -25,7 +34,7 @@ public class ApplicationConfiguration {
     public boolean PARAM_CHANGE = false;
     private Date DT_START = null;
     private Date DT_END = null;
-    private static Map<Integer, List<PaParameterization>> MAP_PARAMETERIZATIONS = null;
+    private Map<Integer, List<PaParameterization>> MAP_PARAMETERIZATIONS = null;
     public static final String CHAR_SEPARATOR = "#";
 
     public synchronized static ApplicationConfiguration getInstance() {
@@ -45,15 +54,13 @@ public class ApplicationConfiguration {
     public List<PaParameterization> getParameterizationsByClient(int idClient, ParameterizationFilter filter) throws SCErrorException {
 
         if((PARAM_CHANGE)||(DT_START == null && MAP_PARAMETERIZATIONS == null && DT_END == null) ||   (filter.getDtStart().before(DT_START) || filter.getDtStart().after(DT_START) || filter.getDtEnd().before(DT_END) || filter.getDtEnd().after(DT_END) || MAP_PARAMETERIZATIONS==null)){
-            MAP_PARAMETERIZATIONS = PaParameterization.getHelper().getByIdClient(filter, true);
+            MAP_PARAMETERIZATIONS = parametrizationService.getByIdClient(filter, true);
             DT_START = filter.getDtStart();
             DT_END = filter.getDtEnd();
             PARAM_CHANGE = false;
         }
-        return MAP_PARAMETERIZATIONS.containsKey(idClient) ? MAP_PARAMETERIZATIONS.get(idClient): null;
+        return MAP_PARAMETERIZATIONS.getOrDefault(idClient, null);
     }
-
-
 
     public static Dealer getDealerByDealerAndAfterSalesCode(String oidNet, String dealerCode, String afterSalesCode) throws SCErrorException {
         String key = oidNet + CHAR_SEPARATOR + dealerCode + CHAR_SEPARATOR + afterSalesCode;
@@ -64,7 +71,6 @@ public class ApplicationConfiguration {
         }
         return dealer;
     }
-
 
     private static void initializeDealerCodeMap() throws SCErrorException {
         if (MAP_DEALERS_DEALER_AFTERSALESCODE == null) {
@@ -79,6 +85,4 @@ public class ApplicationConfiguration {
                     oDealer));
         }
     }
-
-
 }

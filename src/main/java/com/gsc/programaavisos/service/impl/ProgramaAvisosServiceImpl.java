@@ -16,6 +16,7 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import com.gsc.ws.core.objects.response.*;
@@ -61,6 +62,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PaDataInfoRepository paDataInfoRepository;
     private final PARepository programaAvisosRepository;
     private final ProgramaAvisosUtil programaAvisosUtil;
+    private final MrsRepository mrsRepository;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
 
@@ -932,10 +934,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 default:
                     break;
             }
-
             return paDataInfoP;
         }
-
         return null;
     }
     @Override
@@ -958,51 +958,37 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return paBeanRepository.getPaTotals(filterBean);
     }
 
+
     public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
             {
 
         String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
         String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
-        LocalDate localDate = tpaDTO.getDate();
-        Calendar calDate = Calendar.getInstance();
+
+                Calendar calDate = Calendar.getInstance();
 
         try {
-/*
             TpaSimulation simulation = TPAInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
-
             simulation.setAccessory1Code(simulation.getPaData().getMRS().getAcessoryCode1());
             simulation.setAccessory2Code(simulation.getPaData().getMRS().getAcessoryCode2());
-
             simulation.setAccessory1Link(simulation.getPaData().getMRS().getAcessory1Link());
             simulation.setAccessory2Link(simulation.getPaData().getMRS().getAcessory2Link());
-
             simulation.setAccessory1ImgPostal(simulation.getPaData().getMRS().getAcessory1ImgPostal());
             simulation.setAccessory2ImgPostal(simulation.getPaData().getMRS().getAcessory2ImgPostal());
-
             simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAcessory1ImgEPostal());
-            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal())
-
-*/
-            return new TpaSimulation();
-
-
+            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal());
+            return simulation;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
         }
     }
 
     @Override
-    public ProgramaAvisos getPAData(){
-        /*
-        return programaAvisosRepository.getPADataByNifData("511106432",PaConstants.BUSINESS_PLUS_ID,2023,8,
-                new ArrayList<>(Arrays.asList(PaConstants.MAN,PaConstants.ITV,PaConstants.MAN_ITV)));
-
-         */
-        return programaAvisosRepository.getPADataByNifData();
+    public ProgramaAvisos getTestData(){
+        ProgramaAvisos programaAvisos = paRepository.getPADataByPlate("47LN12",2,8,2023,Arrays.asList(1,2,3));
+        return programaAvisos;
     }
-
-
 
 }

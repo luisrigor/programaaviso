@@ -6,8 +6,11 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.TpaSimulation;
+import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
+import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
 import com.gsc.ws.core.AccessoryInstalled;
 import com.gsc.ws.core.Repair;
 import com.gsc.ws.core.objects.response.AccessoryInstalledResponse;
@@ -15,16 +18,21 @@ import com.gsc.ws.core.objects.response.CarInfoResponse;
 import com.gsc.ws.core.objects.response.RepairResponse;
 import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.rg.dealer.Dealer;
+import com.sc.commons.dbconnection.ServerJDBCConnection;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.StringTasks;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Log4j
+@RequiredArgsConstructor
 public class TPAInvokerSimulator {
 
     public static final int CAR_DB_COMBUSTIVEL_SEM_INFO = 4;
@@ -72,6 +80,12 @@ public class TPAInvokerSimulator {
     private static final String TOYOTA_ACCESSORY_DEFAULT_REF_2 = "T2";
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_2 = "L2";
 
+    private static PARepository paRepository;
+    private static MrsRepository mrsRepository;
+    private static ContactReasonRepository contactRepository;
+    private static DocumentUnitRepository documentUnitRepository   ;
+    private static GenreRepository genreRepository;
+
     public static TpaSimulation getTpaSimulation(String nif,String numberplate, Calendar calDate, boolean isTPAImportFromBi)
             throws SCErrorException{
 
@@ -82,12 +96,12 @@ public class TPAInvokerSimulator {
             throws SCErrorException {
         boolean isBusinessPlus = false;
 
-        List<ParameterizationItems> paramItems = null;
-        ParameterizationItems selectedDestaqueParam = null;
+        List<ParametrizationItems> paramItems = null;
+        ParametrizationItems selectedDestaqueParam = null;
         String destaqueOriginParameterization = "";
-        ParameterizationItems selectedServicoParam = null;
+        ParametrizationItems selectedServicoParam = null;
         String servicoOriginParameterization = "";
-        ParameterizationItems selectedHeaderParam = null;
+        ParametrizationItems selectedHeaderParam = null;
         String headerOriginParameterization = "";
         TpaSimulation simulation = new TpaSimulation();
         ParameterizationFilter filter = new ParameterizationFilter();
@@ -97,25 +111,27 @@ public class TPAInvokerSimulator {
 
         ProgramaAvisos paData = null;
         Mrs mrs;
+        List<Integer> contactList = new ArrayList<>(Arrays.asList(PaConstants.MAN,PaConstants.ITV,PaConstants.MAN_ITV));
+
 
         int year = calDate.get(Calendar.YEAR);
         int month = calDate.get(Calendar.MONTH) +1;
         log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
         if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
             log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
-            paData = ProgramaAvisos.getHelper().getPADataByNif(nif, PaConstants.BUSINESS_PLUS_ID,month,year);
+            paData = paRepository.getPADataByNifData(nif, PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
             log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
 
             if(paData!=null){
                 log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-                mrs = Mrs.getHelper().getByIdPaData(paData.getId());
+                mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
                 log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                 paData.setMRS(mrs);
             }
             simulation.setPaData(paData);
             isBusinessPlus = true;
-            List<String> plates = ProgramaAvisos.getHelper().getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year);
+            List<String> plates = paRepository.getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
             if(plates!=null && !plates.isEmpty()){
                 numberplate = plates.get(0);
             }
@@ -141,12 +157,12 @@ public class TPAInvokerSimulator {
                         idClientType = PaConstants.NORMAL_ID;
                     }
                     log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
-                    paData = ProgramaAvisos.getHelper().getPADataByPlate(numberplate, idClientType, month, year);
+                    paData = paRepository.getPADataByPlate(numberplate, idClientType, month, year,contactList);
                     log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
 
                     if (paData != null) {
                         log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-                        mrs = Mrs.getHelper().getByIdPaData(paData.getId());
+                        mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
                         log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                         paData.setMRS(mrs);
@@ -189,22 +205,19 @@ public class TPAInvokerSimulator {
         }
 
         if (parameterizations != null && !parameterizations.isEmpty()) {
-            log.trace("*****TPA_MRS******PRE ->  ContactReason.getHelper().getAllContactReasons();");
-            LinkedHashMap<Integer, ContactReason> contactReasonsMap = ContactReason.getHelper().getAllContactReasons();
-            log.trace("*****TPA_MRS******POS ->  ContactReason.getHelper().getAllContactReasons();");
             log.trace("*****TPA_MRS******PRE ->  DocumentUnit.getHelper().getAllDocumentUnits();");
-            LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = DocumentUnit.getHelper().getAllDocumentUnits();
+            LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = getMapAllDocumentUnits(new LinkedHashMap<Integer, DocumentUnit>());
             log.trace("*****TPA_MRS******POS ->  DocumentUnit.getHelper().getAllDocumentUnits();");
-
-            simulation.setContactReason(contactReasonsMap.get(carInfo.getIdContactReason()).getContactReason());
+            ContactReason contactReason = contactRepository.findById(carInfo.getIdContactReason()).orElseThrow(()-> new ProgramaAvisosException("Contact id not found"));
+            simulation.setContactReason(contactReason.getContactReason());
             simulation.setCarInfo(carInfo);
             simulation.setBusinessCarInfo(businessCarInfo);
 
             for (PaParameterization parametrization : parameterizations) {
-                paramItems = (ArrayList<ParameterizationItems>) parametrization.getParameterizationItems();
+                paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
 
                 if (paramItems != null) {
-                    for (ParameterizationItems paramItem : paramItems) {
+                    for (ParametrizationItems paramItem : paramItems) {
                         boolean isToCheck = true;
                         if(isBusinessPlus){
                             isToCheck = paramItem.getIdContactReason() == PaConstants.ID_CONTACT_TYPE_BUS;
@@ -425,9 +438,9 @@ public class TPAInvokerSimulator {
 
             if (selectedDestaqueParam == null || selectedServicoParam == null || selectedHeaderParam == null) {
                 for (PaParameterization parametrization : parameterizations) {
-                    paramItems = (ArrayList<ParameterizationItems>) parametrization.getParameterizationItems();
+                    paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
                     if (paramItems != null) {
-                        for (ParameterizationItems paramItem : paramItems) {
+                        for (ParametrizationItems paramItem : paramItems) {
 
                             boolean isToCheck = true;
                             if(isBusinessPlus){
@@ -1192,11 +1205,14 @@ public class TPAInvokerSimulator {
                     }
 
                     if(mrs.getGenre() != null && !mrs.getGenre().trim().isEmpty()){
-                        Genre genre = Genre.getHelper().getGenderByDesc(mrs.getGenre());
+
+                        String genreName = getGenreName(mrs.getGenre());
+                        Genre genre = genreRepository.getGenderByName(genreName).orElseThrow(()->new ProgramaAvisosException("Genre not found"));
                         carInfo.setGender(mrs.getGenre());
                         if(genre!=null){
                             carInfo.setIdGender(genre.getId());
                         }
+
                     }else{
                         carInfo.setIdGender(99);
                     }
@@ -1234,6 +1250,18 @@ public class TPAInvokerSimulator {
         Calendar cal = Calendar.getInstance(Locale.getDefault());
         cal.setTime(date);
         return cal;
+    }
+
+    public static LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits(LinkedHashMap<Integer, DocumentUnit> map) {
+        List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
+        documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
+        return map;
+    }
+
+    public static String getGenreName(String character){
+        if (character.equalsIgnoreCase("M"))
+            return "MASCULINO";
+        return character.equalsIgnoreCase("F") ? "FEMENINO" : "N/D";
     }
 
 }

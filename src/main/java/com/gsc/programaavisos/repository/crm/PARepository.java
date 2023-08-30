@@ -17,11 +17,28 @@ public interface PARepository extends JpaRepository<ProgramaAvisos, Integer>, PA
     @Query("UPDATE ProgramaAvisos P SET P.blockedBy = :blockedBy WHERE P.id = :id")
     void updateBlockedByById(@Param("blockedBy") String blockedBy,@Param("id") Integer id);
 
-    /*@Query("SELECT PA FROM ProgramaAvisos PA WHERE nif = :nif " +
-            "AND idClientType = :idClientType AND month = :month AND year = :year AND idContactType IN (:contactList)")
+
+
+    @Query("SELECT PA FROM ProgramaAvisos PA WHERE PA.nif = :nif " +
+            "AND PA.idClientType = :idClientType AND PA.month = :month AND PA.year = :year AND PA.idContactType IN (:contactList)")
     ProgramaAvisos getPADataByNifData(@Param("nif") String nif, @Param("idClientType") Integer idClientType,
                                       @Param("month") Integer month, @Param("year") Integer year, @Param("contactList") List<Integer> concactList);
+    /*
+    @Query(value = "SELECT * FROM PA_DATA PA WHERE PA.NIF = :nif " +
+            "AND PA.ID_CLIENT_TYPE = :idClientType AND PA.MONTH = :month AND PA.YEAR = :year AND PA.ID_CONTACTTYPE IN (1,2,3)",nativeQuery = true)
+    ProgramaAvisos getPADataByNifData(@Param("nif") String nif, @Param("idClientType") Integer idClientType,
+                                      @Param("month") Integer month, @Param("year") Integer year);
      */
-    @Query(value = "SELECT * FROM PA_DATA PA  WHERE ID = 10132",nativeQuery = true)
-    ProgramaAvisos getPADataByNifData();
+
+    @Query("SELECT DISTINCT(PA.licensePlate) FROM ProgramaAvisos PA WHERE PA.nif = :nif " +
+            "AND PA.idClientType = :idClientType AND PA.month = :month AND PA.year = :year AND PA.idContactType IN (:contactList)")
+    List<String> getPlateByNif(@Param("nif") String nif, @Param("idClientType") Integer idClientType,
+                                      @Param("month") Integer month, @Param("year") Integer year, @Param("contactList") List<Integer> concactList);
+
+    @Query("SELECT PA FROM ProgramaAvisos PA WHERE PA.licensePlate = :licensePlate " +
+            "AND PA.idClientType = :idClientType AND PA.month = :month AND PA.year = :year AND PA.idContactType IN (:contactList)" +
+            "ORDER BY dtCreated DESC")
+    ProgramaAvisos getPADataByPlate(@Param("licensePlate") String licensePlate, @Param("idClientType") Integer idClientType,
+                               @Param("month") Integer month, @Param("year") Integer year, @Param("contactList") List<Integer> concactList);
+
 }

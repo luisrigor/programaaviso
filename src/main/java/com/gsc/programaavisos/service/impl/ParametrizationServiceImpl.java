@@ -1,6 +1,7 @@
 package com.gsc.programaavisos.service.impl;
 
 import com.gsc.programaavisos.constants.ApiConstants;
+import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -9,6 +10,7 @@ import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.util.PAUtil;
+import com.sc.commons.exceptions.SCErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,9 +18,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 @Service
@@ -254,6 +254,46 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }catch (Exception e){
             throw new ProgramaAvisosException("Error clone parametrization", e);
         }
+    }
+
+    public HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives) {
+
+        HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
+        List<PaParameterization> parameterizationList = paParameterizationRepository.getByFilter(filter);
+
+        List<PaParameterization> toyotaParam = new ArrayList<>();
+        List<PaParameterization> lexusParam = new ArrayList<>();
+
+        for(PaParameterization parameterization:parameterizationList){
+
+            List<ParametrizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(parameterization.getId(),onlyActives);
+
+            if(parameterizationItems.size()>0){
+                parameterization.setParametrizationItems(parameterizationItems);
+
+                for (ParametrizationItems parameterizationItem : parameterization.getParametrizationItems()){
+
+                    int idParameterizationItem = parameterizationItem.getId();
+
+                    parameterizationItem.setItemEntityTypes(itemsEntityTypeRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemAges(itemsAgeRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemKilometers(itemsKilometersRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemFidelitys(itemsFidelitysRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemFuels(itemsFuelRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemGenres(itemsGenreRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemDealers(itemsDealerRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemModels(itemsModelRepository.findByIdParameterizationItems(idParameterizationItem));
+                }
+            }
+            if(parameterization.getIdBrand() == ApiConstants.ID_BRAND_TOYOTA)
+                toyotaParam.add(parameterization);
+            lexusParam.add(parameterization);
+
+        }
+        mapParameterizations.put(ApiConstants.ID_BRAND_TOYOTA, toyotaParam);
+        mapParameterizations.put(ApiConstants.ID_BRAND_LEXUS, lexusParam);
+
+        return mapParameterizations;
     }
 
 }
