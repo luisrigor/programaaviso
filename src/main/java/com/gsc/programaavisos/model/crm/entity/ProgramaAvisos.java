@@ -1,6 +1,7 @@
 package com.gsc.programaavisos.model.crm.entity;
 
 import com.sc.commons.exceptions.SCErrorException;
+import io.swagger.models.auth.In;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,21 +26,21 @@ public class ProgramaAvisos {
     @Column(name = "ID_DOCUMENT")
     private String idDocument;
     @Column(name = "ID_CHANNEL")
-    private int idChannel;
+    private Integer idChannel;
     @Column(name = "ID_CONTACTTYPE")
-    private int idContactType;
+    private Integer idContactType;
     @Column(name = "ID_CLIENT_TYPE")
-    private int idClientType;
+    private Integer idClientType;
     @Column(name = "ID_CLIENT_ORIGIN")
-    private int idClientOrigin;
+    private Integer idClientOrigin;
     @Column(name = "ID_STATUS")
-    private int idStatus;
+    private Integer idStatus;
     @Column(name = "YEAR")
-    private int year;
+    private Integer year;
     @Column(name = "MONTH")
-    private int month;
+    private Integer month;
     @Column(name = "DAY")
-    private int day;
+    private Integer day;
     @Column(name = "OID_DEALER")
     private String oidDealer;
     @Column(name = "LICENSE_PLATE")
@@ -52,7 +53,6 @@ public class ProgramaAvisos {
     private String model;
     @Column(name = "NIF")
     private String nif;
-    @Column(name = "NAME")
     private String name;
     private String address;
     private String cp4;
@@ -90,12 +90,12 @@ public class ProgramaAvisos {
     private Timestamp dtCreated;
     private String changedBy;
     private Timestamp dtChanged;
-    private int nrMissedCalls;
-    private int nrCalls;
-    private int idLastCall;
+    private Integer nrMissedCalls;
+    private Integer nrCalls;
+    private Integer idLastCall;
     private Integer idClaim;
     private String receiveInformation;
-    private int idClientChannelPreference;
+    private Integer idClientChannelPreference;
     private String oidNewsletter;
     private String newsletterPersonalData;
     private String oidDealerSchedule;
@@ -103,11 +103,9 @@ public class ProgramaAvisos {
     private Time hrSchedule;
     private String owner;
     private String recoveryAndShipping;
-    private int idOrigin;
-    private int extIDInOrigin;
-    private int warningPriority;
-
-
+    private Integer idOrigin;
+    private Integer extIDInOrigin;
+    private Integer warningPriority;
     @Transient
     private Mrs MRS;
 /*

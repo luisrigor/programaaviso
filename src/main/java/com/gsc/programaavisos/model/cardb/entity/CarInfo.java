@@ -1,6 +1,6 @@
 package com.gsc.programaavisos.model.cardb.entity;
 
-import com.gsc.ws.core.*;
+import com.gsc.cardb.car.Car;
 import lombok.*;
 
 import javax.persistence.Transient;
@@ -36,6 +36,7 @@ public class CarInfo {
     private String lastServiceDealer;
     private String lastServiceDealerContact;
     @Transient
-    private Car car;
+    private com.gsc.cardb.car.Car car;
+    @Transient
     protected com.gsc.ws.core.CarInfo as400CarInfo;
 }
