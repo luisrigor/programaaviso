@@ -62,7 +62,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PaDataInfoRepository paDataInfoRepository;
     private final PARepository programaAvisosRepository;
     private final ProgramaAvisosUtil programaAvisosUtil;
-    private final MrsRepository mrsRepository;
+    private final TPAInvokerSimulator tpaInvokerSimulator;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
 
@@ -958,7 +958,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return paBeanRepository.getPaTotals(filterBean);
     }
 
-
+    @Override
     public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
             {
 
@@ -968,7 +968,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 Calendar calDate = Calendar.getInstance();
 
         try {
-            TpaSimulation simulation = TPAInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
+            TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
             simulation.setAccessory1Code(simulation.getPaData().getMRS().getAcessoryCode1());
@@ -980,10 +980,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAcessory1ImgEPostal());
             simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal());
             return simulation;
-        } catch (Exception e) {
+        } catch (ProgramaAvisosException e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
+        } catch (SCErrorException e) {
+            throw new ProgramaAvisosException("Error Getting CarInfo", e);
         }
-    }
+            }
 
     @Override
     public ProgramaAvisos getTestData(){

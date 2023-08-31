@@ -53,7 +53,9 @@ public class ApplicationConfiguration {
 
     public List<PaParameterization> getParameterizationsByClient(int idClient, ParameterizationFilter filter) throws SCErrorException {
 
-        if((PARAM_CHANGE)||(DT_START == null && MAP_PARAMETERIZATIONS == null && DT_END == null) ||   (filter.getDtStart().before(DT_START) || filter.getDtStart().after(DT_START) || filter.getDtEnd().before(DT_END) || filter.getDtEnd().after(DT_END) || MAP_PARAMETERIZATIONS==null)){
+        if((PARAM_CHANGE)||(DT_START == null && MAP_PARAMETERIZATIONS == null && DT_END == null) ||
+                (filter.getDtStart().before(DT_START) || filter.getDtStart().after(DT_START) || filter.getDtEnd().before(DT_END)
+                        || filter.getDtEnd().after(DT_END) || MAP_PARAMETERIZATIONS==null)){
             MAP_PARAMETERIZATIONS = parametrizationService.getByIdClient(filter, true);
             DT_START = filter.getDtStart();
             DT_END = filter.getDtEnd();
@@ -61,6 +63,8 @@ public class ApplicationConfiguration {
         }
         return MAP_PARAMETERIZATIONS.getOrDefault(idClient, null);
     }
+
+
 
     public static Dealer getDealerByDealerAndAfterSalesCode(String oidNet, String dealerCode, String afterSalesCode) throws SCErrorException {
         String key = oidNet + CHAR_SEPARATOR + dealerCode + CHAR_SEPARATOR + afterSalesCode;

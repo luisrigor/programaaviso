@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "PA_MRS")
 public class Mrs {
 

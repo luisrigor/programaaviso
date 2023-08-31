@@ -18,5 +18,6 @@ public interface ProgramaAvisosService {
     void activatePA(UserPrincipal userPrincipal,Integer id);
     TpaSimulation getTpaSimulation(UserPrincipal userPrincipal, TpaDTO tpaDTO);
     DetailsPADTO getPaDetail(UserPrincipal userPrincipal,Integer id,Integer oldId);
+
     ProgramaAvisos getTestData();
 }

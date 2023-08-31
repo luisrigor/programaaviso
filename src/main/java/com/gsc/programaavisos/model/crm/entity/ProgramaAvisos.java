@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "PA_DATA")
 public class ProgramaAvisos {
 
@@ -159,16 +160,6 @@ public class ProgramaAvisos {
     private Integer warningPriority;
     @Transient
     private Mrs MRS;
-/*
-
-    public Mrs getMRS() throws SCErrorException {
-        if (ivMRS == null && (getIdContactType() == ContactType.MAN || getIdContactType() == ContactType.MAN_ITV || getIdContactType() == ContactType.ITV))
-            ivMRS = Mrs.getHelper().getByIdPaData(getId());
-
-        return ivMRS;
-    }
-
- */
 
 
 }

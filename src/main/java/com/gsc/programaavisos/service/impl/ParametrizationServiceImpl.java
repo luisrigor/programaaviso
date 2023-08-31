@@ -268,7 +268,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
 
             List<ParametrizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(parameterization.getId(),onlyActives);
 
-            if(parameterizationItems.size()>0){
+            if(!parameterizationItems.isEmpty()){
                 parameterization.setParametrizationItems(parameterizationItems);
 
                 for (ParametrizationItems parameterizationItem : parameterization.getParametrizationItems()){

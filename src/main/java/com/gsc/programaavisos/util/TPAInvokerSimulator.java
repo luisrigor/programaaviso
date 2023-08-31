@@ -9,6 +9,7 @@ import com.gsc.programaavisos.dto.TpaSimulation;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
+import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
 import com.gsc.ws.core.AccessoryInstalled;
@@ -33,6 +34,7 @@ import java.util.*;
 
 @Log4j
 @RequiredArgsConstructor
+@Service
 public class TPAInvokerSimulator {
 
     public static final int CAR_DB_COMBUSTIVEL_SEM_INFO = 4;
@@ -80,19 +82,20 @@ public class TPAInvokerSimulator {
     private static final String TOYOTA_ACCESSORY_DEFAULT_REF_2 = "T2";
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_2 = "L2";
 
-    private static PARepository paRepository;
-    private static MrsRepository mrsRepository;
-    private static ContactReasonRepository contactRepository;
-    private static DocumentUnitRepository documentUnitRepository   ;
-    private static GenreRepository genreRepository;
+    private final PARepository paRepository;
+    private final MrsRepository mrsRepository;
+    private final ContactReasonRepository contactRepository;
+    private final DocumentUnitRepository documentUnitRepository   ;
+    private final GenreRepository genreRepository;
+    private final CombustivelRepository combustivelRepository;
 
-    public static TpaSimulation getTpaSimulation(String nif,String numberplate, Calendar calDate, boolean isTPAImportFromBi)
+    public TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, boolean isTPAImportFromBi)
             throws SCErrorException{
 
         return getTpaSimulation(nif,numberplate, calDate, null, PaConstants.WS_CAR_LOCATION,isTPAImportFromBi);
     }
 
-    public static TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
+    public TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
             throws SCErrorException {
         boolean isBusinessPlus = false;
 
@@ -120,11 +123,13 @@ public class TPAInvokerSimulator {
         if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
             log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
             paData = paRepository.getPADataByNifData(nif, PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
+            System.out.println(paData);
             log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
 
             if(paData!=null){
                 log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
                 mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
+                System.out.println(mrs);
                 log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                 paData.setMRS(mrs);
@@ -132,6 +137,7 @@ public class TPAInvokerSimulator {
             simulation.setPaData(paData);
             isBusinessPlus = true;
             List<String> plates = paRepository.getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
+            plates.forEach(System.out::println);
             if(plates!=null && !plates.isEmpty()){
                 numberplate = plates.get(0);
             }
@@ -203,7 +209,7 @@ public class TPAInvokerSimulator {
                 }
             }
         }
-
+        log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
         if (parameterizations != null && !parameterizations.isEmpty()) {
             log.trace("*****TPA_MRS******PRE ->  DocumentUnit.getHelper().getAllDocumentUnits();");
             LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = getMapAllDocumentUnits(new LinkedHashMap<Integer, DocumentUnit>());
@@ -212,6 +218,7 @@ public class TPAInvokerSimulator {
             simulation.setContactReason(contactReason.getContactReason());
             simulation.setCarInfo(carInfo);
             simulation.setBusinessCarInfo(businessCarInfo);
+            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
             for (PaParameterization parametrization : parameterizations) {
                 paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
@@ -322,6 +329,7 @@ public class TPAInvokerSimulator {
                                         destaqueOriginParameterization = parametrization.getComments();
                                     }
                                 }
+                                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
                                 if (parametrization.getType().equals("S")) {
                                     if (selectedServicoParam != null) {
@@ -376,7 +384,7 @@ public class TPAInvokerSimulator {
                                         servicoOriginParameterization = parametrization.getComments();
                                     }
                                 }
-
+                                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
                                 if (parametrization.getType().equals("H")) {
                                     if (selectedHeaderParam != null) {
                                         if (gamma.size() < selectedHeaderParam.getItemModels().size()) {
@@ -435,7 +443,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-
+            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
             if (selectedDestaqueParam == null || selectedServicoParam == null || selectedHeaderParam == null) {
                 for (PaParameterization parametrization : parameterizations) {
                     paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
@@ -474,7 +482,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-
+            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
             if (selectedServicoParam != null) {
                 DocumentUnit du1 = documentUnitsMap.get(selectedServicoParam.getIdService1());
                 if (du1 != null) {
@@ -511,7 +519,7 @@ public class TPAInvokerSimulator {
 
                 simulation.setServicoOriginParameterization(servicoOriginParameterization);
             }
-
+            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
             if (selectedDestaqueParam != null) {
 
                 DocumentUnit du4 = documentUnitsMap.get(selectedDestaqueParam.getIdHighlight1());
@@ -539,6 +547,7 @@ public class TPAInvokerSimulator {
 
                 simulation.setDestaqueOriginParameterization(destaqueOriginParameterization);
             }
+            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
             if (selectedHeaderParam != null) {
 
@@ -562,6 +571,7 @@ public class TPAInvokerSimulator {
                     validateDocumentUnit(du7.getName(),du7.getImgPostal(),du7.getImgEPostal(), "Header", numberplate);
 
                 }
+                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
                 DocumentUnit du8 = documentUnitsMap.get(selectedHeaderParam.getIdHeader3());
                 if (du8 != null) {
@@ -573,6 +583,7 @@ public class TPAInvokerSimulator {
                     validateDocumentUnit(du8.getName(),du8.getImgPostal(),du8.getImgEPostal(),"Header", numberplate);
 
                 }
+                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
                 simulation.setHeaderOriginParameterization(headerOriginParameterization);
             }
@@ -648,6 +659,7 @@ public class TPAInvokerSimulator {
                         }
                     }
                 }
+                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
                 if (acessories.get(1) != null) {
                     accessory = acessories.get(1);
@@ -1023,227 +1035,232 @@ public class TPAInvokerSimulator {
         return priorityAcessories;
     }
 
-    public static CarInfo getCarInfo(String numberplate, Date date, String wsCarLocation, ProgramaAvisos paData, boolean isTPAImportFromBi) throws SCErrorException, ParseException {
+    public CarInfo getCarInfo(String numberplate, Date date, String wsCarLocation, ProgramaAvisos paData, boolean isTPAImportFromBi) throws SCErrorException, ParseException {
 
-        CarInfo carInfo = new CarInfo();
+       try {
+           CarInfo carInfo = new CarInfo();
 
-        com.gsc.ws.core.CarInfo as400Car = null;
-        Car carDBInfo1 = null;
+           com.gsc.ws.core.CarInfo as400Car = null;
+           Car carDBInfo1 = null;
 
-        WsInvokeCarServiceTCAP oWsInfo = new WsInvokeCarServiceTCAP(wsCarLocation);
+           WsInvokeCarServiceTCAP oWsInfo = new WsInvokeCarServiceTCAP(wsCarLocation);
+           log.debug("*****TPA_MRS_SIMULATION****** Get CarInfoResponse");
+           CarInfoResponse oCarInfoResponse = oWsInfo.getCarByPlate(numberplate);
+           log.debug("*****TPA_MRS_SIMULATION****** Get CarInfoResponse");
+           RepairResponse repairs = null;
+           if (isTPAImportFromBi) {
+               repairs = oWsInfo.getCarRepairsByPlate(numberplate);
+           }
+           List<Repair> listRepairs = null;
 
-        CarInfoResponse oCarInfoResponse = oWsInfo.getCarByPlate(numberplate);
+           if (repairs != null) {
+               listRepairs = repairs.getRepairInfo();
+           }
 
-        RepairResponse repairs = null;
-        if(isTPAImportFromBi){
-            repairs = oWsInfo.getCarRepairsByPlate(numberplate);
-        }
-        List<Repair> listRepairs = null;
+           if (oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null) {
+               as400Car = oCarInfoResponse.getCarInfo();
+           }
 
-        if(repairs != null){
-            listRepairs = repairs.getRepairInfo();
-        }
+           if (listRepairs != null && !listRepairs.isEmpty()) {
+               Repair lastRepair = listRepairs.get(listRepairs.size() - 1);
+               Dealer oDealer = ApplicationConfiguration.getDealerByDealerAndAfterSalesCode(Dealer.OID_NET_TOYOTA, lastRepair.getDealerCode(), StringTasks.cleanString(lastRepair.getAfterSalesCode(), StringUtils.EMPTY));
+               if (oDealer != null) {
+                   String dealerName = oDealer.getDesig();
 
-        if (oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null) {
-            as400Car = oCarInfoResponse.getCarInfo();
-        }
+                   String dealerLocal = "";
+                   if (oDealer.getCpExt() != null && !oDealer.getCpExt().isEmpty()) {
+                       dealerLocal = "(" + oDealer.getCpExt() + ")";
+                   }
+                   carInfo.setLastServiceDealer(dealerName + " " + dealerLocal);
+                   carInfo.setLastServiceDealerContact(oDealer.getEmail() + " " + oDealer.getTel());
+               }
+           }
+           if (as400Car != null) {
+               carInfo.setAs400CarInfo(as400Car);
+               String comercialModelCode = StringTasks.cleanString(as400Car.getComercialModelCode(), "");
+               String versionCode = StringTasks.cleanString(as400Car.getVersionCode(), "");
+               String dataMatricula = StringTasks.cleanString(as400Car.getDtPlate(), "");
+               if (!dataMatricula.isEmpty()) {
+                   Date date1 = new SimpleDateFormat("yyyy").parse(dataMatricula);
+                   Date today = new Date();
 
-        if(listRepairs!=null && listRepairs.size()>0){
-            Repair lastRepair = listRepairs.get(listRepairs.size()-1);
-            Dealer oDealer = ApplicationConfiguration.getDealerByDealerAndAfterSalesCode(Dealer.OID_NET_TOYOTA, lastRepair.getDealerCode(),  StringTasks.cleanString(lastRepair.getAfterSalesCode(), StringUtils.EMPTY));
-            if(oDealer!=null){
-                String dealerName = oDealer.getDesig();
+                   Calendar a = getCalendar(date1);
+                   Calendar b = getCalendar(today);
+                   int carAge = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
+                   if (carAge == 1) {
+                       carInfo.setIdAge(1);
+                   } else if (carAge == 2) {
+                       carInfo.setIdAge(2);
+                   } else if (carAge == 3) {
+                       carInfo.setIdAge(3);
+                   } else if (carAge == 4) {
+                       carInfo.setIdAge(4);
+                   } else if (carAge == 5) {
+                       carInfo.setIdAge(5);
+                   } else if (carAge == 6) {
+                       carInfo.setIdAge(6);
+                   } else if (carAge == 7) {
+                       carInfo.setIdAge(7);
+                   } else if (carAge == 8) {
+                       carInfo.setIdAge(8);
+                   } else if (carAge == 9) {
+                       carInfo.setIdAge(9);
+                   } else if (carAge == 10) {
+                       carInfo.setIdAge(10);
+                   } else if (carAge > 10) {
+                       carInfo.setIdAge(11);
+                   }
+                   carInfo.setPlateDate(dataMatricula);
+               } else {
+                   carInfo.setIdAge(99);
+               }
 
-                String dealerLocal = "";
-                if(oDealer.getCpExt() != null && !oDealer.getCpExt().isEmpty()){
-                    dealerLocal = "("+oDealer.getCpExt()+")";
-                }
-                carInfo.setLastServiceDealer(dealerName+" "+ dealerLocal);
-                carInfo.setLastServiceDealerContact(oDealer.getEmail() + " " + oDealer.getTel());
-            }
-        }
+               carDBInfo1 = CarHelper.getCarInfo(comercialModelCode, versionCode);
+               log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate+2);
 
-        if (as400Car != null) {
-            carInfo.setAs400CarInfo(as400Car);
-            String comercialModelCode = StringTasks.cleanString(as400Car.getComercialModelCode(), "");
-            String versionCode = StringTasks.cleanString(as400Car.getVersionCode(), "");
-            String dataMatricula = StringTasks.cleanString(as400Car.getDtPlate(), "");
-            if (!dataMatricula.isEmpty()) {
-                Date date1 = new SimpleDateFormat("yyyy").parse(dataMatricula);
-                Date today = new Date();
+               if (carDBInfo1 != null) {
+                   Fuel fuel = CarHelper.getFuelsByIdVc(carDBInfo1.getIdVc());
 
-                Calendar a = getCalendar(date1);
-                Calendar b = getCalendar(today);
-                int carAge = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
-                if(carAge==1){
-                    carInfo.setIdAge(1);
-                }else if(carAge==2){
-                    carInfo.setIdAge(2);
-                }else if(carAge==3){
-                    carInfo.setIdAge(3);
-                }else if(carAge==4){
-                    carInfo.setIdAge(4);
-                }else if(carAge==5){
-                    carInfo.setIdAge(5);
-                }else if(carAge==6){
-                    carInfo.setIdAge(6);
-                }else if(carAge==7){
-                    carInfo.setIdAge(7);
-                }else if(carAge==7){
-                    carInfo.setIdAge(8);
-                }else if(carAge==9){
-                    carInfo.setIdAge(9);
-                }else if(carAge==10){
-                    carInfo.setIdAge(10);
-                }
-                else if(carAge>10){
-                    carInfo.setIdAge(11);
-                }
-                carInfo.setPlateDate(dataMatricula);
-            }else{
-                carInfo.setIdAge(99);
-            }
+                   if (fuel != null) {
+                       carInfo.setIdFuel(fuel.getId());
+                       carInfo.setFuel(fuel.getDescription());
+                   }
 
-            carDBInfo1 = CarHelper.getCarInfo(comercialModelCode, versionCode);
-            if (carDBInfo1 != null) {
-                Fuel fuel = CarHelper.getFuelsByIdVc(carDBInfo1.getIdVc());
+                   carInfo.setIdVc(carDBInfo1.getIdVc());
+                   carInfo.setIdModel(carDBInfo1.getModel().getId());
+                   carInfo.setCar(carDBInfo1);
+               }
+               log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate+3);
 
-                if(fuel!=null){
-                    carInfo.setIdFuel(fuel.getId());
-                    carInfo.setFuel(fuel.getDescription());
-                }
-
-                carInfo.setIdVc(carDBInfo1.getIdVc());
-                carInfo.setIdModel(carDBInfo1.getModel().getId());
-                carInfo.setCar(carDBInfo1);
-            }
-
-            if (paData != null) {
-                Dealer dealer = null;
-                if(paData.getBrand().equalsIgnoreCase("L") && paData.getOidDealer()!=null && !paData.getOidDealer().isEmpty()){
-                    dealer = Dealer.getLexusHelper().getByObjectId(paData.getOidDealer());
-                }else if(paData.getBrand().equalsIgnoreCase("T") && paData.getOidDealer()!=null && !paData.getOidDealer().isEmpty()){
-                    dealer = Dealer.getToyotaHelper().getByObjectId(paData.getOidDealer());
-                }
-
-
-                if(dealer!=null){
-                    String dealerName = dealer.getDesig();
-                    String dealerLocal = "";
-                    if(dealer.getCpExt() != null && !dealer.getCpExt().isEmpty()){
-                        dealerLocal = "("+dealer.getCpExt()+")";
-                    }
-                    paData.setOidDealer(dealer.getObjectId());
-                    carInfo.setDealer(dealerName +" "+ dealerLocal);
-                }else{
-                    carInfo.setDealer("N/D");
-                    paData.setOidDealer("99");
-                }
+               if (paData != null) {
+                   Dealer dealer = null;
+                   if (paData.getBrand().equalsIgnoreCase("L") && paData.getOidDealer() != null && !paData.getOidDealer().isEmpty()) {
+                       dealer = Dealer.getLexusHelper().getByObjectId(paData.getOidDealer());
+                   } else if (paData.getBrand().equalsIgnoreCase("T") && paData.getOidDealer() != null && !paData.getOidDealer().isEmpty()) {
+                       dealer = Dealer.getToyotaHelper().getByObjectId(paData.getOidDealer());
+                   }
 
 
-                Calendar calDate = getCalendar(date);
+                   if (dealer != null) {
+                       String dealerName = dealer.getDesig();
+                       String dealerLocal = "";
+                       if (dealer.getCpExt() != null && !dealer.getCpExt().isEmpty()) {
+                           dealerLocal = "(" + dealer.getCpExt() + ")";
+                       }
+                       paData.setOidDealer(dealer.getObjectId());
+                       carInfo.setDealer(dealerName + " " + dealerLocal);
+                   } else {
+                       carInfo.setDealer("N/D");
+                       paData.setOidDealer("99");
+                   }
 
-                int year = calDate.get(Calendar.YEAR);
-                int month = calDate.get(Calendar.MONTH);
 
-                if (paData.getYear() != year || paData.getMonth() != (month + 1)) {
-                    return null;
-                }
+                   Calendar calDate = getCalendar(date);
 
-                Mrs mrs = paData.getMRS();
+                   int year = calDate.get(Calendar.YEAR);
+                   int month = calDate.get(Calendar.MONTH);
 
-                if (!paData.getNif().isEmpty()) {
-                    String nif = paData.getNif();
-                    carInfo.setNif(nif);
-                    if (nif.startsWith("1") || nif.startsWith("2")) {
-                        carInfo.setIdentity(2);
-                    } else if (nif.startsWith("5") || nif.startsWith("6") || nif.startsWith("9")) {
-                        carInfo.setIdentity(1);
-                    }
-                }else{
-                    carInfo.setIdentity(99);
-                }
+                   if (paData.getYear() != year || paData.getMonth() != (month + 1)) {
+                       return null;
+                   }
 
-                carInfo.setIdContactReason(paData.getIdContactType());
-                if (mrs != null) {
-                    if (mrs.getDtItv() != null ) {
-                        carInfo.setDtItv(mrs.getDtItv());
-                    }else{
-                        if(as400Car.getDtNextITV() != null){
-                            String sDate1=as400Car.getDtNextITV();
-                            Date date1=new SimpleDateFormat("yyyy-MM-dd").parse(sDate1);
-                            carInfo.setDtItv(date1);
-                        }
-                    }
+                   Mrs mrs = paData.getMRS();
 
-                    if (mrs.getDtNextRevision() != null) {
-                        carInfo.setDtNextRevision(mrs.getDtNextRevision());
-                    }
+                   if (!paData.getNif().isEmpty()) {
+                       String nif = paData.getNif();
+                       carInfo.setNif(nif);
+                       if (nif.startsWith("1") || nif.startsWith("2")) {
+                           carInfo.setIdentity(2);
+                       } else if (nif.startsWith("5") || nif.startsWith("6") || nif.startsWith("9")) {
+                           carInfo.setIdentity(1);
+                       }
+                   } else {
+                       carInfo.setIdentity(99);
+                   }
 
-                    if(mrs.getDtLastRevision()!=null){
-                        carInfo.setDtLastRevision((java.sql.Date) mrs.getDtLastRevision());
+                   carInfo.setIdContactReason(paData.getIdContactType());
+                   if (mrs != null) {
+                       if (mrs.getDtItv() != null) {
+                           carInfo.setDtItv(mrs.getDtItv());
+                       } else {
+                           if (as400Car.getDtNextITV() != null) {
+                               String sDate1 = as400Car.getDtNextITV();
+                               Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(sDate1);
+                               carInfo.setDtItv(date1);
+                           }
+                       }
 
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        carInfo.setDtLastRevisionString(sdf.format(mrs.getDtLastRevision()));
+                       if (mrs.getDtNextRevision() != null) {
+                           carInfo.setDtNextRevision(mrs.getDtNextRevision());
+                       }
 
-                        java.sql.Date dateLastRevision = (java.sql.Date) mrs.getDtLastRevision();
-                        Calendar c = Calendar.getInstance();
-                        c.roll(Calendar.YEAR, -2);
-                        java.sql.Date dateToCompare1 = new java.sql.Date(c.getTimeInMillis());
-                        c = Calendar.getInstance();
-                        c.roll(Calendar.YEAR, -3);
-                        java.sql.Date dateToCompare2 = new java.sql.Date(c.getTimeInMillis());
-                        if(dateLastRevision.compareTo(dateToCompare1)>0){
-                            carInfo.setIdFidelity(1);
-                        }else if(dateLastRevision.compareTo(dateToCompare1)<=0 && dateLastRevision.compareTo(dateToCompare2)>=0){
-                            carInfo.setIdFidelity(2);
-                        }else if(dateLastRevision.compareTo(dateToCompare2)<0){
-                            carInfo.setIdFidelity(3);
-                        }
-                    }else{
-                        carInfo.setIdFidelity(99);
-                    }
+                       if (mrs.getDtLastRevision() != null) {
+                           carInfo.setDtLastRevision((java.sql.Date) mrs.getDtLastRevision());
 
-                    if(mrs.getGenre() != null && !mrs.getGenre().trim().isEmpty()){
+                           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                           carInfo.setDtLastRevisionString(sdf.format(mrs.getDtLastRevision()));
 
-                        String genreName = getGenreName(mrs.getGenre());
-                        Genre genre = genreRepository.getGenderByName(genreName).orElseThrow(()->new ProgramaAvisosException("Genre not found"));
-                        carInfo.setGender(mrs.getGenre());
-                        if(genre!=null){
-                            carInfo.setIdGender(genre.getId());
-                        }
+                           java.sql.Date dateLastRevision = (java.sql.Date) mrs.getDtLastRevision();
+                           Calendar c = Calendar.getInstance();
+                           c.roll(Calendar.YEAR, -2);
+                           java.sql.Date dateToCompare1 = new java.sql.Date(c.getTimeInMillis());
+                           c = Calendar.getInstance();
+                           c.roll(Calendar.YEAR, -3);
+                           java.sql.Date dateToCompare2 = new java.sql.Date(c.getTimeInMillis());
+                           if (dateLastRevision.compareTo(dateToCompare1) > 0) {
+                               carInfo.setIdFidelity(1);
+                           } else if (dateLastRevision.compareTo(dateToCompare1) <= 0 && dateLastRevision.compareTo(dateToCompare2) >= 0) {
+                               carInfo.setIdFidelity(2);
+                           } else if (dateLastRevision.compareTo(dateToCompare2) < 0) {
+                               carInfo.setIdFidelity(3);
+                           }
+                       } else {
+                           carInfo.setIdFidelity(99);
+                       }
 
-                    }else{
-                        carInfo.setIdGender(99);
-                    }
-                    if(mrs.getExpectedKm()!=null && !mrs.getExpectedKm().isEmpty()){
-                        double expected = Double.valueOf(mrs.getExpectedKm());
-                        carInfo.setKilometers(mrs.getExpectedKm());
-                        if(expected <= 100000){
-                            carInfo.setIdKilometers(1);
-                        }else if(expected > 100000 && expected <= 130000){
-                            carInfo.setIdKilometers(2);
-                        }else if(expected > 130000 && expected <= 160000){
-                            carInfo.setIdKilometers(3);
-                        }else if(expected > 160000 && expected <= 185000){
-                            carInfo.setIdKilometers(4);
-                        }else if(expected > 185000 && expected <= 195000){
-                            carInfo.setIdKilometers(5);
-                        }else if(expected > 195000 && expected <= 200000){
-                            carInfo.setIdKilometers(6);
-                        }else if(expected > 200000 ){
-                            carInfo.setIdKilometers(7);
-                        }
-                    }else{
-                        carInfo.setIdKilometers(99);
-                    }
-                }
-            }
+                       if (mrs.getGenre() != null && !mrs.getGenre().trim().isEmpty()) {
 
-            carInfo.setNumberPlate(numberplate);
-        }
+                           String genreName = getGenreName(mrs.getGenre());
+                           Genre genre = genreRepository.getGenderByName(genreName).orElseThrow(() -> new ProgramaAvisosException("Genre not found"));
+                           carInfo.setGender(mrs.getGenre());
+                           if (genre != null) {
+                               carInfo.setIdGender(genre.getId());
+                           }
 
-        return carInfo;
+                       } else {
+                           carInfo.setIdGender(99);
+                       }
+                       if (mrs.getExpectedKm() != null && !mrs.getExpectedKm().isEmpty()) {
+                           double expected = Double.valueOf(mrs.getExpectedKm());
+                           carInfo.setKilometers(mrs.getExpectedKm());
+                           if (expected <= 100000) {
+                               carInfo.setIdKilometers(1);
+                           } else if (expected > 100000 && expected <= 130000) {
+                               carInfo.setIdKilometers(2);
+                           } else if (expected > 130000 && expected <= 160000) {
+                               carInfo.setIdKilometers(3);
+                           } else if (expected > 160000 && expected <= 185000) {
+                               carInfo.setIdKilometers(4);
+                           } else if (expected > 185000 && expected <= 195000) {
+                               carInfo.setIdKilometers(5);
+                           } else if (expected > 195000 && expected <= 200000) {
+                               carInfo.setIdKilometers(6);
+                           } else if (expected > 200000) {
+                               carInfo.setIdKilometers(7);
+                           }
+                       } else {
+                           carInfo.setIdKilometers(99);
+                       }
+                   }
+               }
+
+               carInfo.setNumberPlate(numberplate);
+           }
+           log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate);
+           return carInfo;
+       }catch (Exception e){
+           throw new ProgramaAvisosException("Car Info Error");
+       }
     }
 
     private static Calendar getCalendar(Date date) {
@@ -1252,7 +1269,7 @@ public class TPAInvokerSimulator {
         return cal;
     }
 
-    public static LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits(LinkedHashMap<Integer, DocumentUnit> map) {
+    public LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits(LinkedHashMap<Integer, DocumentUnit> map) {
         List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
         documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
         return map;

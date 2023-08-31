@@ -86,6 +86,11 @@
         <artifactId>SCMicrosoft</artifactId>
         <version>20221024-STAGING</version>
     </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.19.4</version>
+        </dependency>
     <dependency>
         <groupId>io.jsonwebtoken</groupId>
         <artifactId>jjwt-api</artifactId>
