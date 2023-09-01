@@ -1,9 +1,12 @@
 package com.gsc.programaavisos.dto;
 
 import com.gsc.programaavisos.model.crm.entity.Mrs;
+import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.sc.commons.exceptions.SCErrorException;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -73,10 +76,10 @@ public class TpaSimulation {
     private String accessory2ImgPostal;
     private String accessory2ImgEPostal;
     private String accessory2Code;
-    protected com.gsc.programaavisos.model.crm.CarInfo carInfo;
     //protected List<com.gsc.programaavisos.core.bo.CarInfo> businessCarInfo;
+    private CarInfo carInfo;
+    private List<CarInfo> businessCarInfo;
     private ProgramaAvisos paData;
-
     private Mrs mrs;
 
 }

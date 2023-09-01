@@ -543,4 +543,11 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             }
         }
     }
+    public  LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits() {
+        LinkedHashMap<Integer, DocumentUnit> map = new LinkedHashMap<>();
+        List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
+        documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
+        return map;
+    }
+
 }

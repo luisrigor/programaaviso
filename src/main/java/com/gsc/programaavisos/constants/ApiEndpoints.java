@@ -8,6 +8,7 @@ public interface ApiEndpoints {
     String SAVE_PARAMETRIZATION= "/save-parametrization";
 
     String CLONE_PARAMETRIZATION= "/clone-parametrization";
+    String TESTS= "/tests";
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";

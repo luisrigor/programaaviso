@@ -4,6 +4,8 @@ import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
+import com.gsc.programaavisos.config.CacheConfig;
+import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -13,9 +15,11 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
+import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import com.gsc.ws.core.objects.response.*;
@@ -61,9 +65,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PaDataInfoRepository paDataInfoRepository;
     private final PARepository programaAvisosRepository;
     private final ProgramaAvisosUtil programaAvisosUtil;
+    private final TPAInvokerSimulator tpaInvokerSimulator;
+    private final CacheConfig cacheConfig;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
-
     private final  CallsRepository callsRepository;
 
 
@@ -932,10 +937,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 default:
                     break;
             }
-
             return paDataInfoP;
         }
-
         return null;
     }
     @Override
@@ -958,20 +961,32 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return paBeanRepository.getPaTotals(filterBean);
     }
 
+    @Override
     public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
             {
 
         String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
         String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
-        LocalDate localDate = tpaDTO.getDate();
-        Calendar calDate = Calendar.getInstance();
+
 
         try {
-            return new TpaSimulation();
-        } catch (Exception e) {
+            TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
+            simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
+            simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
+            simulation.setAccessory1Code(simulation.getPaData().getMRS().getAccessoryCode1());
+            simulation.setAccessory2Code(simulation.getPaData().getMRS().getAccessoryCode2());
+            simulation.setAccessory1Link(simulation.getPaData().getMRS().getAccessory1Link());
+            simulation.setAccessory2Link(simulation.getPaData().getMRS().getAccessory2Link());
+            simulation.setAccessory1ImgPostal(simulation.getPaData().getMRS().getAcessory1ImgPostal());
+            simulation.setAccessory2ImgPostal(simulation.getPaData().getMRS().getAcessory2ImgPostal());
+            simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAccessory1ImgEPostal());
+            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAccessory2ImgEPostal());
+            return simulation;
+        } catch (ProgramaAvisosException e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
+        } catch (SCErrorException e) {
+            throw new ProgramaAvisosException("Error Getting CarInfo", e);
         }
-    }
-
+            }
 
 }

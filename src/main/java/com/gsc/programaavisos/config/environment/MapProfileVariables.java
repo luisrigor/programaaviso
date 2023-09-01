@@ -18,6 +18,7 @@ public class MapProfileVariables {
     public static String CONST_IMG_POSTAL_HIGHLIGHT_URL = "IMG_POSTAL_HIGHLIGHT_URL";
     public static String CONST_IMG_POSTAL_HEADER_URL = "IMG_POSTAL_HEADER_URL";
 
+    public static String CONST_WS_CAR_LOCATION= "CONST_WS_CAR_LOCATION";
 
 
     public static Map<String, String> getEnvVariablesLocal() {
@@ -26,11 +27,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-        envVariables.put(CONST_STATIC_FILES_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/static_files");
-        envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/acessorios");
-        envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
-        envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/comum");
-        envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
+        envVariables.put(CONST_WS_CAR_LOCATION, "http://localhost:10080");
 
         return envVariables;
     }
@@ -41,12 +38,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-        envVariables.put(CONST_STATIC_FILES_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/static_files");
-        envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/acessorios");
-        envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
-        envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
-        envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
-
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
 
         return envVariables;
     }
@@ -57,6 +49,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
         envVariables.put(CONST_STATIC_FILES_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/static_files");
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/acessorios");
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
@@ -72,6 +65,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
         envVariables.put(CONST_STATIC_FILES_URL, "https://w3.toyota.pt/files/programa_de_avisos/static_files");
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/acessorios");
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/servicos");

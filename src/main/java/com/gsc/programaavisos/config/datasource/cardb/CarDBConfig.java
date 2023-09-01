@@ -1,5 +1,7 @@
 package com.gsc.programaavisos.config.datasource.cardb;
 
+import com.sc.commons.dbconnection.ServerJDBCConnection;
+import com.sc.commons.initialization.SCGlobalPreferences;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,7 +50,15 @@ public class CarDBConfig {
 
     @PostConstruct
     private void init() {
-//   log.info("Datasource initialized successfully: jdbc/dbtoynet");
+        SCGlobalPreferences.setResources(scConfigFile);
+        try {
+            InitialContext ctx = new InitialContext();
+            ServerJDBCConnection conn = ServerJDBCConnection.getInstance();
+            conn.setDataSource((DataSource) ctx.lookup(jndi), jndi);
+            log.info("Datasource initialized successfully: : jdbc/cardb");
+        } catch (NamingException e) {
+            log.error("Error initializing datasource ({}): jdbc/cardb");
+        }
     }
 
     @Bean(name="carDataSource")
