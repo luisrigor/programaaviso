@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.config.environment;
 
+import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
@@ -17,6 +18,8 @@ public class MapProfileVariables {
     public static String CONST_IMG_POSTAL_SERVICE_URL = "IMG_POSTAL_SERVICE_URL";
     public static String CONST_IMG_POSTAL_HIGHLIGHT_URL = "IMG_POSTAL_HIGHLIGHT_URL";
     public static String CONST_IMG_POSTAL_HEADER_URL = "IMG_POSTAL_HEADER_URL";
+    public static String CONST_WS_NEWSLETTER_SERVER = "WS_NEWSLETTER_SERVER";
+
 
 
 
@@ -31,6 +34,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/comum");
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
+        envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
 
         return envVariables;
     }
@@ -46,6 +50,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
+        envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
 
 
         return envVariables;
@@ -62,6 +67,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos");
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
+        envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
 
         return envVariables;
     }
@@ -77,6 +83,8 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_SERVICE_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/servicos");
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/headers");
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers");
+        envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_PRODUCTION);
+
 
         return envVariables;
     }

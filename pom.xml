@@ -173,6 +173,15 @@
             <groupId>GSC</groupId>
             <artifactId>SCGesDoc</artifactId>
             <version>20221124</version>
+        </dependency><dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCNewsletterWSClient</artifactId>
+            <version>20220822</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCConsumerDomain</artifactId>
+            <version>20211129</version>
         </dependency>
     </dependencies>
 

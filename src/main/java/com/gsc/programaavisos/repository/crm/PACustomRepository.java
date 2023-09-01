@@ -17,4 +17,5 @@ public interface PACustomRepository {
     List<MaintenanceTypeDTO> getMaintenanceTypes();
 
     List<ProgramaAvisosBean> getOpenContactsforClient(FilterBean oFilter, String nif, String licencePlate,Map<Integer, List<String>> getMaintenanceTypesByContactType);
+    ProgramaAvisosBean getProgramaAvisosById(Integer idPA);
 }

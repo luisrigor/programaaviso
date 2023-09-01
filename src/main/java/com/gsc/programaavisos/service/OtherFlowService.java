@@ -32,4 +32,5 @@ public interface OtherFlowService {
     List<ContactType> getAllContactTypes();
     List<MaintenanceTypeDTO> getMaintenanceTypes();
    void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response);
+    NewsLetterDTO sendNewsletter(Integer id, String email);
 }
