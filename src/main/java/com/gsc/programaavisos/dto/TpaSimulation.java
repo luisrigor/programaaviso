@@ -80,7 +80,6 @@ public class TpaSimulation {
     private CarInfo carInfo;
     private List<CarInfo> businessCarInfo;
     private ProgramaAvisos paData;
-
     private Mrs mrs;
 
 }

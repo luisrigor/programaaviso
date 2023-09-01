@@ -4,6 +4,7 @@ import com.gsc.cardb.car.Car;
 import lombok.*;
 
 import javax.persistence.Transient;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -29,9 +30,9 @@ public class CarInfo {
     private String Dealer;
     private String numberPlate;
     private int idContactReason;
-    private Date dtNextRevision;
-    private Date dtItv;
-    private java.sql.Date dtLastRevision;
+    private LocalDate dtNextRevision;
+    private LocalDate dtItv;
+    private LocalDate dtLastRevision;
     private String dtLastRevisionString;
     private String lastServiceDealer;
     private String lastServiceDealerContact;

@@ -11,10 +11,7 @@ import com.gsc.programaavisos.dto.TpaSimulation;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
-import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.crm.*;
-import com.gsc.programaavisos.service.ParametrizationService;
-import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
 import com.gsc.ws.core.AccessoryInstalled;
 import com.gsc.ws.core.Repair;
 import com.gsc.ws.core.objects.response.AccessoryInstalledResponse;
@@ -29,11 +26,11 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
@@ -101,7 +98,7 @@ public class TPAInvokerSimulator {
             throws SCErrorException{
         Map<String, String> envV = environmentConfig.getEnvVariables();
         log.debug("getTapService: "+envV.get(CONST_WS_CAR_LOCATION));
-        return getTpaSimulation(nif,numberplate, localDate, null, "https://wscar.gruposalvadorcaetano.pt",isTPAImportFromBi);
+        return getTpaSimulation(nif,numberplate, localDate, null, envV.get(CONST_WS_CAR_LOCATION),isTPAImportFromBi);
     }
 
     public TpaSimulation getTpaSimulation(String nif, String numberplate, LocalDate localDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
@@ -136,7 +133,7 @@ public class TPAInvokerSimulator {
 
             if(paData!=null){
                 log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-                mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
+                mrs = mrsRepository.getByIdPaData(paData.getId());
                 log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                 paData.setMRS(mrs);
@@ -175,7 +172,7 @@ public class TPAInvokerSimulator {
 
                     if (paData != null) {
                         log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-                        mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
+                        mrs = mrsRepository.getByIdPaData(paData.getId());
                         log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                         paData.setMRS(mrs);
@@ -1186,7 +1183,7 @@ public class TPAInvokerSimulator {
                            if (as400Car.getDtNextITV() != null) {
                                String sDate1 = as400Car.getDtNextITV();
                                Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(sDate1);
-                               carInfo.setDtItv(date1);
+                               carInfo.setDtItv(convertToLocalDateViaInstant(date1));
                            }
                        }
 
@@ -1195,12 +1192,12 @@ public class TPAInvokerSimulator {
                        }
 
                        if (mrs.getDtLastRevision() != null) {
-                           carInfo.setDtLastRevision((java.sql.Date) mrs.getDtLastRevision());
+                           carInfo.setDtLastRevision(mrs.getDtLastRevision());
 
                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                            carInfo.setDtLastRevisionString(sdf.format(mrs.getDtLastRevision()));
 
-                           java.sql.Date dateLastRevision = (java.sql.Date) mrs.getDtLastRevision();
+                           java.sql.Date dateLastRevision = java.sql.Date.valueOf(mrs.getDtLastRevision());
                            Calendar c = Calendar.getInstance();
                            c.roll(Calendar.YEAR, -2);
                            java.sql.Date dateToCompare1 = new java.sql.Date(c.getTimeInMillis());
@@ -1279,6 +1276,12 @@ public class TPAInvokerSimulator {
         if (character.equalsIgnoreCase("M"))
             return "MASCULINO";
         return character.equalsIgnoreCase("F") ? "FEMENINO" : "N/D";
+    }
+
+    public LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
     }
 
 }
