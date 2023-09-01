@@ -6,6 +6,8 @@ import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.rg.dealer.Dealer;
+
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface OtherFlowService {
@@ -29,4 +31,5 @@ public interface OtherFlowService {
     List<Source> getSources();
     List<ContactType> getAllContactTypes();
     List<MaintenanceTypeDTO> getMaintenanceTypes();
+   void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response);
 }

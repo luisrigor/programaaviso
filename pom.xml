@@ -168,6 +168,21 @@
             <artifactId>poi</artifactId>
             <version>5.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.3</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCCarDB</artifactId>
+            <version>20230209</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCGesDoc</artifactId>
+            <version>20221124</version>
+        </dependency>
     </dependencies>
 
     <build>
