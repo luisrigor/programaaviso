@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -54,11 +56,13 @@ public class ItemsController {
         return ResponseEntity.status(HttpStatus.OK).body(documentUnitDTOList);
     }
 
-    @GetMapping(ApiEndpoints.SAVE_MANAGE_ITEMS)
+    @PostMapping(ApiEndpoints.SAVE_MANAGE_ITEMS)
     public ResponseEntity<String> saveManageItem(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                 @RequestBody SaveManageItemDTO saveManageItemDTO) {
+                                                 @RequestPart("data") SaveManageItemDTO saveManageItemDTO,
+                                                 @RequestPart("files") MultipartFile[] files) {
         log.info("getManageItemsList controller");
-        itemService.saveManageItems(userPrincipal,saveManageItemDTO);
+
+        itemService.saveManageItems(userPrincipal, saveManageItemDTO, files);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully Save");
     }
 }

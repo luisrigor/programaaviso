@@ -15,23 +15,19 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitCategoryRepository;
 import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
-import com.gsc.programaavisos.util.PAUtil;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
@@ -146,7 +142,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void saveManageItems(UserPrincipal oGSCUser, SaveManageItemDTO saveManageItemDTO) {
+    public void saveManageItems(UserPrincipal oGSCUser, SaveManageItemDTO saveManageItemDTO, MultipartFile[] files) {
 
         int idBrand = ApiConstants.getIdBrand(oGSCUser.getOidNet());
 
@@ -154,6 +150,9 @@ public class ItemServiceImpl implements ItemService {
 
         File fileAttach1;
         File fileAttach2;
+
+        Map<String, String> envVar = environmentConfig.getEnvVariables();
+
 
         try {
             // PortletMultipartWrapper portletMpWrapper = new PortletMultipartWrapper(request, 0, MAXFILESIZE,
@@ -181,17 +180,11 @@ public class ItemServiceImpl implements ItemService {
                 documentUnit.setDtEnd(dtEnd);
                 documentUnitRepository.save(documentUnit);
             } else {
+                List<MultipartFile> fileAttachItems = new ArrayList<>();
 
-                String fiel1dInputName = "img1";
-                String fiel2dInputName = "img2";
-
-                /**
-                 *
-                 *  // PortletMultipartWrapper portletMpWrapper = new PortletMultipartWrapper(request, 0, MAXFILESIZE,
-                 *             // MAXFILESIZE,uplodadDir);
-                 */
-                FileItem file1AttachItem = PAUtil.getFileItem(fiel1dInputName);
-                FileItem file2AttachItem = PAUtil.getFileItem(fiel2dInputName);
+                for (MultipartFile currentFile : files) {
+                    fileAttachItems.add(currentFile);
+                }
 
                 documentUnit = new DocumentUnit();
                 documentUnit.setStatus("S");
@@ -206,32 +199,30 @@ public class ItemServiceImpl implements ItemService {
 
                 String extension;
 
-                if (file1AttachItem != null) {
-                    BufferedImage image = ImageIO.read(file1AttachItem.getInputStream());
-                    extension = file1AttachItem.getName().substring(file1AttachItem.getName().indexOf(".") + 1,
-                            file1AttachItem.getName().length());
+                if (fileAttachItems.size()>0) {
+                    BufferedImage image = ImageIO.read(fileAttachItems.get(0).getInputStream());
+                    extension = getFileExtension(fileAttachItems.get(0));
                     documentUnit.setImgPostal(code + "." + extension);
                     fileAttach1 = new File(uplodadDir + PaConstants.BACKSLASH + code + "." + extension);
                     ImageIO.write(image, extension, fileAttach1);
 
                     if (idItemType == 1) {
-                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
-                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
-                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_SERVICE);
+                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
+                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
+                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_SERVICE);
                     } else if (idItemType == 2) {
-                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
-                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
-                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_DESTAQUE);
+                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
+                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
+                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_DESTAQUE);
                     } else if (idItemType == 3) {
-                        SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
-                                PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach1,
-                                PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_POSTAL_HEADER);
+                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
+                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
+                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_HEADER);
                     }
                 }
-                if (file2AttachItem != null) {
-                    BufferedImage image = ImageIO.read(file2AttachItem.getInputStream());
-                    extension = file2AttachItem.getName().substring(file2AttachItem.getName().indexOf(".") + 1,
-                            file2AttachItem.getName().length());
+                if (fileAttachItems.size()>1) {
+                    BufferedImage image = ImageIO.read(fileAttachItems.get(1).getInputStream());
+                    extension = getFileExtension(fileAttachItems.get(1));
                     documentUnit.setImgEPostal(code + "." + extension);
                     fileAttach2 = new File(uplodadDir + "/" + code + "." + extension);
                     ImageIO.write(image, extension, fileAttach2);
@@ -245,6 +236,17 @@ public class ItemServiceImpl implements ItemService {
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error saving manage items ", e);
         }
+    }
+
+    public String getFileExtension(MultipartFile file) {
+        String originalFileName = file.getOriginalFilename();
+        if (org.springframework.util.StringUtils.hasText(originalFileName)) {
+            int dotIndex = originalFileName.lastIndexOf('.');
+            if (dotIndex >= 0) {
+                return originalFileName.substring(dotIndex + 1).toLowerCase();
+            }
+        }
+        return null;
     }
 
 
