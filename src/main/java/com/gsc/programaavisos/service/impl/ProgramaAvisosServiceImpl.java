@@ -973,14 +973,14 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
-            simulation.setAccessory1Code(simulation.getPaData().getMRS().getAcessoryCode1());
-            simulation.setAccessory2Code(simulation.getPaData().getMRS().getAcessoryCode2());
-            simulation.setAccessory1Link(simulation.getPaData().getMRS().getAcessory1Link());
-            simulation.setAccessory2Link(simulation.getPaData().getMRS().getAcessory2Link());
+            simulation.setAccessory1Code(simulation.getPaData().getMRS().getAccessoryCode1());
+            simulation.setAccessory2Code(simulation.getPaData().getMRS().getAccessoryCode2());
+            simulation.setAccessory1Link(simulation.getPaData().getMRS().getAccessory1Link());
+            simulation.setAccessory2Link(simulation.getPaData().getMRS().getAccessory2Link());
             simulation.setAccessory1ImgPostal(simulation.getPaData().getMRS().getAcessory1ImgPostal());
             simulation.setAccessory2ImgPostal(simulation.getPaData().getMRS().getAcessory2ImgPostal());
-            simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAcessory1ImgEPostal());
-            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAcessory2ImgEPostal());
+            simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAccessory1ImgEPostal());
+            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAccessory2ImgEPostal());
             return simulation;
         } catch (ProgramaAvisosException e) {
             throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
