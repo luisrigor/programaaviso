@@ -1,5 +1,7 @@
 package com.gsc.programaavisos.service.impl.pa;
 
+import com.gsc.gesdoc.core.GesDocUpload;
+import com.gsc.gesdoc.invoke.GesDocVehicleDossierInvoke;
 import com.gsc.programaavisos.constants.PAInfo;
 import com.gsc.programaavisos.constants.State;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -7,12 +9,15 @@ import com.gsc.programaavisos.model.crm.entity.Calls;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.CallsRepository;
 import com.gsc.programaavisos.repository.crm.PARepository;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.AEScrypterTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.sql.*;
 
 
@@ -159,5 +164,25 @@ public class ProgramaAvisosUtil {
         pa.setDelegatedTo(StringTasks.cleanString(pa.getDelegatedTo(), ""));
         pa.setClient(StringTasks.cleanString(pa.getClient(), ""));
         pa.setBlockedBy(StringTasks.cleanString(pa.getBlockedBy(), ""));
+    }
+
+    public String uploadFileGesDoc(String brand, String plate, String vin, File file, String gesDocLocation, String documentType) throws SCErrorException {
+        String documentId = null;
+        boolean visibleToDealer = true;
+
+        GesDocVehicleDossierInvoke oGesDocVehicleDossierInvoke = new GesDocVehicleDossierInvoke(gesDocLocation);
+        String token = AEScrypterTasks.encrypt(AEScrypterTasks.APP_VEHICLE_DOSSIER, getSystemUser(brand));
+        GesDocUpload gesDocUpload = oGesDocVehicleDossierInvoke.uploadToVehicleDossier(AEScrypterTasks.APP_VEHICLE_DOSSIER, token, getSystemUser(brand), documentType, brand, plate, vin, visibleToDealer, file);
+        documentId = gesDocUpload.getDocumentPair().get(0).getDocumentId();
+        log.debug("DocumentId: " + documentId);
+
+        return documentId;
+    }
+
+    public static String getSystemUser(String brand) {
+        if (brand.equalsIgnoreCase("T") || brand.equalsIgnoreCase("L")) {
+            return "rigor.master@tpo";
+        }
+        return "";
     }
 }

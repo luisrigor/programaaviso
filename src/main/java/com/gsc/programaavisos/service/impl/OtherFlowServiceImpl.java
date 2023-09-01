@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.service.impl;
 
+import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.AppProfile;
 import com.gsc.programaavisos.dto.*;
@@ -13,8 +14,11 @@ import com.gsc.programaavisos.repository.cardb.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
+import com.gsc.programaavisos.service.impl.pa.TPALexusUtil;
+import com.gsc.programaavisos.service.impl.pa.TPAToyotaUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
+import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.*;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.sql.Date;
 import java.util.*;
 
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;
 import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
@@ -58,8 +65,11 @@ public class OtherFlowServiceImpl implements OtherFlowService {
 
     private final ContactTypeRepositoryCRM contactTypeRepositoryCRM;
 
-
+    private final TPAToyotaUtil tpaToyotaUtil;
+    private final TPALexusUtil tpaLexusUtil;
     private final Environment env;
+    private final EnvironmentConfig environmentConfig;
+
 
 
     @Override
@@ -503,4 +513,34 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }
     }
 
+    @Override
+    public void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response) {
+        Map<String, String> envV = environmentConfig.getEnvVariables();
+        File oFile = null;
+        try {
+            List<TpaSimulation> simulations = new ArrayList<TpaSimulation>();
+            simulations.add(simulation);
+
+            if(oGSCUser.getOidNet().equals(Dealer.OID_NET_TOYOTA)){
+                oFile = tpaToyotaUtil.writePdf(simulations, false, envV.get(CONST_STATIC_FILES_URL),
+                        envV.get(CONST_IMG_POSTAL_ACCESSORY_URL), envV.get(CONST_IMG_POSTAL_SERVICE_URL),
+                        envV.get(CONST_IMG_POSTAL_HIGHLIGHT_URL), envV.get(CONST_IMG_POSTAL_HEADER_URL),
+                        simulation.getPaData().getYear(), simulation.getPaData().getMonth(), false, null);
+            }else if(oGSCUser.getOidNet().equals(Dealer.OID_NET_LEXUS)){
+                oFile = tpaLexusUtil.writePdf(simulations, false, envV.get(CONST_STATIC_FILES_URL),
+                        envV.get(CONST_IMG_POSTAL_ACCESSORY_URL), envV.get(CONST_IMG_POSTAL_SERVICE_URL),
+                        envV.get(CONST_IMG_POSTAL_HIGHLIGHT_URL), envV.get(CONST_IMG_POSTAL_HEADER_URL),
+                        simulation.getPaData().getYear(), simulation.getPaData().getMonth(), false, null);
+            }
+            if(oFile!=null){
+                HttpTasks.sendFileToClient(response, oFile, oFile.getName());
+            }
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error downloading simulation ", e);
+        }finally{
+            if(oFile!=null && oFile.exists()){
+                oFile.delete();
+            }
+        }
+    }
 }

@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -172,6 +174,14 @@ public class OtherFlowController {
         log.info("getAllContactType controller");
         List<MaintenanceTypeDTO> rs = otherFlowService.getMaintenanceTypes();
         return ResponseEntity.status(HttpStatus.OK).body(rs);
+    }
+
+    @PostMapping(ApiEndpoints.DOWNLOAD_SIMULATION)
+    public ResponseEntity<String> downloadSimulation(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                      @RequestBody TpaSimulation simulation, HttpServletResponse response) {
+        log.info("getAllContactType controller");
+        otherFlowService.downloadSimulation(userPrincipal, simulation, response);
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
 }
