@@ -51,6 +51,7 @@ public class TPAInvokerSimulator {
 
     private static final String TOYOTA_ACCESSORY_DEFAULT_LINK = "https://www.toyota.pt/aposvenda/pecas-acessorios/index.json";
     private static final String LEXUS_ACCESSORY_DEFAULT_LINK = "#";
+    private static final String TPA_DEBUG = "*****TPA_MRS_SIMULATION******";
 
 
     private static final String TOYOTA_ACCESSORY_DEFAULT_LINK_1 = "https://www.toyota.pt/aposvenda/pecas-acessorios/seguranca/femeas-de-seguranca";
@@ -127,7 +128,7 @@ public class TPAInvokerSimulator {
 
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
-        log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+        log.debug(TPA_DEBUG);
         if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
             log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
             paData = paRepository.getPADataByNifData(nif, PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
@@ -443,7 +444,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+            log.debug(TPA_DEBUG);
             if (selectedDestaqueParam == null || selectedServicoParam == null || selectedHeaderParam == null) {
                 for (PaParameterization parametrization : parameterizations) {
                     paramItems = parametrization.getParametrizationItems();
@@ -482,7 +483,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+            log.debug(TPA_DEBUG);
             if (selectedServicoParam != null) {
                 DocumentUnit du1 = documentUnitsMap.get(selectedServicoParam.getIdService1());
                 if (du1 != null) {
@@ -546,7 +547,7 @@ public class TPAInvokerSimulator {
 
                 simulation.setDestaqueOriginParameterization(destaqueOriginParameterization);
             }
-            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+            log.debug(TPA_DEBUG);
 
             if (selectedHeaderParam != null) {
 
@@ -570,7 +571,7 @@ public class TPAInvokerSimulator {
                     validateDocumentUnit(du7.getName(),du7.getImgPostal(),du7.getImgEPostal(), "Header", numberplate);
 
                 }
-                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+                log.debug(TPA_DEBUG);
 
                 DocumentUnit du8 = documentUnitsMap.get(selectedHeaderParam.getIdHeader3());
                 if (du8 != null) {
@@ -582,7 +583,7 @@ public class TPAInvokerSimulator {
                     validateDocumentUnit(du8.getName(),du8.getImgPostal(),du8.getImgEPostal(),"Header", numberplate);
 
                 }
-                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+                log.debug(TPA_DEBUG);
 
                 simulation.setHeaderOriginParameterization(headerOriginParameterization);
             }
@@ -658,7 +659,7 @@ public class TPAInvokerSimulator {
                         }
                     }
                 }
-                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+                log.debug(TPA_DEBUG);
 
                 if (acessories.get(1) != null) {
                     accessory = acessories.get(1);
