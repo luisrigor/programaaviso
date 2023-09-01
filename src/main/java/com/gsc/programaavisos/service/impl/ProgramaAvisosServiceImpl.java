@@ -4,6 +4,8 @@ import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
+import com.gsc.programaavisos.config.CacheConfig;
+import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -13,6 +15,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
+import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
@@ -63,9 +66,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PARepository programaAvisosRepository;
     private final ProgramaAvisosUtil programaAvisosUtil;
     private final TPAInvokerSimulator tpaInvokerSimulator;
+    private final CacheConfig cacheConfig;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
-
     private final  CallsRepository callsRepository;
 
 
@@ -965,10 +968,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
         String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
 
-                Calendar calDate = Calendar.getInstance();
 
         try {
-            TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, calDate,false);
+            TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
             simulation.setAccessory1Code(simulation.getPaData().getMRS().getAcessoryCode1());
@@ -986,11 +988,5 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             throw new ProgramaAvisosException("Error Getting CarInfo", e);
         }
             }
-
-    @Override
-    public ProgramaAvisos getTestData(){
-        ProgramaAvisos programaAvisos = paRepository.getPADataByPlate("47LN12",2,8,2023,Arrays.asList(1,2,3));
-        return programaAvisos;
-    }
 
 }

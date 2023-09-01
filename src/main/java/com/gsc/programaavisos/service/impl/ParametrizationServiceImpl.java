@@ -1,7 +1,7 @@
 package com.gsc.programaavisos.service.impl;
 
+import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
-import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -10,7 +10,6 @@ import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.util.PAUtil;
-import com.sc.commons.exceptions.SCErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -256,10 +255,12 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
     }
 
+    @Override
     public HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives) {
 
         HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
-        List<PaParameterization> parameterizationList = paParameterizationRepository.getByFilter(filter);
+        List<PaParameterization> parameterizationList2 = paParameterizationRepository.getByFilter(filter);
+        List<PaParameterization> parameterizationList = Arrays.asList(parameterizationList2.get(50),parameterizationList2.get(51));
 
         List<PaParameterization> toyotaParam = new ArrayList<>();
         List<PaParameterization> lexusParam = new ArrayList<>();
@@ -292,7 +293,6 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
         mapParameterizations.put(ApiConstants.ID_BRAND_TOYOTA, toyotaParam);
         mapParameterizations.put(ApiConstants.ID_BRAND_LEXUS, lexusParam);
-
         return mapParameterizations;
     }
 

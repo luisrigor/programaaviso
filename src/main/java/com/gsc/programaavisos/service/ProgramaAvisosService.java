@@ -2,10 +2,12 @@ package com.gsc.programaavisos.service;
 
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.crm.entity.Mrs;
+import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.security.UserPrincipal;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface ProgramaAvisosService {
@@ -19,5 +21,4 @@ public interface ProgramaAvisosService {
     TpaSimulation getTpaSimulation(UserPrincipal userPrincipal, TpaDTO tpaDTO);
     DetailsPADTO getPaDetail(UserPrincipal userPrincipal,Integer id,Integer oldId);
 
-    ProgramaAvisos getTestData();
 }

@@ -12,6 +12,7 @@ public class MapProfileVariables {
     public static String CONST_FTP_MANAGE_ITEM_LOGIN = "FTP_MANAGE_ITEM_LOGIN";
     public static String CONST_FTP_MANAGE_ITEM_PWD = "FTP_MANAGE_ITEM_PWD";
     public static String CONST_FTP_MANAGE_ITEM_ADDRESS = "FTP_MANAGE_ITEM_ADDRESS";
+    public static String CONST_WS_CAR_LOCATION= "CONST_WS_CAR_LOCATION";
 
 
     public static Map<String, String> getEnvVariablesLocal() {
@@ -20,6 +21,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
+        envVariables.put(CONST_WS_CAR_LOCATION, "http://localhost:10080");
 
         return envVariables;
     }
@@ -30,8 +32,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
-
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
 
         return envVariables;
     }
@@ -42,8 +43,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
-
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
 
         return envVariables;
     }
@@ -54,7 +54,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
+        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
 
         return envVariables;
     }

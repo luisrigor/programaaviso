@@ -7,6 +7,7 @@ import com.gsc.programaavisos.dto.*;
 
 import com.gsc.programaavisos.dto.TpaSimulation;
 import com.gsc.programaavisos.model.crm.entity.Mrs;
+import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -102,11 +104,5 @@ public class ProgramaAvisosController {
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
         return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);
-    }
-
-    @GetMapping(ApiEndpoints.TESTS)
-    public ResponseEntity<ProgramaAvisos> getTestEntity(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-
-        return ResponseEntity.status(HttpStatus.OK).body(programaAvisosService.getTestData());
     }
 }

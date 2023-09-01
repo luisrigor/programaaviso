@@ -2,6 +2,8 @@ package com.gsc.programaavisos.util;
 
 import com.gsc.cardb.car.*;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
+import com.gsc.programaavisos.config.CacheConfig;
+import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
@@ -11,6 +13,7 @@ import com.gsc.programaavisos.model.cardb.entity.CarInfo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
 import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
 import com.gsc.ws.core.AccessoryInstalled;
 import com.gsc.ws.core.Repair;
@@ -19,18 +22,21 @@ import com.gsc.ws.core.objects.response.CarInfoResponse;
 import com.gsc.ws.core.objects.response.RepairResponse;
 import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.rg.dealer.Dealer;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
+
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
 @Log4j
 @RequiredArgsConstructor
@@ -82,20 +88,22 @@ public class TPAInvokerSimulator {
     private static final String TOYOTA_ACCESSORY_DEFAULT_REF_2 = "T2";
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_2 = "L2";
 
+    private final EnvironmentConfig environmentConfig;
     private final PARepository paRepository;
     private final MrsRepository mrsRepository;
     private final ContactReasonRepository contactRepository;
-    private final DocumentUnitRepository documentUnitRepository   ;
+    private final DocumentUnitRepository documentUnitRepository;
     private final GenreRepository genreRepository;
-    private final CombustivelRepository combustivelRepository;
+    private final CacheConfig cacheConfig;
 
-    public TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, boolean isTPAImportFromBi)
+    public TpaSimulation getTpaSimulation(String nif, String numberplate, LocalDate localDate, boolean isTPAImportFromBi)
             throws SCErrorException{
-
-        return getTpaSimulation(nif,numberplate, calDate, null, PaConstants.WS_CAR_LOCATION,isTPAImportFromBi);
+        Map<String, String> envV = environmentConfig.getEnvVariables();
+        log.debug("getTapService: "+envV.get(CONST_WS_CAR_LOCATION));
+        return getTpaSimulation(nif,numberplate, localDate, null, "https://wscar.gruposalvadorcaetano.pt",isTPAImportFromBi);
     }
 
-    public TpaSimulation getTpaSimulation(String nif, String numberplate, Calendar calDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
+    public TpaSimulation getTpaSimulation(String nif, String numberplate, LocalDate localDate, Integer idClientType, String wsCarLocation,boolean isTPAImportFromBi)
             throws SCErrorException {
         boolean isBusinessPlus = false;
 
@@ -107,29 +115,27 @@ public class TPAInvokerSimulator {
         ParametrizationItems selectedHeaderParam = null;
         String headerOriginParameterization = "";
         TpaSimulation simulation = new TpaSimulation();
-        ParameterizationFilter filter = new ParameterizationFilter();
+
         List<PaParameterization> parameterizations = null;
         CarInfo carInfo = new CarInfo();
         List<CarInfo> businessCarInfo = new ArrayList<>();
-
+        Date dateCalendar = new Date(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth());
         ProgramaAvisos paData = null;
         Mrs mrs;
         List<Integer> contactList = new ArrayList<>(Arrays.asList(PaConstants.MAN,PaConstants.ITV,PaConstants.MAN_ITV));
 
 
-        int year = calDate.get(Calendar.YEAR);
-        int month = calDate.get(Calendar.MONTH) +1;
+        int year = localDate.getYear();
+        int month = localDate.getMonthValue();
         log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
         if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
             log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
             paData = paRepository.getPADataByNifData(nif, PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
-            System.out.println(paData);
             log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
 
             if(paData!=null){
                 log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
                 mrs = mrsRepository.getByIdPaData(paData.getId()).orElseThrow(()-> new ProgramaAvisosException("Pa id not found"));
-                System.out.println(mrs);
                 log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                 paData.setMRS(mrs);
@@ -137,23 +143,23 @@ public class TPAInvokerSimulator {
             simulation.setPaData(paData);
             isBusinessPlus = true;
             List<String> plates = paRepository.getPlateByNif(nif,PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
-            plates.forEach(System.out::println);
             if(plates!=null && !plates.isEmpty()){
                 numberplate = plates.get(0);
             }
             try {
                 for(String plate : plates){
-                    carInfo = getCarInfo(plate, calDate.getTime(), wsCarLocation,paData,isTPAImportFromBi);
+
+                    carInfo = getCarInfo(plate, dateCalendar, wsCarLocation,paData,isTPAImportFromBi);
                     if(carInfo!=null){
                         businessCarInfo.add(carInfo);
                     }
                 }
             } catch (Exception e) {
-                throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate+" ->paDate:"+ calDate.getTime(),e);
+                throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate,e);
             }
         }
         if(numberplate != null && !numberplate.isEmpty()) {
-            calDate.getTime();
+
             if (wsCarLocation != null) {
 
 
@@ -163,7 +169,7 @@ public class TPAInvokerSimulator {
                         idClientType = PaConstants.NORMAL_ID;
                     }
                     log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
-                    paData = paRepository.getPADataByPlate(numberplate, idClientType, month, year,contactList);
+                    paData = paRepository.getPADataByPlate(numberplate, month, year,contactList);
                     log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
 
                     if (paData != null) {
@@ -178,16 +184,14 @@ public class TPAInvokerSimulator {
                 simulation.setPaData(paData);
                 try {
                     log.trace("*****TPA_MRS******PRE ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
-                    carInfo = getCarInfo(numberplate, calDate.getTime(), wsCarLocation, paData, isTPAImportFromBi);
+                    carInfo = getCarInfo(numberplate, dateCalendar, wsCarLocation, paData, isTPAImportFromBi);
                     log.trace("*****TPA_MRS******POS ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
                 } catch (Exception e) {
-                    throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation" + "->numberplate: " + numberplate + " ->paDate:" + calDate.getTime(), e);
+                    throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation" + "->numberplate: " + numberplate + " ->paDate:" + localDate, e);
                 }
-
                 if (carInfo != null) {
-                    java.sql.Date date = new java.sql.Date(calDate.getTime().getTime());
-                    filter.setDtStart(date);
-                    filter.setDtEnd(date);
+                    java.sql.Date date = new java.sql.Date(dateCalendar.getTime());
+
                     int idBrand = 0;
                     if (carInfo.getCar() != null && carInfo.getCar().getIdBrand() > 0) {
                         idBrand = carInfo.getCar().getIdBrand();
@@ -202,26 +206,22 @@ public class TPAInvokerSimulator {
                         }
 
                     }
-                    log.trace("*****TPA_MRS******PRE ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
-                    parameterizations = ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);
+                    ParameterizationFilter filter = ParameterizationFilter.builder().idBrand(ApiConstants.ID_BRAND_TOYOTA).build();
+                    parameterizations = cacheConfig.getParameterizationsByClient(idBrand,filter);
                     log.trace("*****TPA_MRS******POS ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
-
                 }
             }
         }
-        log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
         if (parameterizations != null && !parameterizations.isEmpty()) {
-            log.trace("*****TPA_MRS******PRE ->  DocumentUnit.getHelper().getAllDocumentUnits();");
             LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = getMapAllDocumentUnits(new LinkedHashMap<Integer, DocumentUnit>());
             log.trace("*****TPA_MRS******POS ->  DocumentUnit.getHelper().getAllDocumentUnits();");
-            ContactReason contactReason = contactRepository.findById(carInfo.getIdContactReason()).orElseThrow(()-> new ProgramaAvisosException("Contact id not found"));
+            ContactReason contactReason = contactRepository.findById(carInfo.getIdContactReason()).orElse(new ContactReason());
             simulation.setContactReason(contactReason.getContactReason());
             simulation.setCarInfo(carInfo);
             simulation.setBusinessCarInfo(businessCarInfo);
-            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
 
             for (PaParameterization parametrization : parameterizations) {
-                paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
+                paramItems = parametrization.getParametrizationItems();
 
                 if (paramItems != null) {
                     for (ParametrizationItems paramItem : paramItems) {
@@ -273,8 +273,8 @@ public class TPAInvokerSimulator {
                                 continue;
                             }
 
-                            if (calDate.getTime().compareTo(parametrization.getDtStart()) >= 0 && (parametrization.getDtEnd() == null
-                                    || calDate.getTime().compareTo(parametrization.getDtEnd()) <= 0)) {
+                            if (dateCalendar.compareTo(parametrization.getDtStart()) >= 0 && (parametrization.getDtEnd() == null
+                                    || localDate.compareTo(parametrization.getDtEnd().toLocalDate()) <= 0)) {
 
                                 if (parametrization.getType().equals("D")) {
                                     if (selectedDestaqueParam != null) {
@@ -329,7 +329,7 @@ public class TPAInvokerSimulator {
                                         destaqueOriginParameterization = parametrization.getComments();
                                     }
                                 }
-                                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+
 
                                 if (parametrization.getType().equals("S")) {
                                     if (selectedServicoParam != null) {
@@ -384,7 +384,7 @@ public class TPAInvokerSimulator {
                                         servicoOriginParameterization = parametrization.getComments();
                                     }
                                 }
-                                log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
+
                                 if (parametrization.getType().equals("H")) {
                                     if (selectedHeaderParam != null) {
                                         if (gamma.size() < selectedHeaderParam.getItemModels().size()) {
@@ -446,7 +446,7 @@ public class TPAInvokerSimulator {
             log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
             if (selectedDestaqueParam == null || selectedServicoParam == null || selectedHeaderParam == null) {
                 for (PaParameterization parametrization : parameterizations) {
-                    paramItems = (ArrayList<ParametrizationItems>) parametrization.getParametrizationItems();
+                    paramItems = parametrization.getParametrizationItems();
                     if (paramItems != null) {
                         for (ParametrizationItems paramItem : paramItems) {
 
@@ -519,7 +519,6 @@ public class TPAInvokerSimulator {
 
                 simulation.setServicoOriginParameterization(servicoOriginParameterization);
             }
-            log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate +"||  NIF:"+nif );
             if (selectedDestaqueParam != null) {
 
                 DocumentUnit du4 = documentUnitsMap.get(selectedDestaqueParam.getIdHighlight1());
