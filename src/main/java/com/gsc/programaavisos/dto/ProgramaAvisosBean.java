@@ -2,7 +2,6 @@ package com.gsc.programaavisos.dto;
 
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.constants.PAInfo;
-import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import com.rg.dealer.Dealer;

@@ -6,7 +6,6 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 public class PAUtil {
 

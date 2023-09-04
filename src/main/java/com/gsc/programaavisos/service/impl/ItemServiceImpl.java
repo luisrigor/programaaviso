@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
 @Service
 @Log4j
@@ -195,7 +193,6 @@ public class ItemServiceImpl implements ItemService {
                 documentUnit.setDescription(description);
                 documentUnit.setIdBrand(idBrand);
                 documentUnit.setDtEnd(dtEnd);
-
                 String extension;
 
                 if (!fileAttachItems.isEmpty()) {

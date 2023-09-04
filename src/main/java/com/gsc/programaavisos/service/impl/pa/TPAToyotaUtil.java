@@ -42,7 +42,10 @@ public class TPAToyotaUtil {
     private final static String FILE_NAME_TEST = "D:/Toyota_Programa_Avisos.pdf";
     private final static String FILE_NAME = "Toyota_Programa_Avisos";
     private final static String LOGO_TOYOTA = "logo_toyota.png";
-
+    private final static String SERVICE_MESSAGE = "Laboribus dit offic tem hil ium expelectiunt, to bla qui offic tendigni vel militi conserem as et odit moluptat. Quiaspercit, od mos eum, cullandit, eaquae consed.";
+    private final static String OPERACION_RECOMENDADAS = ". A revis�o inclui todas as opera��es recomendadas pela ";
+    private final static String LEXUS = "Lexus";
+    private final static String TOYOTA = "Toyota";
     private static URL LOGO_URL = null;
     private static String NOME = "";
     private static String MORADA = "";
@@ -167,13 +170,13 @@ public class TPAToyotaUtil {
                 ACCESSORY_2_DESC = "Dite porisqu atianim illanducim repedit atiatia doluptu ribusaperior saeratur? Quidendam, earis con explam repelendit, utatist, te alitatqui cone plaut latur aditecus reped experat ionsequi accaborendi re none quam ime vollanis experspient eat et ex et et essimi, ommodi cum dolorerion et molorest odicae intinctat doluptaecum.";
                 ACCESSORY_2_IMG = "WebContent/media/common/images/acessorio_2.jpg";
                 SERVICE_1 = "REPARA��O DE PEQUENOS DANOS";
-                SERVICE_1_DESC = "Laboribus dit offic tem hil ium expelectiunt, to bla qui offic tendigni vel militi conserem as et odit moluptat. Quiaspercit, od mos eum, cullandit, eaquae consed.";
+                SERVICE_1_DESC = SERVICE_MESSAGE;
                 SERVICE_1_IMG ="WebContent/media/common/images/service_1.png";
                 SERVICE_2 = "SERVI�O DE PNEUS";
-                SERVICE_2_DESC = "Laboribus dit offic tem hil ium expelectiunt, to bla qui offic tendigni vel militi conserem as et odit moluptat. Quiaspercit, od mos eum, cullandit, eaquae consed.";
+                SERVICE_2_DESC = SERVICE_MESSAGE;
                 SERVICE_2_IMG ="WebContent/media/common/images/service_2.png";
                 SERVICE_3 = "MARCA��O DE SERVI�OS ONLINE";
-                SERVICE_3_DESC = "Laboribus dit offic tem hil ium expelectiunt, to bla qui offic tendigni vel militi conserem as et odit moluptat. Quiaspercit, od mos eum, cullandit, eaquae consed.";
+                SERVICE_3_DESC = SERVICE_MESSAGE;
                 SERVICE_3_IMG ="WebContent/media/common/images/service_3.png";
                 HIGHLIGHT_1 = "WebContent/media/common/images/destaque.jpg";
 
@@ -300,15 +303,15 @@ public class TPAToyotaUtil {
                             String footerNextRevisionDesc = "";
                             if(!simulation.getMrs().getNextRevision().equals("")){
                                 footerNextRevisionDesc = "Valor previsto para a " + simulation.getMrs().getNextRevision() +
-                                        ". A revis�o inclui todas as opera��es recomendadas pela "
-                                        +((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"Toyota":"Lexus")+". Pre�o em vigor na oficina onde realizou o �ltimo servi�o.";
+                                        OPERACION_RECOMENDADAS
+                                        +((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?TOYOTA:LEXUS)+". Pre�o em vigor na oficina onde realizou o �ltimo servi�o.";
                                 Character isFirstRevision = simulation.getMrs().getIsFirstRevision();
                                 if (String.valueOf(isFirstRevision).equals("S")) {
-                                    footerNextRevisionDesc = "Valor previsto para a " + simulation.getMrs().getNextRevision() + ". A revis�o inclui todas as opera��es recomendadas pela "+((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"Toyota":"Lexus")+".";
+                                    footerNextRevisionDesc = "Valor previsto para a " + simulation.getMrs().getNextRevision() + OPERACION_RECOMENDADAS+((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?TOYOTA:LEXUS)+".";
                                 }
                                 if (simulation.getMrs().getMaintenancePrice() == 0) {
-                                    //								footerNextRevisionDesc = ((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"":"") + simulation.getPaData().getMRS().getNextRevision() + ". A revis�o inclui todas as opera��es recomendadas pela "+((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"Toyota":"Lexus")+".";
-                                    footerNextRevisionDesc = simulation.getMrs().getNextRevision() + ". A revis�o inclui todas as opera��es recomendadas pela "+((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"Toyota":"Lexus")+".";
+                                    //								footerNextRevisionDesc = ((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"":"") + simulation.getPaData().getMRS().getNextRevision() + OPERACION_RECOMENDADAS +((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?"Toyota":"Lexus")+".";
+                                    footerNextRevisionDesc = simulation.getMrs().getNextRevision() + OPERACION_RECOMENDADAS+((simulation.getPaData().getBrand().equalsIgnoreCase("T"))?TOYOTA:LEXUS)+".";
                                 }
                             }
 

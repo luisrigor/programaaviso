@@ -25,13 +25,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_WS_CAR_LOCATION;
 
 @Log4j
 @RequiredArgsConstructor

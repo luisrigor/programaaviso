@@ -4,7 +4,6 @@ import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Getter
@@ -38,6 +37,7 @@ import java.time.LocalDate;
         )
 )
 @Entity
+@ToString
 @Table(name = "PA_DOCUMENT_UNIT")
 public class DocumentUnit {
 

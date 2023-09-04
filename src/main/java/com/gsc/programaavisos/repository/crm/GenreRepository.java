@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.repository.crm;
 
 import com.gsc.programaavisos.model.crm.entity.Genre;
-import com.gsc.programaavisos.model.crm.entity.ItemsGenre;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

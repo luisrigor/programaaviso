@@ -1,18 +1,17 @@
 package com.gsc.programaavisos.model.crm.entity;
 
 
-import com.gsc.ws.core.Campaign;
+import com.gsc.ecare.core.ECareNotification;
+import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
+import com.rg.dealer.Dealer;
 import lombok.*;
+
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-
-import com.gsc.ecare.core.ECareNotification;
-import com.gsc.ws.core.*;
-import com.rg.dealer.Dealer;
 
 @Getter
 @Setter

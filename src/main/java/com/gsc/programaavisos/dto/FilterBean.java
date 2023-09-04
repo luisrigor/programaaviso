@@ -5,13 +5,15 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.State;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.rg.dealer.Dealer;
-import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.DateTimerTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter

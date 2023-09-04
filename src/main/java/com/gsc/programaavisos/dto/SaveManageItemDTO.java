@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.dto;
 
-import io.swagger.models.auth.In;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,6 +19,4 @@ public class SaveManageItemDTO {
     private String serviceLink;
     private LocalDate endDateInput;
     private String serviceCode;
-    //img1: (binary)
-    //img2: (binary)
 }
