@@ -14,11 +14,15 @@ import com.gsc.programaavisos.repository.cardb.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
+import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.service.impl.pa.TPALexusUtil;
 import com.gsc.programaavisos.service.impl.pa.TPAToyotaUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
+import com.gsc.ws.newsletter.core.WsResponse;
+import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.*;
 
@@ -543,11 +550,56 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             }
         }
     }
+
+
+    @Override
+    public NewsLetterDTO sendNewsletter(Integer id, String email) {
+        if (id == 0 || email.equals(""))
+            throw new ProgramaAvisosException("The id and the email can't be empty");
+
+        ProgramaAvisosBean oPABean = null;
+        Map<String, String> envV = environmentConfig.getEnvVariables();
+
+        try {
+            oPABean = paRepository.getProgramaAvisosById(id);
+            WsInvokeNewsletter oWsInfo = new WsInvokeNewsletter(envV.get(CONST_WS_NEWSLETTER_SERVER));
+            // Contactos
+
+            String[] fields = ProgramaAvisosUtil.getNewslettersFields(oPABean.getIdContactType(), oPABean.getBrand());
+            log.trace("fields >> " + (fields == null ? "is null!" : Arrays.toString(fields)));
+
+            String personalData = oPABean.getNewsletterPersonalData();
+            int _Pos = personalData.indexOf(";");
+            if (_Pos != -1)
+                personalData = email + personalData.substring(_Pos);
+
+            String[] arrEmailContacts = new String[] {};
+            if(fields!=null){
+                arrEmailContacts = new String[] { fields[1] };
+                arrEmailContacts = (String[]) ArrayTasks.Expand(arrEmailContacts, 1);
+                arrEmailContacts[1] = new String(personalData.getBytes(), "ISO-8859-1");
+            }
+            WsResponse oWsResponse = oWsInfo.addContactsAndReschedule(oPABean.getOidNewsletter(), arrEmailContacts);
+
+            String operation = "success", msg = "Reenvio efetuado para o email " + email;
+            if (!oWsResponse.getErrorDescription().equals("")) {
+                operation = "error";
+                msg = oWsResponse.getErrorDescription();
+            }
+
+            return NewsLetterDTO.builder()
+                    .message(msg)
+                    .operation(operation)
+                    .build();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error send newsletter ", e);
+        }
+
+    }
     public  LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits() {
         LinkedHashMap<Integer, DocumentUnit> map = new LinkedHashMap<>();
         List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
         documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
         return map;
     }
-
 }

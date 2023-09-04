@@ -184,4 +184,11 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
+    @GetMapping(ApiEndpoints.SEND_NEWSLETTER)
+    public ResponseEntity<NewsLetterDTO> sendNewsletter(@RequestParam Integer id, @RequestParam String email) {
+        log.info("getAllContactType controller");
+        NewsLetterDTO newsletter = otherFlowService.sendNewsletter(id, email);
+        return ResponseEntity.status(HttpStatus.OK).body(newsletter);
+    }
+
 }

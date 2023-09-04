@@ -156,4 +156,29 @@ public class PACustomRepositoryImpl implements PACustomRepository {
         }
     }
 
+   @Override
+   public ProgramaAvisosBean getProgramaAvisosById(Integer idPA) {
+        StringBuilder sql = new StringBuilder();
+        try {
+
+            sql.append(" SELECT PA_DATA_INFO.*, ");
+            sql.append(" HHC.PRODUCT_ID AS HHC_PRODUCT_ID, HHC.PRODUCT_DESCRIPTION AS HHC_PRODUCT_DESCRIPTION, HHC.PRODUCT_DISPLAY_NAME AS HHC_PRODUCT_DISPLAY_NAME, HHC.CONTRACT_START_DATE AS HHC_CONTRACT_START_DATE, HHC.CONTRACT_END_DATE AS HHC_CONTRACT_END_DATE, (HHC.MILEAGE_CONTRACT_CREATION + HHC.COVER_KM) AS HHC_CONTRACT_END_KM ");
+            sql.append(" FROM PA_DATA_INFO ");
+            sql.append(" LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN AND HHC.CONTRACT_STATUS='Active' ");
+            sql.append(" WHERE PA_ID = " + idPA);
+
+            Query query = em.createNativeQuery(sql.toString());
+            NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
+            nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+            List<Map<String,Object>> result = nativeQuery.getResultList();
+            for (Map<String,Object> currentRs: result) {
+                return new ProgramaAvisosBean(currentRs, false);
+            }
+            return null;
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error executing getOpenContactsforClient query ", e);
+        }
+
+    }
+
 }

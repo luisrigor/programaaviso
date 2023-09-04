@@ -44,4 +44,5 @@ public interface ApiEndpoints {
     String GET_PA_DETAIL= "/details-pa";
     String GET_TPA_SIMULATOR= "/tpa-simulation";
     String DOWNLOAD_SIMULATION = "/download-simulation";
+    String SEND_NEWSLETTER = "/send-newsletter";
 }
