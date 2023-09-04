@@ -21,8 +21,6 @@ import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.newsletter.core.WsResponse;
 import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
 import com.rg.dealer.Dealer;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +28,10 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.*;
-
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;

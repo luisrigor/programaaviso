@@ -1,8 +1,6 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.dto.DelegatorsDTO;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.GetDelegatorsDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
@@ -16,19 +14,14 @@ import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
-import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
-import com.rg.dealer.DealerHelper;
 import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.initialization.SCGlobalPreferences;
-import com.sc.commons.utils.StringTasks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
