@@ -14,15 +14,16 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitCategoryRepository;
 import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
-import com.sc.commons.utils.*;
+import com.sc.commons.utils.SftpTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
+
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
+
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
 @Service
 @Log4j

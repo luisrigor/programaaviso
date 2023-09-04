@@ -1,9 +1,8 @@
 package com.gsc.programaavisos.service.impl;
 
-import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
-import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
+import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
@@ -15,9 +14,13 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 @Service
