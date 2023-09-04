@@ -3,10 +3,7 @@ package com.gsc.programaavisos.model.crm.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -20,7 +17,7 @@ import java.time.LocalDateTime;
 public class Mrs {
 
     @Id
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "ID_PA_DATA")

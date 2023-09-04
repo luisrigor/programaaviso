@@ -551,6 +551,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }
     }
 
+
     @Override
     public NewsLetterDTO sendNewsletter(Integer id, String email) {
         if (id == 0 || email.equals(""))
@@ -594,5 +595,11 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error send newsletter ", e);
         }
 
+    }
+    public  LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits() {
+        LinkedHashMap<Integer, DocumentUnit> map = new LinkedHashMap<>();
+        List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
+        documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
+        return map;
     }
 }

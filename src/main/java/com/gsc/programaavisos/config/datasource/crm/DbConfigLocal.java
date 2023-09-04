@@ -73,7 +73,6 @@ public class DbConfigLocal {
         dbclaims.setPassword("db2admin");
         conn.setDataSource(dbclaims, "jdbc/dbclaims");
         log.info("Datasource initialized successfully: jdbc/dbclaims");
-
     }
 
     @Primary
