@@ -970,8 +970,8 @@ public class TPAInvokerSimulator {
 
     private static List<Acessories> getAcessory(int idModel, int idVc, String plate, String wsCarLocation) throws SCErrorException {
 
-        List<Acessories> priorityAcessories = new ArrayList<Acessories>();
-        List<Integer> lstIdsModel = new ArrayList<Integer>();
+        List<Acessories> priorityAcessories = new ArrayList<>();
+        List<Integer> lstIdsModel = new ArrayList<>();
         lstIdsModel.add(idModel);
 
         List<AccessoryInstalled> installedAccessories = null;
@@ -984,7 +984,7 @@ public class TPAInvokerSimulator {
 
         if (oAccessoryInstalledResponse != null &&
                 oAccessoryInstalledResponse.getAcessoryInstalled() != null &&
-                oAccessoryInstalledResponse.getAcessoryInstalled().size() > 0) {
+                !oAccessoryInstalledResponse.getAcessoryInstalled().isEmpty()) {
             installedAccessories = oAccessoryInstalledResponse.getAcessoryInstalled();
         }
 
@@ -1007,7 +1007,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-            if (lstIdsAcessories.size() > 0) {
+            if (!lstIdsAcessories.isEmpty()) {
 
                 HashMap<Integer, String> priorityAccessories = AcessoriesHelper.getPriorityAcessories(idVc,
                         lstIdsAcessories, true, 2);

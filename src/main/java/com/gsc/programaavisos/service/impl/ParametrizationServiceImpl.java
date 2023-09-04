@@ -259,8 +259,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
     public HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives) {
 
         HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
-        List<PaParameterization> parameterizationList2 = paParameterizationRepository.getByFilter(filter);
-        List<PaParameterization> parameterizationList = Arrays.asList(parameterizationList2.get(50),parameterizationList2.get(51));
+        List<PaParameterization> parameterizationList = paParameterizationRepository.getByFilter(filter);
 
         List<PaParameterization> toyotaParam = new ArrayList<>();
         List<PaParameterization> lexusParam = new ArrayList<>();
