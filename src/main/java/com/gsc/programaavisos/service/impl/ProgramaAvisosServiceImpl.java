@@ -962,12 +962,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
-            {
+    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO) {
 
         String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
         String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
-
 
         try {
             TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
@@ -987,6 +985,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         } catch (SCErrorException e) {
             throw new ProgramaAvisosException("Error Getting CarInfo", e);
         }
-            }
+    }
 
 }

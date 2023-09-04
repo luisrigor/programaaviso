@@ -33,7 +33,6 @@ public class PaConstants {
 
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
-    public static String WS_CAR_LOCATION;
     private static final String PARAM_MENAGE_ITEMS_NAME = "serviceName";
     public static String WS_CAR_LOCATION="https://wscar.gruposalvadorcaetano.pt";
     public static final int ECARE = 1;

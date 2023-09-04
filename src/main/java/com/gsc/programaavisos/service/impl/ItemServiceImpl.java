@@ -16,6 +16,7 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
 import com.sc.commons.utils.SftpTasks;
+import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -157,8 +159,6 @@ public class ItemServiceImpl implements ItemService {
 
 
         try {
-            // PortletMultipartWrapper portletMpWrapper = new PortletMultipartWrapper(request, 0, MAXFILESIZE,
-            // MAXFILESIZE,uplodadDir);
             Integer idItemType = saveManageItemDTO.getIdItemType();
             String name = StringTasks.cleanString(saveManageItemDTO.getServiceName(), StringUtils.EMPTY);
             String code = StringTasks.cleanString(saveManageItemDTO.getServiceCode(), StringUtils.EMPTY);
@@ -182,11 +182,8 @@ public class ItemServiceImpl implements ItemService {
                 documentUnit.setDtEnd(dtEnd);
                 documentUnitRepository.save(documentUnit);
             } else {
-                List<MultipartFile> fileAttachItems = new ArrayList<>();
 
-                for (MultipartFile currentFile : files) {
-                    fileAttachItems.add(currentFile);
-                }
+                List<MultipartFile> fileAttachItems = new ArrayList<>(Arrays.asList(files));
 
                 documentUnit = new DocumentUnit();
                 documentUnit.setStatus("S");
@@ -201,7 +198,7 @@ public class ItemServiceImpl implements ItemService {
 
                 String extension;
 
-                if (fileAttachItems.size()>0) {
+                if (!fileAttachItems.isEmpty()) {
                     BufferedImage image = ImageIO.read(fileAttachItems.get(0).getInputStream());
                     extension = getFileExtension(fileAttachItems.get(0));
                     documentUnit.setImgPostal(code + "." + extension);
