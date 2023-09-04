@@ -564,12 +564,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             WsInvokeNewsletter oWsInfo = new WsInvokeNewsletter(envV.get(CONST_WS_NEWSLETTER_SERVER));
             // Contactos
 
-        /*Campos da newsletter a reenviar, estavam a ser obtidos por um metodo diferente, do que � utilizado
-          no daemon2 com.gsc.daemon.extranet.pa.TpaBoPostalElectronicGeneratorJob.PopulateNewsletterWithContactsAndSchedule.
-
-          Aqui estava a ser utilizado:
-            -> String[] fields = PAInfo.getNewslettersFields(oPABean.getYear(), oPABean.getMonth(), oPABean.getIdContactType(), oPABean.getNextRevision());
-         */
             String[] fields = ProgramaAvisosUtil.getNewslettersFields(oPABean.getIdContactType(), oPABean.getBrand());
             log.trace("fields >> " + (fields == null ? "is null!" : Arrays.toString(fields)));
 
