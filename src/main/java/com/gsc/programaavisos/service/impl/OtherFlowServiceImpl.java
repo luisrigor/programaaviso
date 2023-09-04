@@ -10,7 +10,8 @@ import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.entity.*;
-import com.gsc.programaavisos.repository.cardb.*;
+import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
+import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
@@ -22,6 +23,8 @@ import com.gsc.ws.newsletter.core.WsResponse;
 import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
 import com.rg.dealer.Dealer;
 import com.sc.commons.utils.*;
+import com.sc.commons.utils.CarTasks;
+import com.sc.commons.utils.HttpTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -35,7 +38,6 @@ import java.util.*;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;
-import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
 
 @Service
 @Log4j
@@ -595,4 +597,5 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
         return map;
     }
+
 }

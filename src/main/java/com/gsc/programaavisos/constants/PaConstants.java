@@ -57,4 +57,6 @@ public class PaConstants {
     public static final int MAN	= 1;
     public static final int ITV	= 2;
     public static final int MAN_ITV	= 3;
+    public static String TPA_DOCUMENT_ERROR_MESSAGE ="TPAInvokerSimulator.validateDocumentUnit";
+
 }

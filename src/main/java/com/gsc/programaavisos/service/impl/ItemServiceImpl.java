@@ -15,7 +15,7 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitCategoryRepository;
 import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
-import com.sc.commons.utils.*;
+import com.sc.commons.utils.SftpTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,11 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
 
