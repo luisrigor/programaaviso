@@ -47,6 +47,7 @@ log4j:
 sc:
   config:
     file: ""
+
 #customom properties ex local url
 app:
   baseUrl: /avisos

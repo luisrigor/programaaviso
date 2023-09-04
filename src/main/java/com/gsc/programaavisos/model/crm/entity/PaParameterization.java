@@ -57,5 +57,5 @@ public class PaParameterization {
     private Integer idBrand;
 
     @Transient
-    private List<ParametrizationItems> parameterizationItems;
+    private List<ParametrizationItems> parametrizationItems;
 }

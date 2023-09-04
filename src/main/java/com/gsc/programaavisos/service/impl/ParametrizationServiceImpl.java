@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.service.impl;
 
+import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
@@ -16,12 +17,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @Service
 @Log4j
@@ -92,10 +89,10 @@ public class ParametrizationServiceImpl implements ParametrizationService {
     public PaParameterization getById(int idParametrization, boolean onlyActives){
         try {
             PaParameterization parameterization = paParameterizationRepository.findById(idParametrization).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + idParametrization));
-            List<ParametrizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(idParametrization, onlyActives);
-            if (!parameterizationItems.isEmpty()) {
-                parameterization.setParameterizationItems(parameterizationItems);
-                for (ParametrizationItems parameterizationItem : parameterization.getParameterizationItems()) {
+            List<ParametrizationItems> parametrizationItems = getParameterizationItemsByParameterizationId(idParametrization, onlyActives);
+            if (!parametrizationItems.isEmpty()) {
+                parameterization.setParametrizationItems(parametrizationItems);
+                for (ParametrizationItems parameterizationItem : parameterization.getParametrizationItems()) {
                     Integer idParameterizationItem = parameterizationItem.getId();
                     parameterizationItem.setItemEntityTypes(itemsEntityTypeRepository.findByIdParameterizationItems(idParameterizationItem));
                     parameterizationItem.setItemAges(itemsAgeRepository.findByIdParameterizationItems(idParameterizationItem));
@@ -114,7 +111,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
     }
 
-    private List<ParametrizationItems> getParameterizationItemsByParameterizationId(Integer idParametrization,boolean onlyActives){
+    private List<ParametrizationItems> getParameterizationItemsByParameterizationId(Integer idParametrization, boolean onlyActives){
         if(onlyActives){
             return parametrizationItemsRepository.getAllParametrizationItemOnlyActive(idParametrization);
         }else{
@@ -132,7 +129,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                 .published(parameterizationDTO.getPublished())
                 .visible(parameterizationDTO.getVisible())
                 .type(parameterizationDTO.getType())
-                .parameterizationItems(parameterizationDTO.getParametrizationItems())
+                .parametrizationItems(parameterizationDTO.getParametrizationItems())
                 .idBrand(ApiConstants.getIdBrand(oGSCUser.getOidNet()))
                 .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
                 .dtCreated(LocalDateTime.now())
@@ -146,7 +143,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                 parametrizationItemsRepository.deleteById(oParameterization.getId());
             PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
-            for (ParametrizationItems parameterizationItem : oParameterization.getParameterizationItems()) {
+            for (ParametrizationItems parameterizationItem : oParameterization.getParametrizationItems()) {
                 if (parameterizationItem!=null){
 
                     parameterizationItem.setIdParameterization(insertedParam.getId());
@@ -195,7 +192,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                     .idBrand(paramToClone.getIdBrand())
                     .createdBy(PAUtil.getUserStamp(oGSCUser.getUsername()))
                     .dtCreated(LocalDateTime.now())
-                    .parameterizationItems(paramToClone.getParameterizationItems())
+                    .parametrizationItems(paramToClone.getParametrizationItems())
                     .build();
             cloneItemList(cloneParameterization,oGSCUser);
         }catch (Exception e){
@@ -207,7 +204,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         try {
             PaParameterization insertedParam = paParameterizationRepository.save(oParameterization);
             String createdBy = PAUtil.getUserStamp(oGSCUser.getUsername());
-            for (ParametrizationItems paramToClone : oParameterization.getParameterizationItems()) {
+            for (ParametrizationItems paramToClone : oParameterization.getParametrizationItems()) {
                 if (paramToClone!=null){
 
                     ParametrizationItems cloneParaItem = paramToClone.toBuilder()
@@ -256,6 +253,47 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }catch (Exception e){
             throw new ProgramaAvisosException("Error clone parametrization", e);
         }
+    }
+
+    @Override
+    public HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives) {
+
+        HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
+        List<PaParameterization> parameterizationList2 = paParameterizationRepository.getByFilter(filter);
+        List<PaParameterization> parameterizationList = Arrays.asList(parameterizationList2.get(50),parameterizationList2.get(51));
+
+        List<PaParameterization> toyotaParam = new ArrayList<>();
+        List<PaParameterization> lexusParam = new ArrayList<>();
+
+        for(PaParameterization parameterization:parameterizationList){
+
+            List<ParametrizationItems> parameterizationItems = getParameterizationItemsByParameterizationId(parameterization.getId(),onlyActives);
+
+            if(!parameterizationItems.isEmpty()){
+                parameterization.setParametrizationItems(parameterizationItems);
+
+                for (ParametrizationItems parameterizationItem : parameterization.getParametrizationItems()){
+
+                    int idParameterizationItem = parameterizationItem.getId();
+
+                    parameterizationItem.setItemEntityTypes(itemsEntityTypeRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemAges(itemsAgeRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemKilometers(itemsKilometersRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemFidelitys(itemsFidelitysRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemFuels(itemsFuelRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemGenres(itemsGenreRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemDealers(itemsDealerRepository.findByIdParameterizationItems(idParameterizationItem));
+                    parameterizationItem.setItemModels(itemsModelRepository.findByIdParameterizationItems(idParameterizationItem));
+                }
+            }
+            if(parameterization.getIdBrand() == ApiConstants.ID_BRAND_TOYOTA)
+                toyotaParam.add(parameterization);
+            lexusParam.add(parameterization);
+
+        }
+        mapParameterizations.put(ApiConstants.ID_BRAND_TOYOTA, toyotaParam);
+        mapParameterizations.put(ApiConstants.ID_BRAND_LEXUS, lexusParam);
+        return mapParameterizations;
     }
 
 }

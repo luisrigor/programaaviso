@@ -8,6 +8,7 @@ public interface ApiEndpoints {
     String SAVE_PARAMETRIZATION= "/save-parametrization";
 
     String CLONE_PARAMETRIZATION= "/clone-parametrization";
+    String TESTS= "/tests";
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
     String GET_FUELS = "/fuels";
@@ -43,5 +44,6 @@ public interface ApiEndpoints {
     String GET_PA_DETAIL= "/details-pa";
     String GET_TPA_SIMULATOR= "/tpa-simulation";
     String SAVE_MANAGE_ITEMS = "/save-manage-item";
-
+    String DOWNLOAD_SIMULATION = "/download-simulation";
+    String SEND_NEWSLETTER = "/send-newsletter";
 }

@@ -1,18 +1,24 @@
 package com.gsc.programaavisos.service.impl.pa;
 
+import com.gsc.gesdoc.core.GesDocUpload;
+import com.gsc.gesdoc.invoke.GesDocVehicleDossierInvoke;
 import com.gsc.programaavisos.constants.PAInfo;
 import com.gsc.programaavisos.constants.State;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.entity.Calls;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.CallsRepository;
 import com.gsc.programaavisos.repository.crm.PARepository;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.AEScrypterTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.sql.*;
 
 
@@ -22,6 +28,9 @@ public class ProgramaAvisosUtil {
 
     private final PARepository paRepository;
     private final CallsRepository callsRepository;
+    private static final String BRAND_TOYOTA = "T";
+
+    private static final String BRAND_LEXUS = "L";
 
     @Autowired
     public ProgramaAvisosUtil(PARepository paRepository, CallsRepository callsRepository) {
@@ -159,5 +168,81 @@ public class ProgramaAvisosUtil {
         pa.setDelegatedTo(StringTasks.cleanString(pa.getDelegatedTo(), ""));
         pa.setClient(StringTasks.cleanString(pa.getClient(), ""));
         pa.setBlockedBy(StringTasks.cleanString(pa.getBlockedBy(), ""));
+    }
+
+    public String uploadFileGesDoc(String brand, String plate, String vin, File file, String gesDocLocation, String documentType) throws SCErrorException {
+        String documentId = null;
+        boolean visibleToDealer = true;
+
+        GesDocVehicleDossierInvoke oGesDocVehicleDossierInvoke = new GesDocVehicleDossierInvoke(gesDocLocation);
+        String token = AEScrypterTasks.encrypt(AEScrypterTasks.APP_VEHICLE_DOSSIER, getSystemUser(brand));
+        GesDocUpload gesDocUpload = oGesDocVehicleDossierInvoke.uploadToVehicleDossier(AEScrypterTasks.APP_VEHICLE_DOSSIER, token, getSystemUser(brand), documentType, brand, plate, vin, visibleToDealer, file);
+        documentId = gesDocUpload.getDocumentPair().get(0).getDocumentId();
+        log.debug("DocumentId: " + documentId);
+
+        return documentId;
+    }
+
+    public static String getSystemUser(String brand) {
+        if (brand.equalsIgnoreCase("T") || brand.equalsIgnoreCase("L")) {
+            return "rigor.master@tpo";
+        }
+        return "";
+    }
+
+    public static String[] getNewslettersFields(int idContactType, String brand) {
+        // Por defeito define vers�o 1
+        String requiredFields = "", personalFields = "";
+
+        if(brand.equalsIgnoreCase(BRAND_TOYOTA)){
+
+            switch (idContactType) {
+                case ContactTypeB.MAN:
+                    requiredFields = "urlimages;imghighlight1;imgservice2;linkheader1;imgheader1;imgservice3;imgaccessory1;imgaccessory2;nameservice1;nameservice2;nameservice3;linkgeneratedfromosb;model;fontSize;price;nameaccessory1;nameaccessory2;descservice1;descservice2;descservice3;descaccessory1;descaccessory2;plate;nextrevisiondate;lastrevisiondate;imgservice1;linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1;isToShowLastRevisionDate;isToShowNextRevisionDate;name;footernextrevisiondesc";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;isToShowLastRevisionDate;isToShowNextRevisionDate;model;plate;lastrevisiondate;nextrevisiondate;fontSize;price;name;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;linkgeneratedfromosb;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1;footernextrevisiondesc";
+                    /*
+                     * retirado nextitvdate (depois do price e antes do name) pois n�o foi encontrado no HTML da tabela:
+                     * dblists TEMPLATES, nos ids:
+                     * 	25	TPA BO Revis�o Toyota sem publicidade
+                     *  19	TPA BO Revis�o Toyota
+                     *
+                     *  foi retirado tamb�m da coluna PERSONAL_FIELDS dos dois templates
+                     *
+                     * */
+                    break;
+                case ContactTypeB.ITV:
+                    requiredFields = "urlimages;imghighlight1;imgservice2;linkheader1;imgheader1;imgservice3;imgaccessory1;imgaccessory2;nameservice1;nameservice2;nameservice3;linkgeneratedfromosb;model;nextitvdate;nameaccessory1;nameaccessory2;descservice1;descservice2;descservice3;descaccessory1;descaccessory2;plate;nextrevisiondate;lastrevisiondate;imgservice1;linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1;isToShowLastRevisionDate;isToShowNextRevisionDate;name;footernextrevisiondesc";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;isToShowLastRevisionDate;isToShowNextRevisionDate;model;plate;lastrevisiondate;nextrevisiondate;fontSize;price;nextitvdate;name;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;linkgeneratedfromosb;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1;footernextrevisiondesc";
+                    break;
+                case ContactTypeB.MAN_ITV:
+                    requiredFields = "urlimages;imghighlight1;imgservice2;linkheader1;imgheader1;imgservice3;imgaccessory1;imgaccessory2;nameservice1;nameservice2;nameservice3;linkgeneratedfromosb;model;fontSize;price;nextitvdate;nameaccessory1;nameaccessory2;descservice1;descservice2;descservice3;descaccessory1;descaccessory2;plate;nextrevisiondate;lastrevisiondate;imgservice1;linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1;isToShowLastRevisionDate;isToShowNextRevisionDate;name";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;isToShowLastRevisionDate;isToShowNextRevisionDate;model;plate;lastrevisiondate;nextrevisiondate;fontSize;price;nextitvdate;name;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;linkgeneratedfromosb;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1;footernextrevisiondesc";
+                    break;
+
+                default:
+                    break;
+            }
+        }else if(brand.equalsIgnoreCase(BRAND_LEXUS)){
+
+            switch (idContactType) {
+                case ContactTypeB.MAN:
+                    requiredFields = "urlimages;linkheader1;imgheader1;model;plate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
+                    break;
+                case ContactTypeB.ITV:
+                    requiredFields = "urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
+                    break;
+                case ContactTypeB.MAN_ITV:
+                    requiredFields = "urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";
+                    personalFields = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        return new String[] { requiredFields, personalFields };
     }
 }
