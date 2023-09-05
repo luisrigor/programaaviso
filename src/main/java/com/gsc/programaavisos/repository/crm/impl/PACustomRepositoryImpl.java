@@ -6,23 +6,12 @@ import com.gsc.programaavisos.dto.ProgramaAvisosBean;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.repository.crm.PACustomRepository;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.DataBaseTasks;
 import com.sc.commons.utils.StringTasks;
 import org.hibernate.query.internal.NativeQueryImpl;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.DataBaseTasks;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 import java.util.*;
 
 public class PACustomRepositoryImpl implements PACustomRepository {
@@ -171,9 +160,9 @@ public class PACustomRepositoryImpl implements PACustomRepository {
             NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
             nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
             List<Map<String,Object>> result = nativeQuery.getResultList();
-            for (Map<String,Object> currentRs: result) {
-                return new ProgramaAvisosBean(currentRs, false);
-            }
+            if(result !=null && !result.isEmpty())
+                return new ProgramaAvisosBean(result.get(0), false);
+
             return null;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error executing getOpenContactsforClient query ", e);

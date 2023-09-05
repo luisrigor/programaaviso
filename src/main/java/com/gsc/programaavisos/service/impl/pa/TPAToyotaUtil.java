@@ -787,7 +787,7 @@ public class TPAToyotaUtil {
         Paragraph paragraph9 =  new Paragraph();
         if(ID_CONTACT_TYPE_MAN_ITV == CONTACT_REASON_ID || ID_CONTACT_TYPE_MAN == CONTACT_REASON_ID){
             paragraph9.add(new Chunk("Valor da Revis�o: ", new Font(bfToyotaType_Semibold, 10)));
-            if (!MAINTENANCE_CONTRACT.equals("") && String.valueOf(MAINTENANCE_CONTRACT).equalsIgnoreCase("S")){
+            if (String.valueOf(MAINTENANCE_CONTRACT).equalsIgnoreCase("S")){
                 paragraph9.add(new Chunk("0�" , new Font(bfToyotaType_Book, 10)));
             } else if(!MAINTENANCE_PRICE.equals("")){
                 if(isMaintnanceContract){

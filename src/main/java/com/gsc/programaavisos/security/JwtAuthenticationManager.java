@@ -9,8 +9,6 @@ import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
 import com.gsc.scgscwsauthentication.response.AuthenticationExtraResponse;
 import com.gsc.scgscwsauthentication.response.ExtranetUser;
 import com.gsc.scgscwsauthentication.response.PairIdName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,8 +22,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class JwtAuthenticationManager implements AuthenticationManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationManager.class);
 
     // For now we are using a hardcoded client
     public static final Long CLIENT_ID = 1L;
@@ -47,12 +43,14 @@ public class JwtAuthenticationManager implements AuthenticationManager {
         }
 
         String loginToken = authentication.getPrincipal() != null ? authentication.getPrincipal().toString() : null;
-        String tokenParts[] = loginToken.split("\\|\\|\\|");
-        loginToken = tokenParts[1];
+
 
         if (!StringUtils.hasText(loginToken)) {
             throw new BadCredentialsException("Invalid login token");
         }
+
+        String[] tokenParts= loginToken.split("\\|\\|\\|");
+        loginToken = tokenParts[1];
 
         String[] parts = loginToken.split("\\|\\|");
         if (parts.length != 2) {
