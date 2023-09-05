@@ -116,7 +116,6 @@ public class OtherFlowController {
     @GetMapping(ApiEndpoints.GET_CONTACT_TYPE)
     public ResponseEntity<List<ContactType>> getContactType(@RequestParam String userLogin) {
         List<ContactType> contactTypeList = otherFlowService.getContactTypeList(userLogin);
-
         return ResponseEntity.status(HttpStatus.OK).body(contactTypeList);
     }
 
@@ -138,7 +137,6 @@ public class OtherFlowController {
     @PostMapping(ApiEndpoints.MAP_UPDATE)
     public ResponseEntity<String> mapUpdate(@AuthenticationPrincipal UserPrincipal userPrincipal) {
        otherFlowService.mapUpdate(userPrincipal);
-
         return ResponseEntity.status(HttpStatus.OK).body("Update");
     }
     @GetMapping(ApiEndpoints.GET_CLIENT_TYPE)
@@ -179,14 +177,14 @@ public class OtherFlowController {
     @PostMapping(ApiEndpoints.DOWNLOAD_SIMULATION)
     public ResponseEntity<String> downloadSimulation(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                       @RequestBody TpaSimulation simulation, HttpServletResponse response) {
-        log.info("getAllContactType controller");
+        log.info("downloadSimulation controller");
         otherFlowService.downloadSimulation(userPrincipal, simulation, response);
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
     @GetMapping(ApiEndpoints.SEND_NEWSLETTER)
     public ResponseEntity<NewsLetterDTO> sendNewsletter(@RequestParam Integer id, @RequestParam String email) {
-        log.info("getAllContactType controller");
+        log.info("sendNewsletter controller");
         NewsLetterDTO newsletter = otherFlowService.sendNewsletter(id, email);
         return ResponseEntity.status(HttpStatus.OK).body(newsletter);
     }
