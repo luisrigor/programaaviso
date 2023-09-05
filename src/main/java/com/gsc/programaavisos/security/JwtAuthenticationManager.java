@@ -48,10 +48,8 @@ public class JwtAuthenticationManager implements AuthenticationManager {
         if (!StringUtils.hasText(loginToken)) {
             throw new BadCredentialsException("Invalid login token");
         }
-
-        String[] tokenParts= loginToken.split("\\|\\|\\|");
+        String tokenParts[] = loginToken != null ? loginToken.split("\\|\\|\\|") : new String[0];
         loginToken = tokenParts[1];
-
         String[] parts = loginToken.split("\\|\\|");
         if (parts.length != 2) {
             throw new BadCredentialsException("Bad credentials");
