@@ -2,9 +2,8 @@ package com.gsc.programaavisos.repository.crm.impl;
 
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
-import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.repository.crm.DocumentUnitCustomRepository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;

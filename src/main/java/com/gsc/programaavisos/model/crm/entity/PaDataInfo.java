@@ -1,9 +1,11 @@
 package com.gsc.programaavisos.model.crm.entity;
-import com.gsc.programaavisos.model.crm.CompositeDataInfo;
-import com.sc.commons.utils.StringTasks;
+
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

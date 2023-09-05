@@ -4,6 +4,7 @@ import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.security.UserPrincipal;
+
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.exceptions;
 
 import com.gsc.programaavisos.constants.ApiErrorConstants;
-import com.sc.commons.exceptions.SCErrorException;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

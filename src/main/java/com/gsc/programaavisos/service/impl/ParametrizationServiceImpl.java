@@ -1,9 +1,8 @@
 package com.gsc.programaavisos.service.impl;
 
-import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.ApiConstants;
-import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
+import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
@@ -15,9 +14,13 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 @Service
@@ -259,8 +262,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
     public HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives) {
 
         HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
-        List<PaParameterization> parameterizationList2 = paParameterizationRepository.getByFilter(filter);
-        List<PaParameterization> parameterizationList = Arrays.asList(parameterizationList2.get(50),parameterizationList2.get(51));
+        List<PaParameterization> parameterizationList = paParameterizationRepository.getByFilter(filter);
 
         List<PaParameterization> toyotaParam = new ArrayList<>();
         List<PaParameterization> lexusParam = new ArrayList<>();

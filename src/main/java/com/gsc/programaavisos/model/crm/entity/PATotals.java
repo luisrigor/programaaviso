@@ -2,10 +2,6 @@ package com.gsc.programaavisos.model.crm.entity;
 
 import lombok.*;
 
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.SqlResultSetMapping;
-
 @Getter
 @Setter
 @NoArgsConstructor

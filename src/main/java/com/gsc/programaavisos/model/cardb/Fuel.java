@@ -2,7 +2,6 @@ package com.gsc.programaavisos.model.cardb;
 
 import lombok.*;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 @Getter
