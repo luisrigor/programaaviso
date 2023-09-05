@@ -3,7 +3,6 @@ package com.gsc.programaavisos.dto;
 
 import lombok.*;
 
-
 import javax.persistence.Query;
 import java.sql.Date;
 import java.util.List;

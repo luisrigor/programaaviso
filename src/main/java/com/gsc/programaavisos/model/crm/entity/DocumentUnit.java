@@ -4,7 +4,6 @@ import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Getter
@@ -38,6 +37,7 @@ import java.time.LocalDate;
         )
 )
 @Entity
+@ToString
 @Table(name = "PA_DOCUMENT_UNIT")
 public class DocumentUnit {
 
@@ -63,7 +63,7 @@ public class DocumentUnit {
     @Column(name = "IMG_E_POSTAL")
     private String imgEPostal;
     @Column(name = "STATUS")
-    private String status;
+    private Character status;
     @Column(name = "DT_END")
     private LocalDate dtEnd;
     @Column(name = "CREATED_BY")

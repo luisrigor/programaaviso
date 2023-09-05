@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.model.cardb.entity;
 
-import com.gsc.programaavisos.model.cardb.Fuel;
 import lombok.*;
 
 import javax.persistence.*;

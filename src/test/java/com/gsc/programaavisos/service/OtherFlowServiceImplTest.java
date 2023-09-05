@@ -14,6 +14,7 @@ import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
 import org.junit.jupiter.api.Assertions;

@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,7 +32,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
-import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_FTP_MANAGE_ITEM_ADDRESS;
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONST_WS_CAR_LOCATION;
 
 @Log4j
 @RequiredArgsConstructor
@@ -85,6 +84,9 @@ public class TPAInvokerSimulator {
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_1 = "L1";
     private static final String TOYOTA_ACCESSORY_DEFAULT_REF_2 = "T2";
     private static final String LEXUS_ACCESSORY_DEFAULT_REF_2 = "L2";
+    private static final String HEADER = "Header";
+    private static final String DESTAQUE = "Destaque";
+    private static final String SERVICIO = "Servicio";
 
     private final EnvironmentConfig environmentConfig;
     private final PARepository paRepository;
@@ -127,15 +129,9 @@ public class TPAInvokerSimulator {
         int month = localDate.getMonthValue();
         log.debug(TPA_DEBUG);
         if((numberplate==null || numberplate.isEmpty()) && nif!=null && !nif.isEmpty()){
-            log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
             paData = paRepository.getPADataByNifData(nif, PaConstants.BUSINESS_PLUS_ID,month,year,contactList);
-            log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByNif(nif,ClientType.BUSINESS_PLUS_ID,month,year);");
-
             if(paData!=null){
-                log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
                 mrs = mrsRepository.getByIdPaData(paData.getId());
-                log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
-
                 paData.setMRS(mrs);
             }
             simulation.setPaData(paData);
@@ -153,7 +149,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             } catch (Exception e) {
-                throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation"+"->numberplate: "+numberplate,e);
+                throw new SCErrorException(PaConstants.TPA_DOCUMENT_ERROR_MESSAGE,e);
             }
         }
         if(numberplate != null && !numberplate.isEmpty()) {
@@ -166,14 +162,10 @@ public class TPAInvokerSimulator {
                     if (idClientType == null) {
                         idClientType = PaConstants.NORMAL_ID;
                     }
-                    log.trace("*****TPA_MRS******PRE ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
                     paData = paRepository.getPADataByPlate(numberplate, month, year,contactList);
-                    log.trace("*****TPA_MRS******POS ->  ProgramaAvisos.getHelper().getPADataByPlate(numberplate,idClientType,month,year);");
 
                     if (paData != null) {
-                        log.trace("*****TPA_MRS******PRE ->  Mrs.getHelper().getByIdPaData(paData.getId());");
                         mrs = mrsRepository.getByIdPaData(paData.getId());
-                        log.trace("*****TPA_MRS******POS ->  Mrs.getHelper().getByIdPaData(paData.getId());");
 
                         paData.setMRS(mrs);
                     }
@@ -181,11 +173,9 @@ public class TPAInvokerSimulator {
                 }
                 simulation.setPaData(paData);
                 try {
-                    log.trace("*****TPA_MRS******PRE ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
                     carInfo = getCarInfo(numberplate, dateCalendar, wsCarLocation, paData, isTPAImportFromBi);
-                    log.trace("*****TPA_MRS******POS ->  getCarInfo(numberplate, paDate, wsCarLocation,paData);");
                 } catch (Exception e) {
-                    throw new SCErrorException("TPAInvokerSimulator.getTpaSimulation" + "->numberplate: " + numberplate + " ->paDate:" + localDate, e);
+                    throw new SCErrorException(PaConstants.TPA_DOCUMENT_ERROR_MESSAGE);
                 }
                 if (carInfo != null) {
                     java.sql.Date date = new java.sql.Date(dateCalendar.getTime());
@@ -199,20 +189,17 @@ public class TPAInvokerSimulator {
                         } else if (paData.getBrand() != null && BRAND_LEXUS.equalsIgnoreCase(paData.getBrand())) {
                             idBrand = ApiConstants.ID_BRAND_LEXUS;
                         } else {
-                            log.error("A matricula " + numberplate + " n�o tem dados suficiente (vers�o, brand ou cod. local) na CarDB ou DBCRMTCP para fazer simula��o.");
                             return null;
                         }
 
                     }
                     ParameterizationFilter filter = ParameterizationFilter.builder().idBrand(ApiConstants.ID_BRAND_TOYOTA).build();
                     parameterizations = cacheConfig.getParameterizationsByClient(idBrand,filter);
-                    log.trace("*****TPA_MRS******POS ->  ApplicationConfiguration.getInstance().getParameterizationsByClient(idBrand, filter);");
                 }
             }
         }
         if (parameterizations != null && !parameterizations.isEmpty()) {
             LinkedHashMap<Integer, DocumentUnit> documentUnitsMap = getMapAllDocumentUnits(new LinkedHashMap<Integer, DocumentUnit>());
-            log.trace("*****TPA_MRS******POS ->  DocumentUnit.getHelper().getAllDocumentUnits();");
             ContactReason contactReason = contactRepository.findById(carInfo.getIdContactReason()).orElse(new ContactReason());
             simulation.setContactReason(contactReason.getContactReason());
             simulation.setCarInfo(carInfo);
@@ -490,7 +477,7 @@ public class TPAInvokerSimulator {
                     simulation.setService1ImgPostal(du1.getImgPostal());
                     simulation.setService1ImgEPostal(du1.getImgEPostal());
                     simulation.setService1Code(du1.getCode());
-                    validateDocumentUnit(du1.getName(),du1.getImgPostal(),du1.getImgEPostal(), "Servi�o", numberplate);
+                    validateDocumentUnit(du1.getName(),du1.getImgPostal(),du1.getImgEPostal(), SERVICIO, numberplate);
                 }
 
                 DocumentUnit du2 = documentUnitsMap.get(selectedServicoParam.getIdService2());
@@ -501,7 +488,7 @@ public class TPAInvokerSimulator {
                     simulation.setService2ImgPostal(du2.getImgPostal());
                     simulation.setService2ImgEPostal(du2.getImgEPostal());
                     simulation.setService2Code(du2.getCode());
-                    validateDocumentUnit(du2.getName(),du2.getImgPostal(),du2.getImgEPostal(), "Servi�o", numberplate);
+                    validateDocumentUnit(du2.getName(),du2.getImgPostal(),du2.getImgEPostal(), SERVICIO, numberplate);
                 }
 
                 DocumentUnit du3 = documentUnitsMap.get(selectedServicoParam.getIdService3());
@@ -512,7 +499,7 @@ public class TPAInvokerSimulator {
                     simulation.setService3ImgPostal(du3.getImgPostal());
                     simulation.setService3ImgEPostal(du3.getImgEPostal());
                     simulation.setService3Code(du3.getCode());
-                    validateDocumentUnit(du3.getName(),du3.getImgPostal(),du3.getImgEPostal(), "Servi�o", numberplate);
+                    validateDocumentUnit(du3.getName(),du3.getImgPostal(),du3.getImgEPostal(), SERVICIO, numberplate);
                 }
 
                 simulation.setServicoOriginParameterization(servicoOriginParameterization);
@@ -527,7 +514,7 @@ public class TPAInvokerSimulator {
                     simulation.setHighlight1ImgPostal(du4.getImgPostal());
                     simulation.setHighlight1ImgEPostal(du4.getImgEPostal());
                     simulation.setHighlight1Code(du4.getCode());
-                    validateDocumentUnit(du4.getName(),du4.getImgPostal(),du4.getImgEPostal(), "Destaque", numberplate);
+                    validateDocumentUnit(du4.getName(),du4.getImgPostal(),du4.getImgEPostal(), DESTAQUE, numberplate);
                 }
 
                 DocumentUnit du5 = documentUnitsMap.get(selectedDestaqueParam.getIdHighlight2());
@@ -538,7 +525,7 @@ public class TPAInvokerSimulator {
                     simulation.setHighlight2ImgPostal(du5.getImgPostal());
                     simulation.setHighlight2ImgEPostal(du5.getImgEPostal());
                     simulation.setHighlight2Code(du5.getCode());
-                    validateDocumentUnit(du5.getName(),du5.getImgPostal(),du5.getImgEPostal(), "Destaque", numberplate);
+                    validateDocumentUnit(du5.getName(),du5.getImgPostal(),du5.getImgEPostal(), DESTAQUE, numberplate);
 
                 }
 
@@ -555,7 +542,7 @@ public class TPAInvokerSimulator {
                     simulation.setHeader1ImgEPostal(du6.getImgEPostal());
                     simulation.setHeader1Code(du6.getCode());
                     simulation.setHeader1Link(du6.getLink());
-                    validateDocumentUnit(du6.getName(),du6.getImgPostal(),du6.getImgEPostal(), "Header", numberplate);
+                    validateDocumentUnit(du6.getName(),du6.getImgPostal(),du6.getImgEPostal(), HEADER, numberplate);
                 }
 
                 DocumentUnit du7 = documentUnitsMap.get(selectedHeaderParam.getIdHeader2());
@@ -565,7 +552,7 @@ public class TPAInvokerSimulator {
                     simulation.setHeader2ImgEPostal(du7.getImgEPostal());
                     simulation.setHeader2Code(du7.getCode());
                     simulation.setHeader2Link(du7.getLink());
-                    validateDocumentUnit(du7.getName(),du7.getImgPostal(),du7.getImgEPostal(), "Header", numberplate);
+                    validateDocumentUnit(du7.getName(),du7.getImgPostal(),du7.getImgEPostal(), HEADER, numberplate);
 
                 }
                 log.debug(TPA_DEBUG);
@@ -577,19 +564,17 @@ public class TPAInvokerSimulator {
                     simulation.setHeader3ImgEPostal(du8.getImgEPostal());
                     simulation.setHeader3Code(du8.getCode());
                     simulation.setHeader3Link(du8.getLink());
-                    validateDocumentUnit(du8.getName(),du8.getImgPostal(),du8.getImgEPostal(),"Header", numberplate);
+                    validateDocumentUnit(du8.getName(),du8.getImgPostal(),du8.getImgEPostal(),HEADER, numberplate);
 
                 }
                 log.debug(TPA_DEBUG);
 
                 simulation.setHeaderOriginParameterization(headerOriginParameterization);
             }
-            log.trace("*****TPA_MRS******PRE ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
             List<Acessories> acessories = null;
             if(isTPAImportFromBi){
                 acessories = getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);
             }
-            log.trace("*****TPA_MRS******POS ->  getAcessory(carInfo.getIdModel(), carInfo.getIdVc(), numberplate, wsCarLocation);");
 
             Acessories accessory = null;
             AcessorioGrupo kit = null;
@@ -597,14 +582,10 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(0) != null) {
                     accessory = acessories.get(0);
-                    log.trace("*****TPA_MRS******PRE ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    log.trace("*****TPA_MRS******POS ->   AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
 
                     simulation.setAccessory1Link(accessoryLink.getLink());
-                    log.trace("*****TPA_MRS******PRE ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    log.trace("*****TPA_MRS******POS ->   AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     simulation.setAccessory1Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
                         if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
@@ -660,14 +641,10 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(1) != null) {
                     accessory = acessories.get(1);
-                    log.trace("*****TPA_MRS******PRE -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    log.trace("*****TPA_MRS******POS -> 1  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
 
                     simulation.setAccessory2Link(accessoryLink.getLink());
-                    log.trace("*****TPA_MRS******PRE -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    log.trace("*****TPA_MRS******POS -> 1  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
 
                     simulation.setAccessory2Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
@@ -725,13 +702,9 @@ public class TPAInvokerSimulator {
 
                 if (acessories.get(0) != null) {
                     accessory = acessories.get(0);
-                    log.trace("*****TPA_MRS******PRE -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     Acessories accessoryLink = AcessoriesHelper.getAcessory(accessory.getIdAcessorio());
-                    log.trace("*****TPA_MRS******POS -> 2  AcessoriesHelper.getAcessory(accessory.getIdAcessorio());");
                     simulation.setAccessory1Link(accessoryLink.getLink());
-                    log.trace("*****TPA_MRS******PRE -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     kit  = AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());
-                    log.trace("*****TPA_MRS******POS -> 2  AcessorioGrupo.getHelper().getKitByAccessoryAndIdVc(accessory.getIdAcessorio(), carInfo.getIdVc());");
                     simulation.setAccessory1Name(accessory.getDescricao());
                     if(simulation.getPaData().getBrand().equals(BRAND_TOYOTA)){
                         if(accessoryLink.getLink() !=null && !accessoryLink.getLink().isEmpty()){
@@ -833,19 +806,19 @@ public class TPAInvokerSimulator {
     private static void validateDocumentUnit(String name, String imgPostal, String imgEPostal, String type, String numberplate) throws SCErrorException {
 
         if(name==null || name.isEmpty()){
-            SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Nome n�o definido para o "+type+" do carro com a matricula "+numberplate);
+            SCErrorException ex = new SCErrorException(PaConstants.TPA_DOCUMENT_ERROR_MESSAGE);
             log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
 
         if(imgPostal==null || imgPostal.isEmpty()){
-            SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Imagem Postal n�o definida para o "+type+" do carro com a matricula "+numberplate);
+            SCErrorException ex = new SCErrorException(PaConstants.TPA_DOCUMENT_ERROR_MESSAGE);
             log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
 
         if(imgEPostal==null || imgEPostal.isEmpty()){
-            SCErrorException ex = new SCErrorException("TPAInvokerSimulator.validateDocumentUnit","Imagem e-Postal n�odefinida para o "+type+" do carro com a matricula "+numberplate);
+            SCErrorException ex = new SCErrorException(PaConstants.TPA_DOCUMENT_ERROR_MESSAGE);
             log.error(ex.getErrorMessage(), ex);
             throw ex;
         }
@@ -877,7 +850,6 @@ public class TPAInvokerSimulator {
             }
         }
 
-        //Se n�o tiver encontrado, verificar se o carro tem 7+ e verificar se o parametro 7+ est� parametrizado
         if(ageIsInParametrization == false && idAge > 7){
             for (ItemsAge age:ages) {
                 if(age.getId() == PaConstants.ID_PA_PARAMETRIZATION_AGE_7_PLUS){
@@ -970,8 +942,8 @@ public class TPAInvokerSimulator {
 
     private static List<Acessories> getAcessory(int idModel, int idVc, String plate, String wsCarLocation) throws SCErrorException {
 
-        List<Acessories> priorityAcessories = new ArrayList<Acessories>();
-        List<Integer> lstIdsModel = new ArrayList<Integer>();
+        List<Acessories> priorityAcessories = new ArrayList<>();
+        List<Integer> lstIdsModel = new ArrayList<>();
         lstIdsModel.add(idModel);
 
         List<AccessoryInstalled> installedAccessories = null;
@@ -984,7 +956,7 @@ public class TPAInvokerSimulator {
 
         if (oAccessoryInstalledResponse != null &&
                 oAccessoryInstalledResponse.getAcessoryInstalled() != null &&
-                oAccessoryInstalledResponse.getAcessoryInstalled().size() > 0) {
+                !oAccessoryInstalledResponse.getAcessoryInstalled().isEmpty()) {
             installedAccessories = oAccessoryInstalledResponse.getAcessoryInstalled();
         }
 
@@ -1007,7 +979,7 @@ public class TPAInvokerSimulator {
                     }
                 }
             }
-            if (lstIdsAcessories.size() > 0) {
+            if (!lstIdsAcessories.isEmpty()) {
 
                 HashMap<Integer, String> priorityAccessories = AcessoriesHelper.getPriorityAcessories(idVc,
                         lstIdsAcessories, true, 2);
@@ -1041,9 +1013,7 @@ public class TPAInvokerSimulator {
            Car carDBInfo1 = null;
 
            WsInvokeCarServiceTCAP oWsInfo = new WsInvokeCarServiceTCAP(wsCarLocation);
-           log.debug("*****TPA_MRS_SIMULATION****** Get CarInfoResponse");
            CarInfoResponse oCarInfoResponse = oWsInfo.getCarByPlate(numberplate);
-           log.debug("*****TPA_MRS_SIMULATION****** Get CarInfoResponse");
            RepairResponse repairs = null;
            if (isTPAImportFromBi) {
                repairs = oWsInfo.getCarRepairsByPlate(numberplate);
@@ -1113,7 +1083,6 @@ public class TPAInvokerSimulator {
                }
 
                carDBInfo1 = CarHelper.getCarInfo(comercialModelCode, versionCode);
-               log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate+2);
 
                if (carDBInfo1 != null) {
                    Fuel fuel = CarHelper.getFuelsByIdVc(carDBInfo1.getIdVc());
@@ -1127,7 +1096,6 @@ public class TPAInvokerSimulator {
                    carInfo.setIdModel(carDBInfo1.getModel().getId());
                    carInfo.setCar(carDBInfo1);
                }
-               log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate+3);
 
                if (paData != null) {
                    Dealer dealer = null;
@@ -1253,7 +1221,6 @@ public class TPAInvokerSimulator {
 
                carInfo.setNumberPlate(numberplate);
            }
-           log.debug("*****TPA_MRS_SIMULATION******   PLATE:"+numberplate);
            return carInfo;
        }catch (Exception e){
            throw new ProgramaAvisosException("Car Info Error");

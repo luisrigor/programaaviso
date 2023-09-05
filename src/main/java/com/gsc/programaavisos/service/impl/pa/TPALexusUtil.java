@@ -4,7 +4,6 @@ import com.gsc.programaavisos.dto.TpaSimulation;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.PARepository;
-import com.gsc.programaavisos.util.PAUtil;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.sc.commons.exceptions.SCErrorException;

@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.util;
 
 import com.gsc.programaavisos.dto.FilterBean;
-
 import java.sql.Date;
 import java.util.Calendar;
 
@@ -18,6 +17,4 @@ public class PAUtil {
     public static String getUserStamp(String userName){
         return userName.split("\\|\\|")[0]+"||"+userName.split("\\|\\|")[1];
     }
-
-
 }

@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.model.crm.entity;
 
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import lombok.*;
 

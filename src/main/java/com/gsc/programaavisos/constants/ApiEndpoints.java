@@ -43,6 +43,7 @@ public interface ApiEndpoints {
     String GET_MAIN_TYPE = "/main-types";
     String GET_PA_DETAIL= "/details-pa";
     String GET_TPA_SIMULATOR= "/tpa-simulation";
+    String SAVE_MANAGE_ITEMS = "/save-manage-item";
     String DOWNLOAD_SIMULATION = "/download-simulation";
     String SEND_NEWSLETTER = "/send-newsletter";
 }

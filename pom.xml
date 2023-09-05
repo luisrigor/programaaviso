@@ -183,7 +183,8 @@
             <groupId>GSC</groupId>
             <artifactId>SCGesDoc</artifactId>
             <version>20221124</version>
-        </dependency><dependency>
+        </dependency>
+        <dependency>
             <groupId>GSC</groupId>
             <artifactId>SCNewsletterWSClient</artifactId>
             <version>20220822</version>
@@ -196,6 +197,16 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
         </dependency>
     </dependencies>
     <dependencyManagement>

@@ -1,7 +1,5 @@
 package com.gsc.programaavisos.model.crm.entity;
 
-import com.sc.commons.exceptions.SCErrorException;
-import io.swagger.models.auth.In;
 import lombok.*;
 
 import javax.persistence.*;

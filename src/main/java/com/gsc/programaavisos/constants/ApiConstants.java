@@ -1,14 +1,6 @@
 package com.gsc.programaavisos.constants;
 
-import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.rg.dealer.Dealer;
-import com.sc.commons.utils.ServerTasks;
-import org.springframework.core.env.Environment;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ApiConstants {
 

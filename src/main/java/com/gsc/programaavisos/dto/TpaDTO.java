@@ -2,7 +2,6 @@ package com.gsc.programaavisos.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter

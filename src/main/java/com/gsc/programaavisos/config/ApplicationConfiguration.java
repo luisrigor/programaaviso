@@ -1,15 +1,11 @@
 package com.gsc.programaavisos.config;
 
-import com.gsc.programaavisos.dto.ParameterizationFilter;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
-import com.gsc.programaavisos.service.ParametrizationService;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 

@@ -2,6 +2,7 @@ package com.gsc.programaavisos.dto;
 
 import com.sc.commons.utils.DataBaseTasks;
 import lombok.*;
+
 import javax.persistence.Query;
 import java.util.Date;
 

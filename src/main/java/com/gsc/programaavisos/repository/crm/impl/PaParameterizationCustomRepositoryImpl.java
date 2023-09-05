@@ -4,7 +4,6 @@ import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.repository.crm.PaParameterizationCustomRepository;
 
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;

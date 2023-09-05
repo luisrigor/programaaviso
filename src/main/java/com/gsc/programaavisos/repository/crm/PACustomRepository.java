@@ -1,9 +1,8 @@
 package com.gsc.programaavisos.repository.crm;
 
 import com.gsc.programaavisos.dto.FilterBean;
-import com.gsc.programaavisos.dto.ProgramaAvisosBean;
-
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
+import com.gsc.programaavisos.dto.ProgramaAvisosBean;
 
 import java.util.List;
 import java.util.Map;

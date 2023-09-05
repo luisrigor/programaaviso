@@ -3,6 +3,7 @@ package com.gsc.programaavisos.controller;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ItemService;
 import io.swagger.annotations.Api;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -51,5 +54,15 @@ public class ItemsController {
         log.info("getManageItemsList controller");
         List<DocumentUnitDTO> documentUnitDTOList = itemService.getListManagesItems(userPrincipal,searchInput, itemType);
         return ResponseEntity.status(HttpStatus.OK).body(documentUnitDTOList);
+    }
+
+    @PostMapping(ApiEndpoints.SAVE_MANAGE_ITEMS)
+    public ResponseEntity<String> saveManageItem(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                 @RequestPart("data") SaveManageItemDTO saveManageItemDTO,
+                                                 @RequestPart("files") MultipartFile[] files) {
+        log.info("getManageItemsList controller");
+
+        itemService.saveManageItems(userPrincipal, saveManageItemDTO, files);
+        return ResponseEntity.status(HttpStatus.OK).body("Successfully Save");
     }
 }
