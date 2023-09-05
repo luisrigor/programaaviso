@@ -56,7 +56,9 @@ app:
       jndi: jdbc/dbtoynet
     third:
       jndi: jdbc/cardb
-
+  ctt:
+    client:
+      url: "https://demowssccommons.rigorcg.pt/WSSCCommons/services/CTTService/"
 secundary:
   dbs:
     jndi: jdbc/usrlogon,jdbc/dbtoynet,jdbc/cardb,jdbc/ctt,jdbc/webcallc,jdbc/dbclaims,jdbc/dblists,jdbc/lexxtaps
