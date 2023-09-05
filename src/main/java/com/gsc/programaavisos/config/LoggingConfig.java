@@ -15,7 +15,7 @@ public class LoggingConfig {
     private String log4jConfigPath;
 
     @Value("${app.server.type}")
-    private int SERVER_TYPE;
+    private int serverType;
 
     @Bean
     public void configureLogging() throws IOException {

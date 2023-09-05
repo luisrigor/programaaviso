@@ -30,6 +30,7 @@ public class MapProfileVariables {
     public static final String CONST_IMG_POSTAL_SERVICE_URL_VALUE= "https://dev.rigorcg.pt/files/programa_de_avisos/postais/servicos";
     public static final String CONST_IMG_POSTAL_HIGHLIGHT_URL_VALUE= "https://dev.rigorcg.pt/files/programa_de_avisos/postais/comum";
     public static final String CONST_IMG_POSTAL_HEADER_URL_VALUE= "https://dev.rigorcg.pt/files/programa_de_avisos/postais/headers";
+    private static final String WS_CAR_LOCATION = "https://wscar.gruposalvadorcaetano.pt";
 
 
     public static Map<String, String> getEnvVariablesLocal() {
@@ -60,7 +61,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, CONST_IMG_POSTAL_HIGHLIGHT_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, CONST_IMG_POSTAL_HEADER_URL_VALUE);
         envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
-        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
+        envVariables.put(CONST_WS_CAR_LOCATION, WS_CAR_LOCATION);
         return envVariables;
     }
 
@@ -76,7 +77,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, CONST_IMG_POSTAL_HIGHLIGHT_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, CONST_IMG_POSTAL_HEADER_URL_VALUE);
         envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
-        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
+        envVariables.put(CONST_WS_CAR_LOCATION, WS_CAR_LOCATION);
 
         return envVariables;
     }
@@ -93,7 +94,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/headers");
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/headers");
         envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_PRODUCTION);
-        envVariables.put(CONST_WS_CAR_LOCATION, "https://wscar.gruposalvadorcaetano.pt");
+        envVariables.put(CONST_WS_CAR_LOCATION, WS_CAR_LOCATION);
 
         return envVariables;
     }

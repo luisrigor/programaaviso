@@ -48,8 +48,4 @@ public class PAInfo {
     public static final NumberFormat CURRENCY_FORMAT	= new DecimalFormat("#,###.00");
     public static final NumberFormat KM_FORMAT		= new DecimalFormat("#,###,###");
 
-    private static final String BRAND_TOYOTA = "T";
-
-    private static final String BRAND_LEXUS = "L";
-
 }
