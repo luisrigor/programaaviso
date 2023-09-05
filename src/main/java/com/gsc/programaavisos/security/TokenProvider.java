@@ -45,6 +45,7 @@ public class TokenProvider {
    private static final String OID_DEALER_PARENT = "dealer_parent";
    private static final String OID_DEALER = "dealer";
    private static final String OID_NET = "oid_net";
+   private static final String INVALID_TOKEN = "Invalid access token.";
 
    private final ConfigurationRepository configurationRepository;
    private final ServiceLoginRepository serviceLoginRepository;
@@ -154,7 +155,7 @@ public class TokenProvider {
             Collections.emptyList()
          );
       } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-         throw new BadCredentialsException("Invalid access token.");
+         throw new BadCredentialsException(INVALID_TOKEN);
       } catch (ExpiredJwtException ex) {
          throw new AuthTokenException("The session has expired " + ex.getMessage(), ex);
       }
@@ -163,12 +164,12 @@ public class TokenProvider {
    private JwtAuthenticationToken validateServiceToken(String authToken) throws AuthenticationException {
       String[] parts = authToken.split(":", -1);
       if (parts.length != 2) {
-         throw new BadCredentialsException("Invalid access token.");
+         throw new BadCredentialsException(INVALID_TOKEN);
       }
 
       Optional<ServiceLogin> serviceLogin = serviceLoginRepository.findByNameAndValue(parts[0], parts[1]);
 
-      ServiceLogin sl = serviceLogin.orElseThrow(() -> new BadCredentialsException("Invalid access token."));
+      ServiceLogin sl = serviceLogin.orElseThrow(() -> new BadCredentialsException(INVALID_TOKEN));
 
       return JwtAuthenticationToken.authenticated(
          new UserPrincipal(

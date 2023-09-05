@@ -2,23 +2,23 @@ package com.gsc.programaavisos.service.impl;
 
 import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
+import com.gsc.claims.object.core.ClaimDetail;
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.config.CacheConfig;
-import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.PaDataInfoP;
-import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
+import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
-import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.PAUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
@@ -28,7 +28,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
@@ -39,15 +38,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import com.gsc.claims.object.core.ClaimDetail;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
+
 import static com.gsc.programaavisos.constants.AppProfile.*;
 
 
@@ -962,12 +962,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO)
-            {
+    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO) {
 
         String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
         String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
-
 
         try {
             TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
@@ -987,6 +985,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         } catch (SCErrorException e) {
             throw new ProgramaAvisosException("Error Getting CarInfo", e);
         }
-            }
+    }
 
 }

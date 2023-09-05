@@ -1,11 +1,9 @@
 package com.gsc.programaavisos.model.cardb.entity;
 
-import com.gsc.cardb.car.Car;
 import lombok.*;
 
 import javax.persistence.Transient;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

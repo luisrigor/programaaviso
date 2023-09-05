@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Timestamp;
 
 
 @Log4j
@@ -31,6 +31,7 @@ public class ProgramaAvisosUtil {
     private static final String BRAND_TOYOTA = "T";
 
     private static final String BRAND_LEXUS = "L";
+    private static final String PERSONAL_FIELDS = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
 
     @Autowired
     public ProgramaAvisosUtil(PARepository paRepository, CallsRepository callsRepository) {
@@ -227,11 +228,11 @@ public class ProgramaAvisosUtil {
             switch (idContactType) {
                 case ContactTypeB.MAN:
                     requiredFields = "urlimages;linkheader1;imgheader1;model;plate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";
-                    personalFields = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
+                    personalFields = PERSONAL_FIELDS;
                     break;
                 case ContactTypeB.ITV:
                     requiredFields = "urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";
-                    personalFields = "email;urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;linkservice1;imgservice1;nameservice1;descservice1;linkservice2;imgservice2;nameservice2;descservice2;linkservice3;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;linkaccessory1;imgaccessory1;nameaccessory2;descaccessory2;linkaccessory2;imgaccessory2;linkhighlight1;imghighlight1";
+                    personalFields = PERSONAL_FIELDS;
                     break;
                 case ContactTypeB.MAN_ITV:
                     requiredFields = "urlimages;linkheader1;imgheader1;model;plate;nextitvdate;name;linkgeneratedfromosb;imgservice1;nameservice1;descservice1;imgservice2;nameservice2;descservice2;imgservice3;nameservice3;descservice3;nameaccessory1;descaccessory1;imgaccessory1;nameaccessory2;descaccessory2;imgaccessory2;imghighlight1,linkservice1;linkservice2;linkservice3;linkaccessory1;linkaccessory2;linkhighlight1";

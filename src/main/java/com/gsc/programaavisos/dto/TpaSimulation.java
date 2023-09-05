@@ -1,9 +1,8 @@
 package com.gsc.programaavisos.dto;
 
-import com.gsc.programaavisos.model.crm.entity.Mrs;
 import com.gsc.programaavisos.model.cardb.entity.CarInfo;
+import com.gsc.programaavisos.model.crm.entity.Mrs;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
-import com.sc.commons.exceptions.SCErrorException;
 import lombok.*;
 
 import java.util.List;

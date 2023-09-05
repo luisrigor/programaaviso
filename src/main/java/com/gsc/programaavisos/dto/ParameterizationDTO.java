@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gsc.programaavisos.model.crm.entity.ParametrizationItems;
 import lombok.*;
 
-
 import java.util.Date;
 import java.util.List;
 

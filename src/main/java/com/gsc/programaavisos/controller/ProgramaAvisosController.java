@@ -4,11 +4,6 @@ package com.gsc.programaavisos.controller;
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
-
-import com.gsc.programaavisos.dto.TpaSimulation;
-import com.gsc.programaavisos.model.crm.entity.Mrs;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import io.swagger.annotations.Api;
@@ -18,11 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.HashMap;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Log4j

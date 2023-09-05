@@ -33,8 +33,17 @@ public class PaConstants {
 
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
+    private static final String PARAM_MENAGE_ITEMS_NAME = "serviceName";
     public static String WS_CAR_LOCATION="https://wscar.gruposalvadorcaetano.pt";
     public static final int ECARE = 1;
+
+    public static String FTP_MANAGE_ITEM_SERVER;
+    public static String FTP_MANAGE_ITEM_PWD;
+    public static String FTP_MANAGE_ITEM_ADDRESS;
+    public static String FTP_MANAGE_ITEM_LOGIN;
+
+    public static String BACKSLASH = "/";
+
     public final static int BUSINESS_PLUS_ID	= 2;
     public final static int NORMAL_ID	= 1;
     public static final int ID_CONTACT_TYPE_MAN = 1;
@@ -47,4 +56,6 @@ public class PaConstants {
     public static final int MAN	= 1;
     public static final int ITV	= 2;
     public static final int MAN_ITV	= 3;
+    public static String TPA_DOCUMENT_ERROR_MESSAGE ="TPAInvokerSimulator.validateDocumentUnit";
+
 }

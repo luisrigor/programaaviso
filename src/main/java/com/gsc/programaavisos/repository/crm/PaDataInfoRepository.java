@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.repository.crm;
 
-import com.gsc.programaavisos.dto.DataInfoFieldsDTO;
 import com.gsc.programaavisos.model.crm.CompositeDataInfo;
 import com.gsc.programaavisos.model.crm.entity.PaDataInfo;
 import org.springframework.data.jpa.repository.JpaRepository;

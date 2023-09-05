@@ -2,34 +2,27 @@ package com.gsc.programaavisos.repository.crm.impl;
 
 import com.gsc.programaavisos.config.AliasToEntityMapResultTransformer;
 import com.gsc.programaavisos.dto.FilterBean;
+import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.dto.ProgramaAvisosBean;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import com.gsc.programaavisos.repository.crm.PACustomRepository;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.DataBaseTasks;
 import com.sc.commons.utils.StringTasks;
 import org.hibernate.query.internal.NativeQueryImpl;
-import com.sc.commons.dbconnection.ServerJDBCConnection;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.DataBaseTasks;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PACustomRepositoryImpl implements PACustomRepository {
 
 
     @PersistenceContext
     private EntityManager em;
+    private final static String PA_DATA_TABLE = " FROM PA_DATA_INFO ";
 
     @Override
     public List<String> getDelegators(int fromYear, int fromMonth, int toYear, int toMonth, String oidDealer) {
@@ -38,7 +31,7 @@ public class PACustomRepositoryImpl implements PACustomRepository {
 
         sql.append(" SELECT PA_DELEGATED_TO FROM ( ");
         sql.append(" SELECT PA_DELEGATED_TO,COLLATION_KEY_BIT(PA_DELEGATED_TO, 'UCA500R1_S1') AS ORDER_FIELD ");
-        sql.append(" FROM PA_DATA_INFO ");
+        sql.append(PA_DATA_TABLE);
         sql.append(" WHERE (");
         sql.append("(PA_YEAR > " + fromYear + " OR (PA_YEAR = " + fromYear + " AND PA_MONTH >= " + fromMonth + "))");
         sql.append(" AND (");
@@ -63,7 +56,7 @@ public class PACustomRepositoryImpl implements PACustomRepository {
         sql.append(" SELECT DISTINCT PA_CHANGED_BY, ");
         sql.append(" CASE WHEN U.NOME_COMERCIAL<>'' THEN U.NOME_COMERCIAL ELSE U.NOME_UTILIZADOR END AS NOME, ");
         sql.append(" COLLATION_KEY_BIT(CASE WHEN U.NOME_COMERCIAL<>'' THEN U.NOME_COMERCIAL ELSE U.NOME_UTILIZADOR END, 'UCA500R1_S1') AS ORDER_FIELD ");
-        sql.append(" FROM PA_DATA_INFO ");
+        sql.append(PA_DATA_TABLE);
         sql.append(" LEFT JOIN USRLOGON_UTILIZADOR U ON PA_CHANGED_BY = CHAR(U.ID_UTILIZADOR) ");
         sql.append(" WHERE (");
         sql.append("(PA_YEAR > " + fromYear + " OR (PA_YEAR = " + fromYear + " AND PA_MONTH >= " + fromMonth + "))");
@@ -163,7 +156,7 @@ public class PACustomRepositoryImpl implements PACustomRepository {
 
             sql.append(" SELECT PA_DATA_INFO.*, ");
             sql.append(" HHC.PRODUCT_ID AS HHC_PRODUCT_ID, HHC.PRODUCT_DESCRIPTION AS HHC_PRODUCT_DESCRIPTION, HHC.PRODUCT_DISPLAY_NAME AS HHC_PRODUCT_DISPLAY_NAME, HHC.CONTRACT_START_DATE AS HHC_CONTRACT_START_DATE, HHC.CONTRACT_END_DATE AS HHC_CONTRACT_END_DATE, (HHC.MILEAGE_CONTRACT_CREATION + HHC.COVER_KM) AS HHC_CONTRACT_END_KM ");
-            sql.append(" FROM PA_DATA_INFO ");
+            sql.append(PA_DATA_TABLE);
             sql.append(" LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN AND HHC.CONTRACT_STATUS='Active' ");
             sql.append(" WHERE PA_ID = " + idPA);
 
