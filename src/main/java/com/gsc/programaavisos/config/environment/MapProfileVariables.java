@@ -2,26 +2,23 @@ package com.gsc.programaavisos.config.environment;
 
 import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
 import lombok.NoArgsConstructor;
-
 import java.util.HashMap;
 import java.util.Map;
 
 @NoArgsConstructor
 public class MapProfileVariables {
 
-    public static String CONST_FTP_MANAGE_ITEM_SERVER = "FTP_MANAGE_ITEM_SERVER";
-    public static String CONST_FTP_MANAGE_ITEM_LOGIN = "FTP_MANAGE_ITEM_LOGIN";
-    public static String CONST_FTP_MANAGE_ITEM_PWD = "FTP_MANAGE_ITEM_PWD";
-    public static String CONST_FTP_MANAGE_ITEM_ADDRESS = "FTP_MANAGE_ITEM_ADDRESS";
-    public static String CONST_STATIC_FILES_URL = "STATIC_FILES_URL";
-    public static String CONST_IMG_POSTAL_ACCESSORY_URL = "IMG_POSTAL_ACCESSORY_URL";
-    public static String CONST_IMG_POSTAL_SERVICE_URL = "IMG_POSTAL_SERVICE_URL";
-    public static String CONST_IMG_POSTAL_HIGHLIGHT_URL = "IMG_POSTAL_HIGHLIGHT_URL";
-    public static String CONST_IMG_POSTAL_HEADER_URL = "IMG_POSTAL_HEADER_URL";
-    public static String CONST_WS_NEWSLETTER_SERVER = "WS_NEWSLETTER_SERVER";
-
-
-    public static String CONST_WS_CAR_LOCATION= "CONST_WS_CAR_LOCATION";
+    public static final String CONST_FTP_MANAGE_ITEM_SERVER = "FTP_MANAGE_ITEM_SERVER";
+    public static final String CONST_FTP_MANAGE_ITEM_LOGIN = "FTP_MANAGE_ITEM_LOGIN";
+    public static final String CONST_FTP_MANAGE_ITEM_PWD = "FTP_MANAGE_ITEM_PWD";
+    public static final String CONST_FTP_MANAGE_ITEM_ADDRESS = "FTP_MANAGE_ITEM_ADDRESS";
+    public static final String CONST_STATIC_FILES_URL = "STATIC_FILES_URL";
+    public static final String CONST_IMG_POSTAL_ACCESSORY_URL = "IMG_POSTAL_ACCESSORY_URL";
+    public static final String CONST_IMG_POSTAL_SERVICE_URL = "IMG_POSTAL_SERVICE_URL";
+    public static final String CONST_IMG_POSTAL_HIGHLIGHT_URL = "IMG_POSTAL_HIGHLIGHT_URL";
+    public static final String CONST_IMG_POSTAL_HEADER_URL = "IMG_POSTAL_HEADER_URL";
+    public static final String CONST_WS_NEWSLETTER_SERVER = "WS_NEWSLETTER_SERVER";
+    public static final String  CONST_WS_CAR_LOCATION= "CONST_WS_CAR_LOCATION";
 
 
     public static Map<String, String> getEnvVariablesLocal() {
