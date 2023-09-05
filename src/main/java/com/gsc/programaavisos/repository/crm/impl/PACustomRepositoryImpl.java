@@ -12,10 +12,7 @@ import org.hibernate.query.internal.NativeQueryImpl;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PACustomRepositoryImpl implements PACustomRepository {
 
@@ -164,9 +161,9 @@ public class PACustomRepositoryImpl implements PACustomRepository {
             NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
             nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
             List<Map<String,Object>> result = nativeQuery.getResultList();
-            for (Map<String,Object> currentRs: result) {
-                return new ProgramaAvisosBean(currentRs, false);
-            }
+            if(result !=null && !result.isEmpty())
+                return new ProgramaAvisosBean(result.get(0), false);
+
             return null;
         } catch (Exception e) {
             throw new ProgramaAvisosException("Error executing getOpenContactsforClient query ", e);
