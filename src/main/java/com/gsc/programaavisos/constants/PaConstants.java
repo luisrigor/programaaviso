@@ -41,7 +41,7 @@ public class PaConstants {
     public static String FTP_MANAGE_ITEM_ADDRESS;
     public static String FTP_MANAGE_ITEM_LOGIN;
 
-    public static String BACKSLASH = "/";
+    public static final String BACKSLASH = "/";
 
     public static final int BUSINESS_PLUS_ID	= 2;
     public static final int NORMAL_ID	= 1;
