@@ -63,7 +63,7 @@ public class DocumentUnit {
     @Column(name = "IMG_E_POSTAL")
     private String imgEPostal;
     @Column(name = "STATUS")
-    private String status;
+    private Character status;
     @Column(name = "DT_END")
     private LocalDate dtEnd;
     @Column(name = "CREATED_BY")

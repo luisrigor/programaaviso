@@ -147,14 +147,12 @@ public class ItemServiceImpl implements ItemService {
     public void saveManageItems(UserPrincipal oGSCUser, SaveManageItemDTO saveManageItemDTO, MultipartFile[] files) {
 
         int idBrand = ApiConstants.getIdBrand(oGSCUser.getOidNet());
-
-        String uplodadDir = System.getProperty("java.io.tmpdir");
+        String uploadDir = System.getProperty("java.io.tmpdir");
 
         File fileAttach1;
         File fileAttach2;
 
         Map<String, String> envVar = environmentConfig.getEnvVariables();
-
 
         try {
             Integer idItemType = saveManageItemDTO.getIdItemType();
@@ -184,7 +182,7 @@ public class ItemServiceImpl implements ItemService {
                 List<MultipartFile> fileAttachItems = new ArrayList<>(Arrays.asList(files));
 
                 documentUnit = new DocumentUnit();
-                documentUnit.setStatus("S");
+                documentUnit.setStatus('S');
                 documentUnit.setIdDocumentUnitType(idItemType);
                 documentUnit.setIdDocumentUnitCategory(categoryId);
                 documentUnit.setLink(link);
@@ -193,13 +191,15 @@ public class ItemServiceImpl implements ItemService {
                 documentUnit.setDescription(description);
                 documentUnit.setIdBrand(idBrand);
                 documentUnit.setDtEnd(dtEnd);
+                documentUnit.setCreatedBy(oGSCUser.getUsername());
+                documentUnit.setDtCreated(LocalDate.now());
                 String extension;
 
                 if (!fileAttachItems.isEmpty()) {
                     BufferedImage image = ImageIO.read(fileAttachItems.get(0).getInputStream());
                     extension = getFileExtension(fileAttachItems.get(0));
                     documentUnit.setImgPostal(code + "." + extension);
-                    fileAttach1 = new File(uplodadDir + PaConstants.BACKSLASH + code + "." + extension);
+                    fileAttach1 = new File(uploadDir + PaConstants.BACKSLASH + code + "." + extension);
                     ImageIO.write(image, extension, fileAttach1);
 
                     if (idItemType == 1) {
@@ -220,12 +220,12 @@ public class ItemServiceImpl implements ItemService {
                     BufferedImage image = ImageIO.read(fileAttachItems.get(1).getInputStream());
                     extension = getFileExtension(fileAttachItems.get(1));
                     documentUnit.setImgEPostal(code + "." + extension);
-                    fileAttach2 = new File(uplodadDir + "/" + code + "." + extension);
+                    fileAttach2 = new File(uploadDir + "/" + code + "." + extension);
                     ImageIO.write(image, extension, fileAttach2);
 
-                    SftpTasks.putFile(PaConstants.FTP_MANAGE_ITEM_SERVER, PaConstants.FTP_MANAGE_ITEM_LOGIN,
-                            PaConstants.FTP_MANAGE_ITEM_PWD, fileAttach2,
-                            PaConstants.FTP_MANAGE_ITEM_ADDRESS + PaConstants.FTP_EPOSTAL_PATH);
+                    SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
+                            envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach2,
+                            envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_EPOSTAL_PATH);
                 }
                 documentUnitRepository.save(documentUnit);
             }
@@ -244,6 +244,4 @@ public class ItemServiceImpl implements ItemService {
         }
         return null;
     }
-
-
 }
