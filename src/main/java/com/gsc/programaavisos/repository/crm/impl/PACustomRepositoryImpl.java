@@ -106,7 +106,7 @@ public class PACustomRepositoryImpl implements PACustomRepository {
 
             FilterBean tmpFilterBean = null;
             try {
-                tmpFilterBean = (FilterBean) oFilter.clone();
+                tmpFilterBean = new FilterBean(oFilter);
                 tmpFilterBean.setFromYear(2013);
                 tmpFilterBean.setFromMonth(1);
                 tmpFilterBean.setToYear(9999);
@@ -117,7 +117,7 @@ public class PACustomRepositoryImpl implements PACustomRepository {
                 tmpFilterBean.clearState();
                 tmpFilterBean.setStatePending(1);
                 tmpFilterBean.setStateHasSchedule(1);
-            } catch (CloneNotSupportedException e) {
+            } catch (Exception e) {
             }
             if(tmpFilterBean!=null){
                 sql.append(" SELECT * FROM PA_DATA_INFO " + tmpFilterBean.getWhereClause(getMaintenanceTypesByContactType) + " AND (1=2 ");
