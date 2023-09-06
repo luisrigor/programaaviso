@@ -20,8 +20,8 @@ public class CttServiceImpl implements CttService {
     @Override
     public ResponseEntity<String> getCttAddressInfo(String cp4, String cp3) {
         Map<String, String> headers = new HashMap<>();
-        String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnZpcm9tZW50IjoyMCwiY29tcGFueSI6IlJpZ29yIn0.BXNRh9MvAp7KNxNjYF5WH1guWe9-IaRbvePO0ootHFc";
-        headers.put("accessToken", accessToken);
+        String accessT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbnZpcm9tZW50IjoyMCwiY29tcGFueSI6IlJpZ29yIn0.BXNRh9MvAp7KNxNjYF5WH1guWe9-IaRbvePO0ootHFc";
+        headers.put("accessToken", accessT);
 
         return cttClient.getCttAddressInfo(headers, cp4, cp3);
     }

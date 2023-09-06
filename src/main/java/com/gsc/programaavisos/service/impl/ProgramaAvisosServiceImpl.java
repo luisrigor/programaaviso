@@ -257,23 +257,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    @Override
-    public void uploadFile(UserPrincipal userPrincipal, MultipartFile file) {
-
-        String importErrors = "";
-        try {
-            //TODO Validate file
-            // validate file
-//            String importErrors = CSVUploadFileUtils.validateFile(file);
-
-            // parse file and update DB
-            importErrors = parseAndUpdateDB(file, userPrincipal, importErrors);
-        } catch(Exception e) {
-            throw new ProgramaAvisosException("An error occurred while uploading files ", e);
-        }
-
-    }
-
     public void unlockPARegister(Integer id) {
         try {
             paRepository.updateBlockedByById("", id);
