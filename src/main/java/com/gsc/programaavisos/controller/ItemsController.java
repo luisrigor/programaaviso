@@ -44,7 +44,6 @@ public class ItemsController {
                                                          @RequestParam int itemType, @RequestParam int itemId) {
         log.info("getManageItems controller");
         ManageItemsDTO manageItems = itemService.getManageItems(userPrincipal, itemType, itemId);
-
         return ResponseEntity.status(HttpStatus.OK).body(manageItems);
     }
 
@@ -60,8 +59,6 @@ public class ItemsController {
     public ResponseEntity<String> saveManageItem(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                  @RequestPart("data") SaveManageItemDTO saveManageItemDTO,
                                                  @RequestPart("files") MultipartFile[] files) {
-        log.info("getManageItemsList controller");
-
         itemService.saveManageItems(userPrincipal, saveManageItemDTO, files);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully Save");
     }
