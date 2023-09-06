@@ -81,9 +81,6 @@ public class FilterBean implements Cloneable{
     // OWNER
     private String owner;
 
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 
     public void clearState() {
         setStatePending(0);
