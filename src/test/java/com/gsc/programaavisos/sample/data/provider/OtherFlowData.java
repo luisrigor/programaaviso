@@ -128,10 +128,52 @@ public class OtherFlowData {
     }
 
     public static ClientPropDTO getClientPropDTO(){
-        return  ClientPropDTO.builder()
+        return ClientPropDTO.builder()
                 .id(1)
                 .nextRevision("2023-09-01")
                 .licencePlate("ABC123")
                 .build();
     }
+
+    public static GetDelegatorsDTO getGetDelegatorsDTO(){
+        return GetDelegatorsDTO.builder()
+                .fromYear("2022")
+                .toYear("2023")
+                .fromMonth("01")
+                .toMonth("12")
+                .arrayOidDealer(new String[]{"dealer1", "dealer2"})
+                .build();
+    }
+
+    public static ClientType getClientType(){
+        return ClientType.builder()
+                .id(1)
+                .name("RANDOM_NAME")
+                .status('S')
+                .createdBy("RANDOM_CREATED_BY")
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
+    public static Channel getChannel(){
+        return  Channel.builder()
+                .id(1)
+                .name(RANDOM_NAME)
+                .status('S')
+                .createdBy(RANDOM_CREATED_BY)
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
+    public static Source getSource(){
+        return  Source.builder()
+                .id(1)
+                .name(RANDOM_NAME)
+                .status('S')
+                .createdBy(RANDOM_CREATED_BY)
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
+
 }

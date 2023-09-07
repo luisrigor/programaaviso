@@ -189,6 +189,9 @@ public class ProgramaAvisosBean {
 	protected Date ivDtVisible;
 	protected int ivWarningPriority;
 
+	public ProgramaAvisosBean() {
+	}
+
 	public ProgramaAvisosBean(Map<String,Object> rs, boolean withHHC) throws Exception {
 		//------------------------ Info PA_DATA
 		setId((Integer) rs.get("PA_ID"));
