@@ -51,14 +51,6 @@ public class ProgramaAvisosController {
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
         return ResponseEntity.status(HttpStatus.OK).body("removed");
     }
-
-    @PostMapping(ApiEndpoints.UPLOAD_FILE)
-    public ResponseEntity<String> uploadFile(@AuthenticationPrincipal UserPrincipal userPrincipal,  @RequestPart MultipartFile file) {
-        log.info("uploadFile controller");
-        programaAvisosService.uploadFile(userPrincipal, file);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Document successfully imported.");
-    }
     @PutMapping(ApiEndpoints.UNLOCK_PA)
     public ResponseEntity<String> unlockPARegister(@RequestParam Integer id) {
         log.info("unlockPARegister controller");

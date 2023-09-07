@@ -116,14 +116,6 @@ public class ProgramaAvisosControllerTest {
                 .andExpect(status().isOk());
     }
 
-    void whenRequestUploadFileThenItsSuccessfully() throws Exception {
-        String accessToken = generatedToken;
-        doNothing().when(programaAvisosService).uploadFile(any(),any());
-        mvc.perform(post(BASE_REQUEST_MAPPING+ ApiEndpoints.UPLOAD_FILE)
-                        .header("accessToken", accessToken))
-                .andExpect(status().isOk());
-    }
-
     @Test
     void whenRequestUnlockPARegisterThenItsSuccessfully() throws Exception {
         String accessToken = generatedToken;
