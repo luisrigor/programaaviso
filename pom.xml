@@ -242,14 +242,14 @@
                 <version>0.8.7</version>
                 <configuration>
                     <excludes>
-                        <exclude>com/gsc/programaaviso/config/**</exclude>
-                        <exclude>com/gsc/programaaviso/constants/**</exclude>
-                        <exclude>com/gsc/programaaviso/dto/**</exclude>
-                        <exclude>com/gsc/programaaviso/exceptions/**</exclude>
-                        <exclude>com/gsc/programaaviso/model/**</exclude>
-                        <exclude>com/gsc/programaaviso/repository/**</exclude>
-                        <exclude>com/gsc/programaaviso/security/**</exclude>
-                        <exclude>com/gsc/programaaviso/utils/**</exclude>
+                        <exclude>com/gsc/programaavisos/config/**</exclude>
+                        <exclude>com/gsc/programaavisos/constants/**</exclude>
+                        <exclude>com/gsc/programaavisos/dto/**</exclude>
+                        <exclude>com/gsc/programaavisos/exceptions/**</exclude>
+                        <exclude>com/gsc/programaavisos/model/**</exclude>
+                        <exclude>com/gsc/programaavisos/repository/**</exclude>
+                        <exclude>com/gsc/programaavisos/security/**</exclude>
+                        <exclude>com/gsc/programaavisos/utils/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
