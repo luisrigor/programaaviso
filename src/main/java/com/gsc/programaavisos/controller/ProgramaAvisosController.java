@@ -51,7 +51,6 @@ public class ProgramaAvisosController {
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
         return ResponseEntity.status(HttpStatus.OK).body("removed");
     }
-
     @PutMapping(ApiEndpoints.UNLOCK_PA)
     public ResponseEntity<String> unlockPARegister(@RequestParam Integer id) {
         log.info("unlockPARegister controller");
@@ -83,7 +82,7 @@ public class ProgramaAvisosController {
     }
 
     @GetMapping(ApiEndpoints.GET_TPA_SIMULATOR)
-    public ResponseEntity<TpaSimulation> getPaDetail(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<TpaSimulation> getTPASimulator(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
         return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);

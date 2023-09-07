@@ -1,14 +1,13 @@
 package com.gsc.programaavisos.sample.data.provider;
 
-import com.gsc.programaavisos.dto.DelegatorsDTO;
-import com.gsc.programaavisos.dto.DelegatorsValues;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.rg.dealer.Dealer;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -115,5 +114,66 @@ public class OtherFlowData {
     public static Dealer getDealer(){
         return new Dealer();
     }
+
+    public static ContactType getContactType() {
+        return ContactType.builder()
+                .id(1)
+                .name(RANDOM_NAME)
+                .status(RANDOM_STATUS)
+                .orderColumn(RANDOM_NAME)
+                .orderColumnDescription(RANDOM_NAME+"D")
+                .createdBy(RANDOM_CREATED_BY)
+                .dtCreated(LocalDateTime.now())
+                .build();
+    }
+
+    public static ClientPropDTO getClientPropDTO(){
+        return ClientPropDTO.builder()
+                .id(1)
+                .nextRevision("2023-09-01")
+                .licencePlate("ABC123")
+                .build();
+    }
+
+    public static GetDelegatorsDTO getGetDelegatorsDTO(){
+        return GetDelegatorsDTO.builder()
+                .fromYear("2022")
+                .toYear("2023")
+                .fromMonth("01")
+                .toMonth("12")
+                .arrayOidDealer(new String[]{"dealer1", "dealer2"})
+                .build();
+    }
+
+    public static ClientType getClientType(){
+        return ClientType.builder()
+                .id(1)
+                .name("RANDOM_NAME")
+                .status('S')
+                .createdBy("RANDOM_CREATED_BY")
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
+    public static Channel getChannel(){
+        return  Channel.builder()
+                .id(1)
+                .name(RANDOM_NAME)
+                .status('S')
+                .createdBy(RANDOM_CREATED_BY)
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
+    public static Source getSource(){
+        return  Source.builder()
+                .id(1)
+                .name(RANDOM_NAME)
+                .status('S')
+                .createdBy(RANDOM_CREATED_BY)
+                .dtCreated(LocalDate.now())
+                .build();
+    }
+
 
 }

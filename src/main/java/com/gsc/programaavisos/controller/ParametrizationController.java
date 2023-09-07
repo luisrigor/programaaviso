@@ -57,15 +57,15 @@ public class ParametrizationController {
         return ResponseEntity.status(HttpStatus.OK).body(paParameterizationList);
     }
 
-    @PutMapping(ApiEndpoints.SAVE_PARAMETRIZATION)
-    public void saveParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    @PostMapping(ApiEndpoints.SAVE_PARAMETRIZATION)
+    public ResponseEntity<String> saveParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                     @RequestBody ParameterizationDTO dto) {
         parametrizationService.saveParameterization(userPrincipal,dto);
+        return ResponseEntity.status(HttpStatus.OK).body("Successfully Save Parametrization");
     }
 
     @PostMapping(ApiEndpoints.CLONE_PARAMETRIZATION)
-    public ResponseEntity<String> cloneParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                    @RequestParam Integer id) {
+    public ResponseEntity<String> cloneParametrization(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam Integer id) {
         parametrizationService.cloneParameterization(userPrincipal,id);
         return new ResponseEntity<>("Successfully Clone Parametrization",HttpStatus.OK);
     }

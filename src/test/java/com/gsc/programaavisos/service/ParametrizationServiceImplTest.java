@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -38,15 +39,15 @@ public class ParametrizationServiceImplTest {
     }
 
     @Test
-    void  whenSearchParameterizationThenReturnSuccessfully() {
+    void whenSearchParameterizationThenReturnSuccessfully() {
         // Arrange
         List<PaParameterization> expectedParameterization = new ArrayList<>(Collections.singletonList(ParametrizationData.getPaParameterization()));
         when(paParameterizationRepository.getByFilter(any())).thenReturn(expectedParameterization);
         // Act
         List<PaParameterization> actualParameterization = parametrizationService.searchParametrization(Date.valueOf(LocalDate.MIN),
-                Date.valueOf(LocalDate.MIN),"",SecurityData.getUserDefaultStatic());
+                Date.valueOf(LocalDate.MIN), "", SecurityData.getUserDefaultStatic());
         // Assert
-        Assertions.assertEquals(expectedParameterization,actualParameterization);
+        Assertions.assertEquals(expectedParameterization, actualParameterization);
     }
 
     @Test
@@ -56,7 +57,7 @@ public class ParametrizationServiceImplTest {
 
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class, () -> parametrizationService.searchParametrization(Date.valueOf(LocalDate.MIN),
-                Date.valueOf(LocalDate.MIN),"",SecurityData.getUserDefaultStatic()));
+                Date.valueOf(LocalDate.MIN), "", SecurityData.getUserDefaultStatic()));
     }
 
     @Test
@@ -66,19 +67,19 @@ public class ParametrizationServiceImplTest {
         when(paParameterizationRepository.getByFilter(any())).thenReturn(expectedParameterization);
         // Act
         List<PaParameterization> actualParameterization = parametrizationService.searchParametrization(Date.valueOf(LocalDate.MIN),
-                Date.valueOf(LocalDate.MIN),"selectType",SecurityData.getUserDefaultStatic());
+                Date.valueOf(LocalDate.MIN), "selectType", SecurityData.getUserDefaultStatic());
         // Assert
-        Assertions.assertEquals(expectedParameterization,actualParameterization);
+        Assertions.assertEquals(expectedParameterization, actualParameterization);
     }
 
     @Test
-    void  whenDeleteParameterizationThenReturnSuccessfully() {
+    void whenDeleteParameterizationThenReturnSuccessfully() {
         // Arrange
         doNothing().when(paParameterizationRepository).deleteById(anyInt());
         // Act
-        parametrizationService.deleteParametrization(SecurityData.getUserDefaultStatic(),1);
+        parametrizationService.deleteParametrization(SecurityData.getUserDefaultStatic(), 1);
         // Assert
-        verify(paParameterizationRepository,times(1)).deleteById(1);
+        verify(paParameterizationRepository, times(1)).deleteById(1);
     }
 
     @Test
@@ -87,7 +88,27 @@ public class ParametrizationServiceImplTest {
         doThrow(ProgramaAvisosException.class).when(paParameterizationRepository).deleteById(anyInt());
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class,
-                () -> parametrizationService.deleteParametrization(SecurityData.getUserDefaultStatic(),1));
+                () -> parametrizationService.deleteParametrization(SecurityData.getUserDefaultStatic(), 1));
+    }
+
+    @Test
+    void whenGetParametrizationsListThenReturnSuccessfully() {
+        //Arrange
+        List<PaParameterization> expectedParameterization = new ArrayList<>(Collections.singletonList(ParametrizationData.getPaParameterization()));
+        when(paParameterizationRepository.getByFilter(any())).thenReturn(expectedParameterization);
+        // Act
+        List<PaParameterization> actualParameterization = parametrizationService.getParametrizationsList(SecurityData.getUserDefaultStatic());
+        // Assert
+        Assertions.assertEquals(expectedParameterization, actualParameterization);
+    }
+
+    @Test
+    void whenGetParametrizationsListThenThrowProgramaAvisosException() {
+        //Arrange
+        when(paParameterizationRepository.getByFilter(any())).thenThrow(ProgramaAvisosException.class);
+        // Act
+        Assertions.assertThrows(ProgramaAvisosException.class,
+                () -> parametrizationService.getParametrizationsList(SecurityData.getUserDefaultStatic()));
     }
 
 }

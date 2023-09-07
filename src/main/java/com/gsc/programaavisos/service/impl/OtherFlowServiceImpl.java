@@ -44,7 +44,7 @@ import static com.gsc.programaavisos.constants.AppProfile.*;
 @Service
 @Log4j
 @RequiredArgsConstructor
-public class OtherFlowServiceImpl implements OtherFlowService {
+public class  OtherFlowServiceImpl implements OtherFlowService {
 
     private final ContactReasonRepository contactReasonRepository;
     private final ModeloRepository modeloRepository;
@@ -400,6 +400,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error fetching plates list for the same customer");
         }
     }
+
     public List<ClientType> getClientTypes() {
         try {
             return clientTypeRepository.getByStatus("S".charAt(0));
@@ -455,11 +456,8 @@ public class OtherFlowServiceImpl implements OtherFlowService {
 
     public Map<Integer, String> getContactAcces() {
         Map<Integer, String> MAP_PA_CONTACT_TYPE_ACCESS = new HashMap<Integer, String>();
-
         String USERS_CAN_VIEW_CONNECTIVITY = "";
-
         String[] activeProfiles = env.getActiveProfiles();
-
 
         if (!Arrays.asList(activeProfiles).contains(PRODUCTION_SERVER_STR)){
             USERS_CAN_VIEW_CONNECTIVITY = "tcap1@tpo";
@@ -501,11 +499,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }catch (Exception e){
             throw new ProgramaAvisosException("Error fetching source ", e);
         }
-    }
-
-    public void readMapUpdate(int year, int month, Integer idsContactType) {
-
-
     }
 
     @Override
@@ -593,11 +586,4 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }
 
     }
-    public  LinkedHashMap<Integer, DocumentUnit> getMapAllDocumentUnits() {
-        LinkedHashMap<Integer, DocumentUnit> map = new LinkedHashMap<>();
-        List<DocumentUnit> documentUnits = documentUnitRepository.findAll();
-        documentUnits.forEach(documentUnit -> map.put(documentUnit.getId(), documentUnit));
-        return map;
-    }
-
 }
