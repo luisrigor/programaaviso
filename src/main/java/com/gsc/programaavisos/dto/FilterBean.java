@@ -10,10 +10,7 @@ import com.sc.commons.utils.StringTasks;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -81,10 +78,48 @@ public class FilterBean implements Cloneable{
     // OWNER
     private String owner;
 
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public FilterBean(FilterBean other) throws Exception {
+        this.fromYear = other.fromYear;
+        this.toYear = other.toYear;
+        this.fromMonth = other.fromMonth;
+        this.toMonth = other.toMonth;
+        this.vecDealers = other.vecDealers;
+        this.arrSelDealer = other.arrSelDealer;
+        this.arrSelDealerToString = other.arrSelDealerToString;
+        this.changedList = other.changedList;
+        this.changedBy = other.changedBy;
+        this.GSCUserLogin = other.GSCUserLogin;
+        this.idSource = other.idSource;
+        this.idChannel = other.idChannel;
+        this.idContactType = other.idContactType;
+        this.flagHibrid = other.flagHibrid;
+        this.delegators = other.delegators;
+        this.delegatedTo = other.delegatedTo;
+        this.statePending = other.statePending;
+        this.stateHasSchedule = other.stateHasSchedule;
+        this.stateScheduleDone = other.stateScheduleDone;
+        this.stateScheduleRejected = other.stateScheduleRejected;
+        this.stateNotOwner = other.stateNotOwner;
+        this.stateAstContactsClient = other.stateAstContactsClient;
+        this.stateClientScheduledAtWorkshop = other.stateClientScheduledAtWorkshop;
+        this.stateShowRemovedManually = other.stateShowRemovedManually;
+        this.stateShowRemovedAutoByManut = other.stateShowRemovedAutoByManut;
+        this.stateShowRemovedAutoByPeriod = other.stateShowRemovedAutoByPeriod;
+        this.arrSelMaintenanceTypes = other.arrSelMaintenanceTypes;
+        this.arrSelMaintenanceTypesToString = other.arrSelMaintenanceTypesToString;
+        this.hasMaintenanceContract = other.hasMaintenanceContract;
+        this.missedCalls = other.missedCalls;
+        this.plate = other.plate;
+        this.flag5Plus = other.flag5Plus;
+        this.idClientType = other.idClientType;
+        this.showImportByExcell = other.showImportByExcell;
+        this.firstPage = other.firstPage;
+        this.currPage = other.currPage;
+        this.lastPage = other.lastPage;
+        this.orderColumn = other.orderColumn;
+        this.orderOrientation = other.orderOrientation;
+        this.owner = other.owner;
     }
-
     public void clearState() {
         setStatePending(0);
         setStateHasSchedule(0);

@@ -31,10 +31,10 @@ import java.util.List;
 @Component
 public class TPALexusUtil {
 
-    private final static String FILE_NAME_TEST = "D:/Lexus_Programa_Avisos.pdf";
-    private final static String FILE_NAME = "Lexus_Programa_Avisos";
-    private final static String LOGO_LEXUS = "logo_lexus.png";
-    private final static String BOOTOM_IMAGE = "7_anos_garantia_lexus.png";
+    private static final String FILE_NAME_TEST = "D:/Lexus_Programa_Avisos.pdf";
+    private static final String FILE_NAME = "Lexus_Programa_Avisos";
+    private static final String LOGO_LEXUS = "logo_lexus.png";
+    private  final String BOOTOM_IMAGE = "7_anos_garantia_lexus.png";
 
     private static URL LOGO_URL = null;
     private static URL BOOTOM_IMAGE_URL = null;

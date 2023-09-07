@@ -44,7 +44,7 @@ public class DbConfigLocal {
     private String scConfigFile;
 
     private static final String SET_USER = "db2inst1";
-    private static final String SET_PASSWORD = "db2admin";
+    private static final String SET_PAS = "db2admin";
 
     @PostConstruct
     private void init() {
@@ -56,7 +56,7 @@ public class DbConfigLocal {
         dbToynet.setDatabaseName("DBTOYNET");
         dbToynet.setDriverType(4);
         dbToynet.setUser(SET_USER);
-        dbToynet.setPassword(SET_PASSWORD);
+        dbToynet.setPassword(SET_PAS);
         conn.setDataSource(dbToynet, "jdbc/dbtoynet");
         log.info("Datasource initialized successfully: jdbc/dbtoynet");
         DB2SimpleDataSource dblexxtaps = new DB2SimpleDataSource();
@@ -65,7 +65,7 @@ public class DbConfigLocal {
         dblexxtaps.setDatabaseName("LEXXTAPS");
         dblexxtaps.setDriverType(4);
         dblexxtaps.setUser(SET_USER);
-        dblexxtaps.setPassword(SET_PASSWORD);
+        dblexxtaps.setPassword(SET_PAS);
         conn.setDataSource(dblexxtaps, "jdbc/lexxtaps");
         log.info("Datasource initialized successfully: jdbc/lexxtaps");
         DB2SimpleDataSource dbclaims = new DB2SimpleDataSource();
@@ -74,7 +74,7 @@ public class DbConfigLocal {
         dbclaims.setDatabaseName("DBCLAIMS");
         dbclaims.setDriverType(4);
         dbclaims.setUser(SET_USER);
-        dbclaims.setPassword(SET_PASSWORD);
+        dbclaims.setPassword(SET_PAS);
         conn.setDataSource(dbclaims, "jdbc/dbclaims");
         log.info("Datasource initialized successfully: jdbc/dbclaims");
     }

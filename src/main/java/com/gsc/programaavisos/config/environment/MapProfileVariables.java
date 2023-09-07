@@ -22,7 +22,7 @@ public class MapProfileVariables {
 
     public static final String CONST_FTP_MANAGE_ITEM_SERVER_VALUE= "scwebsrvd.sc.pt";
     public static final String CONST_FTP_MANAGE_ITEM_LOGIN_VALUE= "javauser";
-    public static final String CONST_FTP_MANAGE_ITEM_PWD_VALUE= "java";
+    public static final String CONST_FTP_MANAGE_ITEM_JAVA_VALUE= "java";
 
     public static final String CONST_FTP_MANAGE_ITEM_ADDRESS_VALUE ="/home/www/html/rede/files/programa_de_avisos";
     public static final String CONST_STATIC_FILES_URL_VALUE = "https://dev.rigorcg.pt/files/programa_de_avisos/static_files";
@@ -37,7 +37,7 @@ public class MapProfileVariables {
         Map<String, String> envVariables = new HashMap<>();
         envVariables.put(CONST_FTP_MANAGE_ITEM_SERVER, CONST_FTP_MANAGE_ITEM_SERVER_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, CONST_FTP_MANAGE_ITEM_LOGIN_VALUE);
-        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_PWD_VALUE);
+        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_JAVA_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, CONST_FTP_MANAGE_ITEM_ADDRESS_VALUE);
         envVariables.put(CONST_STATIC_FILES_URL,CONST_STATIC_FILES_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, CONST_IMG_POSTAL_ACCESSORY_URL_VALUE);
@@ -53,7 +53,7 @@ public class MapProfileVariables {
         Map<String, String> envVariables = new HashMap<>();
         envVariables.put(CONST_FTP_MANAGE_ITEM_SERVER, CONST_FTP_MANAGE_ITEM_SERVER_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, CONST_FTP_MANAGE_ITEM_LOGIN_VALUE);
-        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_PWD_VALUE);
+        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_JAVA_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, CONST_FTP_MANAGE_ITEM_ADDRESS_VALUE);
         envVariables.put(CONST_STATIC_FILES_URL, CONST_STATIC_FILES_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, CONST_IMG_POSTAL_ACCESSORY_URL_VALUE);
@@ -69,7 +69,7 @@ public class MapProfileVariables {
         Map<String, String> envVariables = new HashMap<>();
         envVariables.put(CONST_FTP_MANAGE_ITEM_SERVER, CONST_FTP_MANAGE_ITEM_SERVER_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, CONST_FTP_MANAGE_ITEM_LOGIN_VALUE);
-        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_PWD_VALUE);
+        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_JAVA_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, CONST_FTP_MANAGE_ITEM_ADDRESS_VALUE);
         envVariables.put(CONST_STATIC_FILES_URL, CONST_STATIC_FILES_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, CONST_IMG_POSTAL_ACCESSORY_URL_VALUE);
@@ -86,7 +86,7 @@ public class MapProfileVariables {
         Map<String, String> envVariables = new HashMap<>();
         envVariables.put(CONST_FTP_MANAGE_ITEM_SERVER, "scwebsrva");
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, CONST_FTP_MANAGE_ITEM_LOGIN_VALUE);
-        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_PWD_VALUE);
+        envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, CONST_FTP_MANAGE_ITEM_JAVA_VALUE);
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, CONST_FTP_MANAGE_ITEM_ADDRESS_VALUE);
         envVariables.put(CONST_STATIC_FILES_URL, "https://w3.toyota.pt/files/programa_de_avisos/static_files");
         envVariables.put(CONST_IMG_POSTAL_ACCESSORY_URL, "https://w3.toyota.pt/files/programa_de_avisos/postais/acessorios");
