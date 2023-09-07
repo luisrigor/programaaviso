@@ -21,45 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(value = "", tags = "AVISOS")
 @RestController
 @CrossOrigin("*")
-public class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ProgramaAvisosController {
+public class ProgramaAvisosController {
 
     private final ProgramaAvisosService programaAvisosService;
 
@@ -91,7 +53,7 @@ ProgramaAvisosController {
         return ResponseEntity.status(HttpStatus.OK).body("removed");
     }
 
-    @PostMapping()
+    @PostMapping(ApiEndpoints.UPLOAD_FILE)
     public ResponseEntity<String> uploadFile(@AuthenticationPrincipal UserPrincipal userPrincipal,  @RequestPart MultipartFile file) {
         log.info("uploadFile controller");
         programaAvisosService.uploadFile(userPrincipal, file);
@@ -129,7 +91,7 @@ ProgramaAvisosController {
     }
 
     @GetMapping(ApiEndpoints.GET_TPA_SIMULATOR)
-    public ResponseEntity<TpaSimulation> getPaDetail(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<TpaSimulation> getTPASimulator(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
         return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);

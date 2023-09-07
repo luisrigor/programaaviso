@@ -44,7 +44,7 @@ import static com.gsc.programaavisos.constants.AppProfile.*;
 @Service
 @Log4j
 @RequiredArgsConstructor
-public class OtherFlowServiceImpl implements OtherFlowService {
+public class  OtherFlowServiceImpl implements OtherFlowService {
 
     private final ContactReasonRepository contactReasonRepository;
     private final ModeloRepository modeloRepository;

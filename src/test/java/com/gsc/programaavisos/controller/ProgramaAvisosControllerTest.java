@@ -5,9 +5,7 @@ import com.google.gson.Gson;
 import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiEndpoints;
-import com.gsc.programaavisos.dto.FilterBean;
-import com.gsc.programaavisos.dto.PADTO;
-import com.gsc.programaavisos.dto.SearchPADTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.repository.crm.ClientRepository;
 import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
@@ -118,4 +116,71 @@ public class ProgramaAvisosControllerTest {
                 .andExpect(status().isOk());
     }
 
+    void whenRequestUploadFileThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(programaAvisosService).uploadFile(any(),any());
+        mvc.perform(post(BASE_REQUEST_MAPPING+ ApiEndpoints.UPLOAD_FILE)
+                        .header("accessToken", accessToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenRequestUnlockPARegisterThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(programaAvisosService).unlockPARegister(anyInt());
+        mvc.perform(put(BASE_REQUEST_MAPPING+ ApiEndpoints.UNLOCK_PA)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("unlocked"));
+    }
+
+    @Test
+    void whenRequestPaInfoListThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        PAInfoDTO paInfoDTO = new PAInfoDTO();
+        when(programaAvisosService.getInfoPA(any())).thenReturn(paInfoDTO);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.LIST_PA)
+                        .header("accessToken", accessToken))
+                .andExpect(status().isOk())
+                .andExpect(content().string(gson.toJson(paInfoDTO)));
+    }
+
+    @Test
+    void whenRequestGetPaDetailThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        DetailsPADTO detailsPADTO = new DetailsPADTO();
+        when(programaAvisosService.getPaDetail(any(),anyInt(),anyInt())).thenReturn(detailsPADTO);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_PA_DETAIL)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1")
+                        .queryParam("oldId","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(detailsPADTO)));
+    }
+
+    @Test
+    void whenRequestGetTPASimulationThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        TpaSimulation tpaSimulation = new TpaSimulation();
+        TpaDTO tpaDTO = new TpaDTO();
+        when(programaAvisosService.getTpaSimulation(any(),any())).thenReturn(tpaSimulation);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_TPA_SIMULATOR)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tpaDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(tpaSimulation)));
+    }
+
+    @Test
+    void whenRequestActivePAThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(programaAvisosService).activatePA(any(),anyInt());
+        mvc.perform(put(BASE_REQUEST_MAPPING+ ApiEndpoints.ACTIVE_PA)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("activePA"));
+    }
 }

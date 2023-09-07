@@ -37,6 +37,7 @@ public interface ApiEndpoints {
     String GET_CHANNEL = "/channels";
     String GET_SOURCE = "/source";
     String UNLOCK_PA = "/unlock-pa";
+    String UPLOAD_FILE = "/upload-file";
     String ACTIVE_PA = "/active";
     String GET_CONTACT_TYPE = "/contact-type";
     String GET_MAIN_TYPE = "/main-types";
