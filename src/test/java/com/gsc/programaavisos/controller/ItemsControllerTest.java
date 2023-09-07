@@ -130,38 +130,5 @@ public class ItemsControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().string(objectMapper.writeValueAsString(documentUnitDTOList)));
     }
-/*
-    @Test
-    void whenSaveManageItemSuccessfully() throws Exception {
-
-        /*
-        mvc.perform(post(BASE_REQUEST_MAPPING+ ApiEndpoints.SAVE_MANAGE_ITEMS)
-                        .contentType(String.valueOf(new MockMultipartFile("data", "", "application/json", jsonPayload.getBytes())))
-                        .contentType(Objects.requireNonNull(file.getContentType()))
-                        .header("accessToken", accessToken))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Successfully Save"));
-
-        String accessToken = generatedToken;
-        SaveManageItemDTO saveManageItemDTO = ItemData.getSaveManageItemDto();
-        String jsonPayload = saveManageItemDTO.toString(); // Replace with your DTO properties
-
-        doNothing().when(itemService).saveManageItems(any(),any(),any());
-
-        MockMultipartFile firstFile = new MockMultipartFile("files", "filename.txt", "text/plain", "some xml".getBytes());
-        MockMultipartFile secondFile = new MockMultipartFile("files", "other-file-name.png", "text/plain", "some other type".getBytes());
-        MockMultipartFile jsonFile = new MockMultipartFile("data", "", "application/json", ItemData.getSaveManageItemDto().toString().getBytes());
-
-        mvc.perform(MockMvcRequestBuilders.multipart(BASE_REQUEST_MAPPING+ ApiEndpoints.SAVE_MANAGE_ITEMS)
-                        .file(firstFile)
-                        .file(secondFile)
-                        .file(jsonFile)
-                        .header("accessToken", accessToken))
-                .andExpect(status().is(200));
-
-    }
-
-     */
-
 
 }
