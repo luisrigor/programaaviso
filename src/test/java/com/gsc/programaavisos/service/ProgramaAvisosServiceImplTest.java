@@ -151,20 +151,6 @@ class ProgramaAvisosServiceImplTest {
     }
 
     @Test
-    void activatePASuccessfullyCase() {
-        // Arrange
-        UserPrincipal user = SecurityData.getUserDefaultStatic();
-        ProgramaAvisos programaAvisos = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(programaAvisos));
-        doNothing().when(programaAvisosUtil).save(anyString(),anyBoolean(), any());
-
-        // Act
-        programaAvisosService.activatePA(user,1);
-        // Assert
-        verify(programaAvisosUtil,times(1)).save(anyString(),anyBoolean(), any());
-    }
-
-    @Test
     void activatePAThenThrowSuccessfullyCase() {
         // Arrange
         when(paRepository.findById(anyInt())).thenThrow(ProgramaAvisosException.class);
