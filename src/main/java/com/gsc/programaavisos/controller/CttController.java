@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController()
 @Slf4j
-@Api(value = "",tags = "Ctt")
+@Api(value = "",tags = "CTT")
 public class CttController {
     private final CttService cttService;
 
