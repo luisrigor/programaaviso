@@ -15,27 +15,21 @@ import com.gsc.programaavisos.service.impl.pa.ExcelUtils;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
-import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
-
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.util.PAUtil.getKeyByListElements;
 
@@ -63,10 +57,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
             if (file == null)
                 throw new ProgramaAvisosException("The file is null, won't be loaded");
-
-            log.trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             log.trace("importTechnicalCampaing: Starting reading excel file");
-            log.trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             InputStream fileContent = file.getInputStream();
             lstFields = readTechnicalCampaignFile(fileContent);
             log.trace(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -89,8 +80,8 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
         List<Dealer> vecAllAfterSalesDealers = new ArrayList<>();
 
-        StringBuilder bodyOfMail = new StringBuilder("");
-        StringBuilder errorCSV = new StringBuilder("");
+        StringBuilder bodyOfMail = new StringBuilder(StringUtils.EMPTY);
+        StringBuilder errorCSV = new StringBuilder(StringUtils.EMPTY);
 
         File errorFile = convertToFile(contentFile);
 
