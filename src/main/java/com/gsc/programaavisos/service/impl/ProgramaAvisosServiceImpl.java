@@ -774,9 +774,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             filter.setCurrPage(1);
             filter.setFirstPage(1);
             filter.setShowImportByExcell(false);
-
-            //TODO VALIDAR DE  DONDE TOMAR VARIABLE
-//            filter.setGSCUserLogin(oGSCUser.getLogin());
         }
         return filter;
     }
