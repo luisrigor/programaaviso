@@ -41,4 +41,6 @@ public interface PARepository extends JpaRepository<ProgramaAvisos, Integer>, PA
     ProgramaAvisos getPADataByPlate(@Param("licensePlate") String licensePlate, @Param("month") Integer month,
                                     @Param("year") Integer year, @Param("contactList") List<Integer> concactList);
 
+
+
 }
