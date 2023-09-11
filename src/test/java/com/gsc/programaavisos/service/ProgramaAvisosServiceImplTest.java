@@ -1,12 +1,10 @@
 package com.gsc.programaavisos.service;
 
 import com.gsc.programaavisos.constants.PaConstants;
-import com.gsc.programaavisos.dto.DetailsPADTO;
-import com.gsc.programaavisos.dto.FilterBean;
-import com.gsc.programaavisos.dto.PADTO;
-import com.gsc.programaavisos.dto.SearchPADTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
+import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.PARepository;
 import com.gsc.programaavisos.repository.crm.QuarantineRepository;
 import com.gsc.programaavisos.repository.crm.VehicleRepository;
@@ -19,6 +17,7 @@ import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.ProgramaAvisosServiceImpl;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
@@ -31,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
@@ -44,12 +44,6 @@ class ProgramaAvisosServiceImplTest {
     @Mock
     private PARepository paRepository;
     @Mock
-    private VehicleRepository vehicleRepository;
-    @Mock
-    private QuarantineRepository quarantineRepository;
-    @Mock
-    private PARepository programaAvisosRepository;
-    @Mock
     private PABeanRepository paBeanRepository;
     @Mock
     private ProgramaAvisosUtil programaAvisosUtil;
@@ -57,6 +51,8 @@ class ProgramaAvisosServiceImplTest {
     private ChannelRepository channelRepository;
     @Mock
     private CallsRepository callsRepository;
+    @Mock
+    private TPAInvokerSimulator tpaInvokerSimulator;
     @InjectMocks
     private ProgramaAvisosServiceImpl programaAvisosService;
     @BeforeEach
@@ -235,6 +231,112 @@ class ProgramaAvisosServiceImplTest {
         Assertions.assertEquals(StringUtils.EMPTY,actualOPABean.getLicensePlate());
     }
 
+    @Test
+    void whenGetPaInfoThenReturnSuccessfully(){
+        //Arrange
+        String oldAddress = "oldAddress";
+        String oldNif = "111111111";
+        ProgramaAvisosBean oPaBean = ProgramaAvisosData.getProgramaAvisosBean();
+        ProgramaAvisosBean oldPaBean = ProgramaAvisosData.getProgramaAvisosBean();
+        oldPaBean.setNewAddress(oldAddress);
+        oldPaBean.setNewNif(oldNif);
+        oldPaBean.setDataIsCorrect("N");
+        //Act
+        ProgramaAvisosBean actualBean = programaAvisosService.getPaInfo(oPaBean,oldPaBean);
+        //Assert
+        Assertions.assertEquals(oldAddress,actualBean.getNewAddress());
+        Assertions.assertEquals(oldNif,actualBean.getNewNif());
+    }
 
+    @Test
+    void whenActivatePASuccessfully(){
+        //Arrange
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        pa.setId(1);
+        when(paRepository.findById(anyInt())).thenReturn(Optional.of(pa));
+        doNothing().when(programaAvisosUtil).save(anyString(),anyBoolean(),any());
+        //Act
+        programaAvisosService.activatePA(SecurityData.getUserDefaultStatic(),1);
+        //Assert
+        Assertions.assertEquals(StringUtils.EMPTY,pa.getRemovedObs());
+        Assertions.assertEquals("N",pa.getSuccessContact());
+        Assertions.assertNull(pa.getHrScheduleContact());
+        Assertions.assertNull(pa.getDtScheduleContact());
+    }
+
+    @Test
+    void whenRemovePASuccessfully(){
+        //Arrange
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        pa.setId(1);
+        when(paRepository.findById(anyInt())).thenReturn(Optional.of(pa));
+        doNothing().when(programaAvisosUtil).save(anyString(),anyBoolean(),any());
+        //Act
+        programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"removedOption",StringUtils.EMPTY);
+        //Assert
+        verify(programaAvisosUtil,times(1)).save(anyString(),anyBoolean(),any());
+    }
+
+    @Test
+    void whenDataPAReturnThisSuccessfully(){
+        //Arrange
+        PADTO padto = ProgramaAvisosData.getPADTO();
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        when(paRepository.findById(anyInt())).thenReturn(Optional.of(pa));
+        //Act
+        ProgramaAvisos opa = programaAvisosService.dataPA(padto);
+        //Assert
+        Assertions.assertEquals(padto.getNewEmail(),opa.getNewEmail());
+        Assertions.assertEquals(padto.getSuccessMotive(),opa.getSuccessMotive());
+        Assertions.assertEquals(padto.getNewNif(),opa.getNewNif());
+    }
+
+    @Test
+    void whenGetInfoPAReturnThisSuccessfully() {
+        //Arrange
+        PATotals paTotals = ProgramaAvisosData.getPATotals();
+        List<ProgramaAvisosBean> paBeans = Collections.singletonList(ProgramaAvisosData.getProgramaAvisosBean());
+        when(paBeanRepository.getPaTotals(any())).thenReturn(paTotals);
+        when(paBeanRepository.getProgramaAvisosBean(any())).thenReturn(paBeans);
+        //Act
+        PAInfoDTO paInfoDTO = programaAvisosService.getInfoPA(SecurityData.getUserDefaultStatic());
+        //Arrange
+        Assertions.assertEquals(paTotals,paInfoDTO.getPaTotals());
+        Assertions.assertEquals(paBeans,paInfoDTO.getPaInfoList());
+    }
+
+    @Test
+    void whenGetInfoPAThenThrowProgramaAvisosException() {
+        //Arrange
+        when(paBeanRepository.getPaTotals(any())).thenThrow(ProgramaAvisosException.class);
+        //Act & Arrange
+        Assertions.assertThrows(ProgramaAvisosException.class,()->
+                programaAvisosService.getInfoPA(SecurityData.getUserDefaultStatic()));
+    }
+
+    @Test
+    void whenGetTpaSimulationReturnThisSuccessfully() throws SCErrorException {
+        //Arrange
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        LocalDate localDate = LocalDate.now();
+        TpaSimulation tpaExpected = TpaSimulation.builder().paData(pa).build();
+        pa.setMRS(ProgramaAvisosData.getMrs());
+        when(tpaInvokerSimulator.getTpaSimulation("nif","plate",localDate,false)).thenReturn(tpaExpected);
+        //Act
+        TpaSimulation tpa = programaAvisosService.getTpaSimulation(SecurityData.getUserDefaultStatic(), new TpaDTO("plate","nif", localDate));
+        //Arrange
+        Assertions.assertEquals(pa.getMRS().getAcessory1(),tpa.getAccessory1Name());
+    }
+
+    @Test
+    void whenGetTpaSimulationThenThrowProgramaAvisosException() throws SCErrorException {
+        //Arrange
+        LocalDate localDate = LocalDate.now();
+        when(tpaInvokerSimulator.getTpaSimulation("nif","plate",localDate,false))
+                .thenThrow(ProgramaAvisosException.class);
+        //Act & Arrange
+        Assertions.assertThrows(ProgramaAvisosException.class,()->
+                programaAvisosService.getTpaSimulation(SecurityData.getUserDefaultStatic(), new TpaDTO("plate","nif", localDate)));
+    }
 
 }

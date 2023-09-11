@@ -24,6 +24,7 @@ import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -36,7 +37,7 @@ import static com.gsc.programaavisos.config.environment.MapProfileVariables.CONS
 
 @Log4j
 @RequiredArgsConstructor
-@Service
+@Component
 public class TPAInvokerSimulator {
 
     public static final int CAR_DB_COMBUSTIVEL_SEM_INFO = 4;

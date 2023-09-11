@@ -499,23 +499,4 @@ class OtherFlowServiceImplTest {
         Assertions.assertThrows(ProgramaAvisosException.class,
                 ()->  otherFlowServiceImpl.sendNewsletter(0,"cabarriosb@gmail.com"));
     }
-/*
-    @Test
-    void sendNewsletterSuccessfullyCase() {
-        //Arrange
-        NewsLetterDTO newsLetterDTO = new NewsLetterDTO("operation","message");
-        ProgramaAvisosBean programaAvisosBean = new ProgramaAvisosBean();
-        programaAvisosBean.setBrand("T");
-        programaAvisosBean.setIdContactType(1);
-        programaAvisosBean.setNewsletterPersonalData("Newsletter");
-        programaAvisosBean.setOidNewsletter("oid");
-        when(paRepository.getProgramaAvisosById(anyInt())).thenReturn(programaAvisosBean);
-        //Act
-        NewsLetterDTO actualDTO = otherFlowServiceImpl.sendNewsletter(1,"email@example.com");
-        //Assert
-        Assertions.assertEquals(newsLetterDTO.getMessage(),actualDTO.getMessage());
-    }
-
- */
-
 }

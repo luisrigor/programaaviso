@@ -359,7 +359,6 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
                     contactTypeListWAcess.add(contactType);
             }
         }
-
         return contactTypeListWAcess;
     }
 

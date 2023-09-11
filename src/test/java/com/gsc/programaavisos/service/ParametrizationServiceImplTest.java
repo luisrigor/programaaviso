@@ -9,6 +9,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
+import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.ParametrizationServiceImpl;
@@ -338,6 +339,5 @@ class ParametrizationServiceImplTest {
         // Assert
         Assertions.assertEquals(expectedParameterization, actualParameterization);
     }
-
 
 }

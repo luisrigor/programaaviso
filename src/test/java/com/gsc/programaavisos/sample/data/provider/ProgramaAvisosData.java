@@ -3,13 +3,12 @@ package com.gsc.programaavisos.sample.data.provider;
 import com.gsc.programaavisos.dto.FilterBean;
 import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.dto.SearchPADTO;
-import com.gsc.programaavisos.model.crm.entity.Calls;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
+import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
@@ -347,5 +346,83 @@ public class ProgramaAvisosData {
                 .isContactCcRigor(1)
                 .recoveryShipping("Shipping Required")
                 .build();
+    }
+
+    public static PATotals getPATotals(){
+        return PATotals.builder()
+                .total(100)
+                .notDone(30)
+                .done(70)
+                .withAppointment(50)
+                .schedule(20)
+                .removedMannually(5)
+                .removedAutoByManut(10)
+                .removedAutoByPeriod(15)
+                .build();
+    }
+
+    public static Mrs getMrs(){
+        return Mrs.builder()
+                .id(1)
+                .idPaData(2)
+                .dealerCode("ABC123")
+                .aftersalesCode("XYZ456")
+                .contactChannel("Email")
+                .postalType("Type1")
+                .lastRevision("Revision1")
+                .lastRevisionKm("10000")
+                .dtLastRevision(LocalDate.of(2023, 8, 30))
+                .nextRevision("Revision2")
+                .yearNextRevision(2024)
+                .monthNextRevision(9)
+                .dtItv(LocalDate.of(2023, 9, 15))
+                .maintenancePrice(200.0)
+                .eurocare("Yes")
+                .flag5Plus('Y')
+                .flagSend('N')
+                .skinDoPostal("Skin1")
+                .contactReason("Reason1")
+                .flagMaintenanceContract('Y')
+                .flagHybrid('N')
+                .accessoryCode1("Code1")
+                .acessory1("Accessory1")
+                .accessoryCode2("Code2")
+                .acessory2("Accessory2")
+                .serviceCode1("ServiceCode1")
+                .service1("Service1")
+                .serviceCode2("ServiceCode2")
+                .service2("Service2")
+                .serviceCode3("ServiceCode3")
+                .service3("Service3")
+                .changedBy("User1")
+                .dtChanged(LocalDateTime.now())
+                .cmkDmv1("CMK1")
+                .cmkDmv1DtEnd(LocalDate.of(2023, 12, 31))
+                .cmkDmv1Image("Image1")
+                .cmkDav2("CMK2")
+                .cmkDav2DtEnd(LocalDate.of(2024, 6, 30))
+                .cmkDav2Image("Image2")
+                .maintenancePlan("Plan1")
+                .maintenancePriceDiscountPerc(10.0)
+                .maintenancePriceDiscountValue(20.0)
+                .dtNextRevision(LocalDate.of(2024, 9, 30))
+                .isFirstRevision('N')
+                .sendType('E')
+                .operationCode("OperationCode1")
+                .sentInfo("SentInfo1")
+                .createdBy("User2")
+                .dtCreated(LocalDateTime.now())
+                .expectedKm("12000")
+                .genre("Genre1")
+                .acessory1Desc("Accessory1Desc")
+                .accessory1Link("Accessory1Link")
+                .acessory1ImgPostal("Accessory1ImgPostal")
+                .acessory2Desc("Accessory2Desc")
+                .accessory2Link("Accessory2Link")
+                .acessory2ImgPostal("Accessory2ImgPostal")
+                .lastServiceDealer("Dealer1")
+                .lastServiceDealerContact("Contact1")
+                .build();
+
     }
 }
