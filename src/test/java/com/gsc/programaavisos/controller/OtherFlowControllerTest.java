@@ -273,7 +273,7 @@ public class OtherFlowControllerTest {
     @Test
     void whenMapUpdateItsSuccessfully() throws Exception {
         String accessToken = generatedToken;
-        doNothing().when(otherFlowService).mapUpdate(any());
+        doNothing().when(otherFlowService).mapUpdate(any(),any());
         mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.MAP_UPDATE)
                         .header("accessToken", accessToken)
                         .contentType(MediaType.APPLICATION_JSON))
