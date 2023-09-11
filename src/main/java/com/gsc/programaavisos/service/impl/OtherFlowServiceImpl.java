@@ -590,17 +590,7 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
                 throw new ProgramaAvisosException("Error validating image ", e);
             } finally {
                 log.trace("Terminar conex�o com servidor de ftp.");
-                if (ftp != null) {
-                    try {
-                        ftp.logout();
-                        if (ftp.isConnected()) {
-                            ftp.disconnect();
-                        }
-                    } catch (IOException e) {
-                        throw new ProgramaAvisosException("Error closing connection", e);
-                    }
-
-                }
+                closeConn(ftp);
             }
         }
     }
@@ -680,5 +670,18 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error send newsletter ", e);
         }
 
+    }
+
+    protected void closeConn(FTPClient ftp) {
+        if (ftp != null) {
+            try {
+                ftp.logout();
+                if (ftp.isConnected()) {
+                    ftp.disconnect();
+                }
+            } catch (IOException e) {
+                throw new ProgramaAvisosException("Error closing connection", e);
+            }
+        }
     }
 }
