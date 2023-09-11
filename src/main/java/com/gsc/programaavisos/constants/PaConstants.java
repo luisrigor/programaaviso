@@ -29,4 +29,28 @@ public class PaConstants {
 
     public static final int COMMERCIAL_CAMPAIGN			= 7; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
     public static final int COMMERCIAL_CAMPAIGN_APV_MAP = 8; /*POR DEFEITO EXCLUIDO NA PESQUISA POR "TODOS"*/
+
+    public static final String SUCESSO = "Sucesso!";
+    public static final String SUCESSO_TOTAL = "Em anexo encontra-se resultado do envio das SMS's para a atualiza��o dos mapas. ";
+    public static final String ERRO_CELULAS ="Falta de informa��o contida nas celulas.";
+    public static final String ERRO_MATRICULA = "N�o foi possivel obter informa��o sobre a matr�cula apresentada.";
+    public static final String ERRO_USER = "N�o existe informa��o sobre utilizador/proprietario.";
+    public static final String ERRO_MOBILE = "N�o existe contacto de telemovel referente ao utilizador/proprietario.";
+    public static final String ERRO_SMS = "Ocorreu um erro a enviar o SMS para o cliente.";
+    public static final String ERRO_PREFERRED_DEALER = "N�o possivel obter preferred dealer sobre a matricula apresentada";
+    public static final String ERRO_LER_FICHEIRO = "Ocorreu um erro ao ler o ficheiro, por favor contactar a equipa de suporte.";
+    public static final String FICHEIRO_VAZIO = "O Ficheiro carregado encontrava-se vazio, queira por favor repetir a opera��o.";
+
+    public final static int DMV_APV	= 2;
+    public final static int NORMAL_ID	= 1;
+    public static final int CRM_ID	= 1;
+    public static final int LETTER		= 5;
+    public final static int BUSINESS_PLUS_ID	= 2;
+    public static final int AS400_ID = 2;
+
+
+
+
+
+
 }

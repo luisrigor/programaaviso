@@ -17,4 +17,6 @@ public interface PARepository extends JpaRepository<ProgramaAvisos, Integer>, PA
     void updateBlockedByById(@Param("blockedBy") String blockedBy,@Param("id") Integer id);
 
 
+
+
 }

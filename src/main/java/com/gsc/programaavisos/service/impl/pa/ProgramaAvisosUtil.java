@@ -7,6 +7,8 @@ import com.gsc.programaavisos.model.crm.entity.Calls;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.CallsRepository;
 import com.gsc.programaavisos.repository.crm.PARepository;
+import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.DataBaseTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +101,50 @@ public class ProgramaAvisosUtil {
         }
     }
 
+    public ProgramaAvisos insert(ProgramaAvisos oProgramaAvisos, boolean isContactCallCenterRigor, String createdBy) {
+
+        Timestamp ts = new Timestamp(System.currentTimeMillis());
+        try {
+            if(oProgramaAvisos.getIdStatus() <= 0)
+                oProgramaAvisos.setIdStatus(State.PENDING);
+
+            this.setEmptyFields(oProgramaAvisos);
+
+            oProgramaAvisos.setLicensePlate(StringTasks.ReplaceStr(StringTasks.cleanString(oProgramaAvisos.getLicensePlate(), ""), "-", "").trim().toUpperCase());
+            oProgramaAvisos.setRevisionSchedule(StringTasks.cleanString(oProgramaAvisos.getRevisionSchedule(), ""));
+            oProgramaAvisos.setRevisionScheduleMotive( StringTasks.cleanString(oProgramaAvisos.getRevisionScheduleMotive(), ""));
+            oProgramaAvisos.setRevisionScheduleMotive2(StringTasks.cleanString(oProgramaAvisos.getRevisionScheduleMotive2(), ""));
+            oProgramaAvisos.setRemovedObs(StringTasks.cleanString(oProgramaAvisos.getRemovedObs(), ""));
+            oProgramaAvisos.setCreatedBy(createdBy);
+            oProgramaAvisos.setDtCreated(ts);
+            oProgramaAvisos.setDtChanged(null);
+            oProgramaAvisos.setRecoveryAndShipping(StringTasks.cleanString(oProgramaAvisos.getRecoveryAndShipping(), ""));
+
+            oProgramaAvisos = paRepository.save(oProgramaAvisos);
+
+            // registar contato pendente
+            Calls oCall = new Calls();
+            oCall.setIdPaData(oProgramaAvisos.getId());
+            oCall.setSuccessContact('N');
+            oCall.setSuccessMotive("");
+            oCall.setDtScheduleContact(null);
+            oCall.setHrScheduleContact(null);
+            oCall.setRevisionSchedule(oProgramaAvisos.getIdStatus() == State.UNAVAILABLE_FOR_CONTACT ? State.UNAVAILABLE_FOR_CONTACT_DESC :  State.PENDING_DESC);
+            oCall.setRevisionScheduleMotive("");
+            oCall.setRevisionScheduleMotive2("");
+            oCall.setRemovedObs("");
+            oCall.setIsContactCcRigor(isContactCallCenterRigor ? 1 : 0);
+            oCall.setRecoveryShipping("");
+            oCall.setCreatedBy(createdBy);
+            oCall.setDtCreated(ts.toLocalDateTime());
+
+            callsRepository.save(oCall);
+
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error inserting data ", e);
+        }
+        return oProgramaAvisos;
+    }
 
     private Integer calculateIdStatus(ProgramaAvisos pa, String revisionSchedule,String revisionScheduleMotive,
                                       String removedObs, String changedBy) {
@@ -150,6 +196,7 @@ public class ProgramaAvisosUtil {
         pa.setNewAddressNumber(StringTasks.cleanString(pa.getNewAddressNumber(), ""));
         pa.setNewFloor(StringTasks.cleanString(pa.getNewFloor(), ""));
         pa.setNewCp4(StringTasks.cleanString(pa.getNewCp4(), ""));
+        pa.setNewCp3(StringTasks.cleanString(pa.getNewCp3(), ""));
         pa.setNewCpExt(StringTasks.cleanString(pa.getNewCpExt(), ""));
         pa.setNewContactPhone(StringTasks.cleanString(pa.getNewContactPhone(), ""));
         pa.setNewEmail(StringTasks.cleanString(pa.getNewEmail(), ""));

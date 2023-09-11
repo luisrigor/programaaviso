@@ -12,6 +12,8 @@ public class MapProfileVariables {
     public static String CONST_FTP_MANAGE_ITEM_LOGIN = "FTP_MANAGE_ITEM_LOGIN";
     public static String CONST_FTP_MANAGE_ITEM_PWD = "FTP_MANAGE_ITEM_PWD";
     public static String CONST_FTP_MANAGE_ITEM_ADDRESS = "FTP_MANAGE_ITEM_ADDRESS";
+    public static String CONST_CONSENT_CENTER_URL = "CONSENT_CENTER_URL";
+    public static String CONST_AS400_WEBSERVICE_ADDRESS = "AS400_WEBSERVICE_ADDRESS";
 
 
     public static Map<String, String> getEnvVariablesLocal() {
@@ -20,6 +22,8 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
+        envVariables.put(CONST_CONSENT_CENTER_URL, com.gsc.consent.util.DATA.CONSENT_CENTER_URL_STAGING_HTTPS);
+        envVariables.put(CONST_AS400_WEBSERVICE_ADDRESS, com.gsc.ws.util.DATA.SERVER_STAGING_HTTPS);
 
         return envVariables;
     }
@@ -30,8 +34,8 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
-
+        envVariables.put(CONST_CONSENT_CENTER_URL, com.gsc.consent.util.DATA.CONSENT_CENTER_URL_STAGING_HTTPS);
+        envVariables.put(CONST_AS400_WEBSERVICE_ADDRESS, com.gsc.ws.util.DATA.SERVER_STAGING_HTTPS);
 
         return envVariables;
     }
@@ -42,8 +46,8 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
-
+        envVariables.put(CONST_CONSENT_CENTER_URL, com.gsc.consent.util.DATA.CONSENT_CENTER_URL_STAGING_HTTPS);
+        envVariables.put(CONST_AS400_WEBSERVICE_ADDRESS, com.gsc.ws.util.DATA.SERVER_STAGING_HTTPS);
 
         return envVariables;
     }
@@ -54,7 +58,8 @@ public class MapProfileVariables {
         envVariables.put(CONST_FTP_MANAGE_ITEM_LOGIN, "javauser");
         envVariables.put(CONST_FTP_MANAGE_ITEM_PWD, "java");
         envVariables.put(CONST_FTP_MANAGE_ITEM_ADDRESS, "/home/www/html/rede/files/programa_de_avisos");
-
+        envVariables.put(CONST_CONSENT_CENTER_URL, com.gsc.consent.util.DATA.CONSENT_CENTER_URL_PRODUCTION_HTTPS);
+        envVariables.put(CONST_AS400_WEBSERVICE_ADDRESS, com.gsc.ws.util.DATA.SERVER_PRODUCTION_HTTPS);
 
         return envVariables;
     }

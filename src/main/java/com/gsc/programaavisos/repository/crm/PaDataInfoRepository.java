@@ -59,4 +59,13 @@ public interface PaDataInfoRepository extends JpaRepository<PaDataInfo, Composit
             @Param("oidDealerList") List<String> oidDealerList);
 
 
+
+
+    @Query( "SELECT DI FROM PaDataInfo DI " +
+            "WHERE DI.paLicensePlate = :plate AND DI.paIdContactType IN (1, 2, 3) " +
+            "AND DI.paVisible = 'S' " +
+            "ORDER BY DI.paId DESC ")
+    PaDataInfo getLastPaDataForPlate(@Param("plate") String plate);
+
+
 }
