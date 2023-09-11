@@ -1,7 +1,5 @@
 package com.gsc.programaavisos.service.impl;
 
-import com.gsc.consent.core.objects.SubscriptionCenterResponse;
-import com.gsc.consent.invoke.ConsentCenterInvoke;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.AppProfile;
@@ -19,22 +17,13 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.gsc.programaavisos.service.impl.pa.MapUpdateUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
-import com.gsc.ws.core.CarInfo;
-import com.gsc.ws.core.objects.response.CarInfoResponse;
-import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.rg.dealer.Dealer;
-import com.sc.commons.comunications.Mail;
-import com.sc.commons.comunications.Sms;
-import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.service.impl.pa.TPALexusUtil;
 import com.gsc.programaavisos.service.impl.pa.TPAToyotaUtil;
-import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.newsletter.core.WsResponse;
 import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
-import com.rg.dealer.Dealer;
 import com.sc.commons.utils.ArrayTasks;
 import com.sc.commons.utils.CarTasks;
 import com.sc.commons.utils.HttpTasks;
@@ -47,20 +36,13 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
-import java.net.SocketException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.*;
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
@@ -87,8 +69,6 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
     private final ContactTypeRepository contactTypeRepository;
     private final PaDataInfoRepository dataInfoRepository;
     private final CcRigorServiceRepository ccRepository;
-
-
     private static final String QUOTES = "\"";
     private final ClientTypeRepository clientTypeRepository;
     private final SourceRepository sourceRepository;
@@ -104,8 +84,6 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
     public static final String FTP_EPOSTAL_PATH = "/epostais/comum";
     private final TPAToyotaUtil tpaToyotaUtil;
     private final TPALexusUtil tpaLexusUtil;
-    private final Environment env;
-    private final EnvironmentConfig environmentConfig;
 
     @Override
     public List<ContactReason> getContactReasons() {
