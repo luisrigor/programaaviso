@@ -203,9 +203,9 @@ public class BackOfficeServiceImpl implements BackOfficeService {
     public File convertToFile(MultipartFile file) throws Exception {
         File convFile = new File(file.getOriginalFilename());
         convFile.createNewFile();
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(convFile)) {
+            fos.write(file.getBytes());
+        }
         return convFile;
     }
 

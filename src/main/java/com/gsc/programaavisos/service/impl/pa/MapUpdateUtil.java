@@ -295,7 +295,7 @@ public class MapUpdateUtil {
 
     public boolean validateRGPD(String brand, String phone) {
 
-        brand.toUpperCase();
+        brand = brand.toUpperCase();
         String contactPhone = phone;
         if ("".equals(StringTasks.cleanString(phone, "")))
             return false;
@@ -383,9 +383,9 @@ public class MapUpdateUtil {
     public File convertToFile(MultipartFile file) throws Exception {
         File convFile = new File(file.getOriginalFilename());
         convFile.createNewFile();
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(convFile)) {
+            fos.write(file.getBytes());
+        }
         return convFile;
     }
 
