@@ -28,7 +28,6 @@ import com.sc.commons.utils.ArrayTasks;
 import com.sc.commons.utils.CarTasks;
 import com.sc.commons.utils.HttpTasks;
 import com.sc.commons.utils.StringTasks;
-import com.sc.commons.validations.Validate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;

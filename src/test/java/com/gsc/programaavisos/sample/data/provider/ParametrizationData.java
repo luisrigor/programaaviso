@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.sample.data.provider;
 
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
-
 import java.sql.Date;
 import java.time.LocalDate;
 

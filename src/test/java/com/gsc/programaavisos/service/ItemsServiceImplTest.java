@@ -19,19 +19,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
-public class ItemsServiceImplTest {
+class ItemsServiceImplTest {
 
     @Mock
     private DocumentUnitRepository documentUnitRepository;

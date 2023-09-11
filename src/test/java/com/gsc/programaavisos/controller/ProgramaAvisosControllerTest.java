@@ -6,16 +6,13 @@ import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.repository.crm.ClientRepository;
 import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
 import com.gsc.programaavisos.repository.crm.LoginKeyRepository;
 import com.gsc.programaavisos.repository.crm.ServiceLoginRepository;
-import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
 import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.TokenProvider;
-import com.gsc.programaavisos.service.ParametrizationService;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -43,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, TokenProvider.class})
 @ActiveProfiles(profiles = SecurityData.ACTIVE_PROFILE)
 @WebMvcTest(ProgramaAvisosController.class)
-public class ProgramaAvisosControllerTest {
+class ProgramaAvisosControllerTest {
 
     @Autowired
     private MockMvc mvc;

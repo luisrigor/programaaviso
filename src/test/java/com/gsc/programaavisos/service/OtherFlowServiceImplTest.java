@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.dto.ProgramaAvisosBean;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -20,7 +19,6 @@ import com.gsc.programaavisos.service.impl.OtherFlowServiceImpl;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
-import com.sc.commons.utils.HttpTasks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,16 +27,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
-public class OtherFlowServiceImplTest {
+class OtherFlowServiceImplTest {
 
     @Mock
     private DocumentUnitRepository documentUnitRepository;

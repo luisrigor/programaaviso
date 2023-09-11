@@ -14,19 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
-public class ParametrizationServiceImplTest {
+class ParametrizationServiceImplTest {
 
     @Mock
     private PaParameterizationRepository paParameterizationRepository;

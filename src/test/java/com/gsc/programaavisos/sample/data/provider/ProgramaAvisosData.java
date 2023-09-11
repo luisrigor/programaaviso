@@ -4,11 +4,8 @@ import com.gsc.programaavisos.dto.FilterBean;
 import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.dto.SearchPADTO;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
-
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;

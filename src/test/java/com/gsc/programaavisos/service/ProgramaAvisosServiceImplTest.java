@@ -6,7 +6,6 @@ import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.dto.SearchPADTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
-import com.gsc.programaavisos.model.crm.entity.Vehicle;
 import com.gsc.programaavisos.repository.crm.PARepository;
 import com.gsc.programaavisos.repository.crm.QuarantineRepository;
 import com.gsc.programaavisos.repository.crm.VehicleRepository;
@@ -24,15 +23,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
-public class ProgramaAvisosServiceImplTest {
+class ProgramaAvisosServiceImplTest {
 
     public final SimpleDateFormat timeZoFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
     @Mock

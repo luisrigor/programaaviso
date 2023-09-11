@@ -5,7 +5,6 @@ import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.rg.dealer.Dealer;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.Collections;
 
 public class OtherFlowData {
 
-    /** Modelo Data*/
     public static final Integer RANDOM_ID = 111;
     public static final String RANDOM_NAME = "RANDOM_NAME";
     public static final Integer RANDOM_MARCA_ID = 222;
