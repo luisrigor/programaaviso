@@ -264,7 +264,7 @@
                         <exclude>com/gsc/programaavisos/model/**</exclude>
                         <exclude>com/gsc/programaavisos/repository/**</exclude>
                         <exclude>com/gsc/programaavisos/security/**</exclude>
-                        <exclude>com/gsc/programaavisos/utils/**</exclude>
+                        <exclude>com/gsc/programaavisos/util/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
