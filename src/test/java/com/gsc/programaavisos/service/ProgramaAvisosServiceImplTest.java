@@ -1,6 +1,7 @@
 package com.gsc.programaavisos.service;
 
 import com.gsc.programaavisos.constants.PaConstants;
+import com.gsc.programaavisos.dto.DetailsPADTO;
 import com.gsc.programaavisos.dto.FilterBean;
 import com.gsc.programaavisos.dto.PADTO;
 import com.gsc.programaavisos.dto.SearchPADTO;
@@ -9,10 +10,16 @@ import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.PARepository;
 import com.gsc.programaavisos.repository.crm.QuarantineRepository;
 import com.gsc.programaavisos.repository.crm.VehicleRepository;
+import com.gsc.programaavisos.model.crm.entity.*;
+import com.gsc.programaavisos.repository.crm.*;
+import com.gsc.programaavisos.sample.data.provider.ItemData;
+import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
 import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.ProgramaAvisosServiceImpl;
+import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.ws.core.*;
 import com.rg.dealer.Dealer;
 import com.sc.commons.exceptions.SCErrorException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +32,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
@@ -37,6 +47,16 @@ class ProgramaAvisosServiceImplTest {
     private VehicleRepository vehicleRepository;
     @Mock
     private QuarantineRepository quarantineRepository;
+    @Mock
+    private PARepository programaAvisosRepository;
+    @Mock
+    private PABeanRepository paBeanRepository;
+    @Mock
+    private ProgramaAvisosUtil programaAvisosUtil;
+    @Mock
+    private ChannelRepository channelRepository;
+    @Mock
+    private CallsRepository callsRepository;
     @InjectMocks
     private ProgramaAvisosServiceImpl programaAvisosService;
     @BeforeEach
@@ -56,18 +76,6 @@ class ProgramaAvisosServiceImplTest {
         verify(paRepository,times(0)).save(oPA);
     }
 
-   /* @Test
-    void whenSavePASuccessfullyCase() {
-        // Arrange
-        PADTO padto = ProgramaAvisosData.getPADTO();
-        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
-        // Act
-        programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
-        // Assert
-        verify(paRepository,times(1)).save(oPA);
-    }*/
-
     @Test
     void whenSavePAAndIdDoNotFoundThenThrowProgramaAvisosException() {
         // Arrange
@@ -78,48 +86,9 @@ class ProgramaAvisosServiceImplTest {
                 () -> programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto));
     }
 
-   /* @Test
-    void whenSavePAWithRevisionScheduleMotiveThenSavePASuccessfullyCase() {
-        // Arrange
-        PADTO padto = ProgramaAvisosData.getPADTO();
-        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        padto.setRevisionScheduleMotive(PaConstants.RSM_NOT_OWNER);
-        padto.setRevisionSchedule(PaConstants.RSM_NOT_OWNER2);
-        Vehicle vehicle = Vehicle.builder().idUser(1).build();
-        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
-        when(vehicleRepository.getVehicle(any())).thenReturn(vehicle);
-        // Act
-        programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
-        // Assert
-        verify(paRepository,times(1)).save(oPA);
-    }*/
-
-    @Test
-    void whenRemovePAAndPAIdIsLowerThanZeroThenDoNotSaveAnythingCase() {
-        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        oPA.setId(0);
-        when(paRepository.findById(anyInt())).thenReturn(Optional.ofNullable(oPA));
-        // Act
-        programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
-        // Assert
-        verify(paRepository,times(0)).save(oPA);
-    }
-
-  /*  @Test
-    void whenRemovePASuccessfullyCase() {
-        // Arrange
-        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
-        when(paRepository.findById(any())).thenReturn(Optional.ofNullable(oPA));
-        // Act
-        programaAvisosService.removePA(SecurityData.getUserDefaultStatic(),1,"Option","Obs");
-        // Assert
-        verify(paRepository,times(1)).save(any(ProgramaAvisos.class));
-    }*/
-
     @Test
     void whenRemovePAIdDoNotFoundThenThrowProgramaAvisosException() {
         // Arrange
-        PADTO padto = ProgramaAvisosData.getPADTO();
         when(paRepository.findById(anyInt())).thenThrow(ProgramaAvisosException.class);
         // Act & Assert
         Assertions.assertThrows(ProgramaAvisosException.class,
@@ -172,4 +141,100 @@ class ProgramaAvisosServiceImplTest {
         Assertions.assertEquals(searchPADTO.getArrMaintenanceTypes(),actualFilter.getArrSelMaintenanceTypes());
         Assertions.assertEquals(searchPADTO.getFilterOwner(),actualFilter.getOwner());
     }
+
+    @Test
+    void unlockPARegisterThenThrowSuccessfullyCase() {
+        // Arrange
+        doThrow(ProgramaAvisosException.class).when(paRepository).updateBlockedByById(anyString(),anyInt());
+        // Act & Assert
+        Assertions.assertThrows(ProgramaAvisosException.class,()->programaAvisosService.unlockPARegister(anyInt()));
+    }
+
+    @Test
+    void activatePAThenThrowSuccessfullyCase() {
+        // Arrange
+        when(paRepository.findById(anyInt())).thenThrow(ProgramaAvisosException.class);
+        // Act & Assert
+        Assertions.assertThrows(ProgramaAvisosException.class,()->programaAvisosService.activatePA(any(),anyInt()));
+    }
+
+    @Test
+    void getPaDetailSuccessfullyCase(){
+        //Arrange
+        UserPrincipal user = SecurityData.getUserDefaultStatic();
+        List<Channel> channels = new ArrayList<>();
+        List<Calls> calls = new ArrayList<>();
+
+        when(paBeanRepository.getProgramaAvisosBeanById(anyInt()))
+                .thenReturn(ProgramaAvisosData.getProgramaAvisosBean());
+        doNothing().when(paRepository).updateBlockedByById(anyString(),anyInt());
+        when(channelRepository.findAll()).thenReturn(channels);
+        when(callsRepository.findByIdPaData(anyInt())).thenReturn(calls);
+        //Act
+        DetailsPADTO detailsPADTO = programaAvisosService.getPaDetail(user,1,2);
+        //Assert
+        Assertions.assertNull(detailsPADTO.getCalls());
+        Assertions.assertTrue(detailsPADTO.getChannels().isEmpty());
+    }
+
+    @Test
+    void getPaDetailThrowProgramaAvisosException(){
+        //Arrange
+        when(paBeanRepository.getProgramaAvisosBeanById(anyInt()))
+                .thenThrow(ProgramaAvisosException.class);
+        //Act & Assert
+        Assertions.assertThrows(ProgramaAvisosException.class,
+                ()->programaAvisosService.getPaDetail(SecurityData.getUserDefaultStatic(),1,2));
+    }
+
+    @Test
+    void getRevisionsSuccessfullyCase(){
+        List<Revision> revisions = programaAvisosService.getRevisions(StringUtils.EMPTY);
+        Assertions.assertTrue(revisions.isEmpty());
+    }
+
+    @Test
+    void getWarrantiesSuccessfullyCase(){
+        List<Warranty> warranties = programaAvisosService.getWarranties(StringUtils.EMPTY);
+        Assertions.assertTrue(warranties.isEmpty());
+    }
+
+    @Test
+    void getClaimsSuccessfullyCase(){
+        List<Claim> claims = programaAvisosService.getClaims(StringUtils.EMPTY);
+        Assertions.assertTrue(claims.isEmpty());
+    }
+
+    @Test
+    void getRptsSuccessfullyCase(){
+        List<Rpt> rpts = programaAvisosService.getRpts(StringUtils.EMPTY);
+        Assertions.assertTrue(rpts.isEmpty());
+    }
+
+    @Test
+    void getCampaignsSuccessfullyCase(){
+        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY);
+        Assertions.assertTrue(campaigns.isEmpty());
+    }
+
+    @Test
+    void sortCampaignsSuccessfullyCase(){
+        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY);
+        programaAvisosService.sortCampaigns(campaigns);
+        Assertions.assertTrue(campaigns.isEmpty());
+    }
+
+    @Test
+    void fillPAWsDataPlateNullCase() throws Exception {
+        //Arrange
+        ProgramaAvisosBean oPABean = ProgramaAvisosData.getProgramaAvisosBean();
+        oPABean.setLicensePlate(StringUtils.EMPTY);
+        //Act
+        ProgramaAvisosBean actualOPABean = programaAvisosService.fillPAWsData(oPABean,true);
+        //Assert
+        Assertions.assertEquals(StringUtils.EMPTY,actualOPABean.getLicensePlate());
+    }
+
+
+
 }

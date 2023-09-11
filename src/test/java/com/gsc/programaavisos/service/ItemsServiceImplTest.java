@@ -3,6 +3,7 @@ package com.gsc.programaavisos.service;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnitCategory;
@@ -11,6 +12,7 @@ import com.gsc.programaavisos.repository.crm.DocumentUnitRepository;
 import com.gsc.programaavisos.sample.data.provider.ItemData;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
+import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.ItemServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
 class ItemsServiceImplTest {
@@ -129,27 +134,87 @@ class ItemsServiceImplTest {
         Assertions.assertThrows(ProgramaAvisosException.class, () ->
                 itemService.getManageItems(SecurityData.getUserDefaultStatic(),itemType,itemId));
     }
-/*
+
     @Test
-    void whenSearchManageItemsListAndItemIdIsEqualTwoThenReturnManagedItemsDto() {
+    void whenGetListManagesItemsThenReturnSuccessfully() {
         //Arrange
-        int itemType = 1;
-        int itemId = 2;
-        DocumentUnit expectedItem = new DocumentUnit();
-        expectedItem.setImgEPostal("EV_UX.jpg");
-        expectedItem.setImgPostal("EV_UX.jpg");
-        List<DocumentUnitCategory> categories = new ArrayList<>();
-        when(documentUnitCategoryRepository.getByType(any())).thenReturn(categories);
-        when(documentUnitRepository.findById(itemId)).thenReturn(Optional.of(expectedItem));
-        doNothing().when(SftpTasks.class);
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
+        List<DocumentUnitDTO> expectedList = new ArrayList<>();
+        when(documentUnitRepository.getByFilter(any())).thenReturn(expectedList);
         // Act
-        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId);
+        List<DocumentUnitDTO> actualList = itemService.getListManagesItems(userPrincipal,"searchInput",1);
         // Assert
-        Assertions.assertEquals(expectedItem,actualManageItemsDTO.getItem());
-        Assertions.assertNull(actualManageItemsDTO.getItemId());
-        Assertions.assertEquals(itemType,actualManageItemsDTO.getItemType());
-        Assertions.assertEquals(categories,actualManageItemsDTO.getCategories());
+        Assertions.assertEquals(expectedList,actualList);
     }
-*/
+
+    @Test
+    void whenGetListManagesItemsThenThrowProgramaAvisosExceptio() {
+        //Arrange
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
+        when(documentUnitRepository.getByFilter(any())).thenThrow(ProgramaAvisosException.class);
+        // Act & Assert
+        Assertions.assertThrows(ProgramaAvisosException.class, () ->
+                itemService.getListManagesItems(userPrincipal,"searchInput",1));
+    }
+
+    @Test
+    void whenSaveManageItemsThenItsSuccessfully() {
+        //Arrange
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
+        SaveManageItemDTO saveManageItemDTO = ItemData.getSaveManageItemDto();
+        DocumentUnit documentUnit = ItemData.getDocumentUnit();
+        when(documentUnitRepository.findById(anyInt())).thenReturn(Optional.ofNullable(documentUnit));
+        when(documentUnitRepository.findById(anyInt())).thenReturn(Optional.ofNullable(documentUnit));
+        // Act
+        itemService.saveManageItems(userPrincipal,saveManageItemDTO,
+                new MockMultipartFile[]{});
+        // Assert
+        verify(documentUnitRepository,times(1)).save(any());
+    }
+
+    @Test
+    void whenSaveManageItemsWhenTPAIdEqualZeroThenItsSuccessfully() {
+        //Arrange
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
+        SaveManageItemDTO saveManageItemDTO = ItemData.getSaveManageItemDto();
+        saveManageItemDTO.setIdTpaItem(0);
+        MockMultipartFile firstFile = new MockMultipartFile("files", "filename.txt", "text/plain", "some xml".getBytes());
+        MockMultipartFile secondFile = new MockMultipartFile("files", "other-file-name.png", "text/plain", "some other type".getBytes());
+        DocumentUnit documentUnit = ItemData.getDocumentUnit();
+        when(documentUnitRepository.save(any())).thenReturn(documentUnit);
+        when(documentUnitRepository.findById(anyInt())).thenReturn(Optional.ofNullable(documentUnit));
+        // Act
+        itemService.saveManageItems(userPrincipal,saveManageItemDTO,
+                new MockMultipartFile[]{});
+        // Assert
+        verify(documentUnitRepository,times(1)).save(any());
+    }
+
+    @Test
+    void whenSaveManageItemsThenThrowProgramaAvisosExceptio() {
+        //Arrange
+        UserPrincipal userPrincipal = SecurityData.getUserDefaultStatic();
+        SaveManageItemDTO saveManageItemDTO = ItemData.getSaveManageItemDto();
+        when(documentUnitRepository.getByFilter(any())).thenThrow(ProgramaAvisosException.class);
+        // Act & Assert
+        Assertions.assertThrows(ProgramaAvisosException.class, () ->
+                itemService.saveManageItems(userPrincipal, saveManageItemDTO, new MockMultipartFile[]{}));
+
+    }
+
+    @Test
+    void whenGetFileExtensionThenItsSuccessfully() {
+        MockMultipartFile firstFile = new MockMultipartFile("files", "filename.txt", "text/plain", "some xml".getBytes());
+        String name = itemService.getFileExtension(firstFile);
+        Assertions.assertFalse(name.isEmpty());
+        Assertions.assertEquals("txt",name);
+    }
+
+    @Test
+    void whenGetFileExtensionThenItsReturnNull() {
+        MockMultipartFile firstFile = new MockMultipartFile("files", "filename", "text/plain", "some xml".getBytes());
+        String name = itemService.getFileExtension(firstFile);
+        Assertions.assertNull(name);
+    }
 
 }

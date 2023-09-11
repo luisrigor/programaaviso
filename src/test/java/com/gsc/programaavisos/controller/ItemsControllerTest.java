@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.sql.Date;
 import java.util.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -99,7 +100,7 @@ class ItemsControllerTest {
     @Test
     void whenGetItemListSuccessfully() throws Exception {
         String accessToken = generatedToken;
-        List<DocumentUnitDTO> documentUnitDTOList = Collections.singletonList(ItemData.getDocumentUnit());
+        List<DocumentUnitDTO> documentUnitDTOList = Collections.singletonList(ItemData.getDocumentUnitDTO());
         when(itemService.getListManagesItems(any(),anyString(),anyInt())).thenReturn(documentUnitDTOList);
         mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_MANAGE_LIST)
                         .param("searchInput","anyInput")
