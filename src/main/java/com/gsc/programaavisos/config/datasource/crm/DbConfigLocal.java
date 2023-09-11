@@ -83,8 +83,8 @@ public class DbConfigLocal {
         dblists.setDatabaseName("DBLISTS");
         dblists.setDriverType(4);
         dblists.setCurrentSchema("DB2INST2");
-        dblists.setUser("db2inst1");
-        dblists.setPassword("db2admin");
+        dblists.setUser(SET_USER);
+        dblists.setPassword(SET_PAS);
         conn.setDataSource(dblists, "jdbc/dblists");
         log.info("Datasource initialized successfully: jdbc/dblists");
     }
