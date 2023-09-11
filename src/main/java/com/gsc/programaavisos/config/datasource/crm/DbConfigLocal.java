@@ -19,6 +19,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -42,6 +43,9 @@ public class DbConfigLocal {
     @Value("${sc.config.file}")
     private String scConfigFile;
 
+    private static final String SET_USER = "db2inst1";
+    private static final String SET_PAS = "db2admin";
+
     @PostConstruct
     private void init() {
         SCGlobalPreferences.setResources(scConfigFile);
@@ -51,8 +55,8 @@ public class DbConfigLocal {
         dbToynet.setPortNumber(50000);
         dbToynet.setDatabaseName("DBTOYNET");
         dbToynet.setDriverType(4);
-        dbToynet.setUser("db2inst1");
-        dbToynet.setPassword("db2admin");
+        dbToynet.setUser(SET_USER);
+        dbToynet.setPassword(SET_PAS);
         conn.setDataSource(dbToynet, "jdbc/dbtoynet");
         log.info("Datasource initialized successfully: jdbc/dbtoynet");
         DB2SimpleDataSource dblexxtaps = new DB2SimpleDataSource();
@@ -60,8 +64,8 @@ public class DbConfigLocal {
         dblexxtaps.setPortNumber(50000);
         dblexxtaps.setDatabaseName("LEXXTAPS");
         dblexxtaps.setDriverType(4);
-        dblexxtaps.setUser("db2inst1");
-        dblexxtaps.setPassword("db2admin");
+        dblexxtaps.setUser(SET_USER);
+        dblexxtaps.setPassword(SET_PAS);
         conn.setDataSource(dblexxtaps, "jdbc/lexxtaps");
         log.info("Datasource initialized successfully: jdbc/lexxtaps");
         DB2SimpleDataSource dbclaims = new DB2SimpleDataSource();
@@ -69,8 +73,8 @@ public class DbConfigLocal {
         dbclaims.setPortNumber(50000);
         dbclaims.setDatabaseName("DBCLAIMS");
         dbclaims.setDriverType(4);
-        dbclaims.setUser("db2inst1");
-        dbclaims.setPassword("db2admin");
+        dbclaims.setUser(SET_USER);
+        dbclaims.setPassword(SET_PAS);
         conn.setDataSource(dbclaims, "jdbc/dbclaims");
         log.info("Datasource initialized successfully: jdbc/dbclaims");
         DB2SimpleDataSource dblists = new DB2SimpleDataSource();
@@ -83,7 +87,6 @@ public class DbConfigLocal {
         dblists.setPassword("db2admin");
         conn.setDataSource(dblists, "jdbc/dblists");
         log.info("Datasource initialized successfully: jdbc/dblists");
-
     }
 
     @Primary

@@ -6,6 +6,7 @@ import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
@@ -40,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -104,17 +104,56 @@ public class ParametrizationControllerTest {
                         .header("accessToken", accessToken))
                 .andExpect(status().isOk());
     }
-/*
-    @Test
-    void whenDeletePaParameterizationDeleteSuccessfully() throws Exception {
-        String accessToken = generatedToken;
-        doThrow(ProgramaAvisosException.class).when(parametrizationService).deleteParametrization(any(),any());
-        // Act & Assert
-        mvc.perform(delete(BASE_REQUEST_MAPPING+ ApiEndpoints.DELETE_PARAMATRIZATION)
-                        .header("accessToken", accessToken))
-                .andExpect(status().isInternalServerError());
-    }
- */
 
+    @Test
+    void whenGetListParametrizationThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<PaParameterization> paParameterizationList = new ArrayList<>(Collections
+                .singletonList(ParametrizationData.getPaParameterization()));
+        when(parametrizationService.getParametrizationsList(any())).thenReturn(paParameterizationList);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_PARAMETRIZATION_LIST)
+                        .header("accessToken", accessToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().string(objectMapper.writeValueAsString(paParameterizationList)));
+    }
+
+    @Test
+    void whenGetNewParametrizationThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        PaParameterization paParameterization = ParametrizationData.getPaParameterization();
+        when(parametrizationService.getNewParametrization(any(),anyInt())).thenReturn(paParameterization);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_NEW_PARAMETRIZATION)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(paParameterization)));
+    }
+
+    @Test
+    void whenCloneParametrizationThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(parametrizationService).cloneParameterization(any(),anyInt());
+        mvc.perform(post(BASE_REQUEST_MAPPING+ ApiEndpoints.CLONE_PARAMETRIZATION)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Successfully Clone Parametrization"));
+    }
+
+    @Test
+    void whenSaveParametrizationThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        ParameterizationDTO parameterizationDTO = new ParameterizationDTO();
+        doNothing().when(parametrizationService).saveParameterization(any(),any());
+        mvc.perform(post(BASE_REQUEST_MAPPING+ ApiEndpoints.SAVE_PARAMETRIZATION)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(parameterizationDTO))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string("Successfully Save Parametrization"));
+    }
 
 }

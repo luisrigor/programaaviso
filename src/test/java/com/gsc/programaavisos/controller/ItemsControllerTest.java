@@ -7,6 +7,7 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.repository.crm.ClientRepository;
 import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
 import com.gsc.programaavisos.repository.crm.LoginKeyRepository;
@@ -25,19 +26,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.charset.Charset;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,6 +115,20 @@ public class ItemsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().string(objectMapper.writeValueAsString(manageItemsDTO)));
+    }
+
+    @Test
+    void whenGetItemListSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<DocumentUnitDTO> documentUnitDTOList = Collections.singletonList(ItemData.getDocumentUnit());
+        when(itemService.getListManagesItems(any(),anyString(),anyInt())).thenReturn(documentUnitDTOList);
+        mvc.perform(get(BASE_REQUEST_MAPPING+ ApiEndpoints.GET_MANAGE_LIST)
+                        .param("searchInput","anyInput")
+                        .param("itemType","1")
+                        .header("accessToken", accessToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().string(objectMapper.writeValueAsString(documentUnitDTOList)));
     }
 
 }

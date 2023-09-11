@@ -1,7 +1,6 @@
 package com.gsc.programaavisos.util;
 
 import com.gsc.programaavisos.dto.FilterBean;
-
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
@@ -30,5 +29,4 @@ public class PAUtil {
 
         return key.deleteCharAt(key.length()-1).toString();
     }
-
 }

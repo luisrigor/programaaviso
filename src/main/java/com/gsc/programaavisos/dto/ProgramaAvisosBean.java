@@ -2,7 +2,6 @@ package com.gsc.programaavisos.dto;
 
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.constants.PAInfo;
-import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.ws.core.*;
 import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
 import com.rg.dealer.Dealer;
@@ -190,11 +189,19 @@ public class ProgramaAvisosBean {
 	protected Date ivDtVisible;
 	protected int ivWarningPriority;
 
+	public ProgramaAvisosBean() {
+	}
+
 	public ProgramaAvisosBean(Map<String,Object> rs, boolean withHHC) throws Exception {
 		//------------------------ Info PA_DATA
 		setId((Integer) rs.get("PA_ID"));
+		setIdContactType((Integer) rs.get("PA_ID"));
 		setLicensePlate(			 StringTasks.cleanString((String) rs.get("PA_LICENSE_PLATE").toString(), ""));
+		setBrand(					 StringTasks.cleanString((String) rs.get("PA_BRAND"), ""));
+		setOidNewsletter((String) rs.get("PA_OID_NEWSLETTER"));
+		setNewsletterPersonalData((String) rs.get("PA_NEWSLETTER_PERSONAL_DATA"));
 		setNextRevision(			StringTasks.cleanString((String) rs.get("MRS_NEXT_REVISION"), ""));
+
 	}
 
 	//------------------------ Info PA_DATA

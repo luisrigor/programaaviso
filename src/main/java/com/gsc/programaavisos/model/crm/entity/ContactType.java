@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.model.crm.entity;
 
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.MaintenanceTypeDTO;
 import lombok.*;
 
@@ -31,22 +30,16 @@ public class ContactType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Integer id;
-
     @Column(name = "NAME")
     private String name;
-
     @Column(name = "STATUS")
     private Character status;
-
     @Column(name = "ORDER_COLUMN")
     private String orderColumn;
-
     @Column(name = "ORDER_COLUMN_DESCRIPTION")
     private String orderColumnDescription;
-
     @Column(name = "CREATED_BY")
     private String createdBy;
-
     @Column(name = "DT_CREATED")
     private LocalDateTime dtCreated;
 }

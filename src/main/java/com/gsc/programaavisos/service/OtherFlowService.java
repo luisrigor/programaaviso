@@ -7,7 +7,7 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.rg.dealer.Dealer;
 import org.springframework.web.multipart.MultipartFile;
-
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface OtherFlowService {
@@ -32,4 +32,6 @@ public interface OtherFlowService {
     List<ContactType> getAllContactTypes();
     List<MaintenanceTypeDTO> getMaintenanceTypes();
     void verifyImageNameOnServer(String fileName, String idTpaItemType, String tpaItemTypeNameSingular);
+   void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response);
+    NewsLetterDTO sendNewsletter(Integer id, String email);
 }

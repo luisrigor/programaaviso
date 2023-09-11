@@ -17,6 +17,7 @@
     <properties>
         <java.version>1.8</java.version>
         <io.jsonwebtoken.version>0.11.5</io.jsonwebtoken.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
     </properties>
     <dependencies>
         <dependency>
@@ -30,21 +31,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-
-        <exclusions>
-             <exclusion>
-                 <groupId>org.springframework.boot</groupId>
-                 <artifactId>spring-boot-starter-tomcat</artifactId>
-             </exclusion>
-        </exclusions>
-
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-jetty</artifactId>
         <scope>provided</scope>
     </dependency>
-
     <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
@@ -69,6 +67,11 @@
         <artifactId>SCGSCWSAuthentication</artifactId>
         <version>20230726</version>
     </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCCarDB</artifactId>
+            <version>20230209</version>
+        </dependency>
     <dependency>
         <groupId>GSC</groupId>
         <artifactId>SCWSCARDB</artifactId>
@@ -84,6 +87,11 @@
         <artifactId>SCMicrosoft</artifactId>
         <version>20221024-STAGING</version>
     </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.19.4</version>
+        </dependency>
     <dependency>
         <groupId>io.jsonwebtoken</groupId>
         <artifactId>jjwt-api</artifactId>
@@ -175,14 +183,57 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>3.8.0</version>
+         <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.3</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCCarDB</artifactId>
+            <version>20230209</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCGesDoc</artifactId>
+            <version>20221124</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCNewsletterWSClient</artifactId>
+            <version>20220822</version>
+        </dependency>
+        <dependency>
+            <groupId>GSC</groupId>
+            <artifactId>SCConsumerDomain</artifactId>
+            <version>20211129</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.4</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <finalName>programaavisos</finalName>
@@ -205,14 +256,14 @@
                 <version>0.8.7</version>
                 <configuration>
                     <excludes>
-                        <exclude>com/gsc/programaaviso/config/**</exclude>
-                        <exclude>com/gsc/programaaviso/constants/**</exclude>
-                        <exclude>com/gsc/programaaviso/dto/**</exclude>
-                        <exclude>com/gsc/programaaviso/exceptions/**</exclude>
-                        <exclude>com/gsc/programaaviso/model/**</exclude>
-                        <exclude>com/gsc/programaaviso/repository/**</exclude>
-                        <exclude>com/gsc/programaaviso/security/**</exclude>
-                        <exclude>com/gsc/programaaviso/utils/**</exclude>
+                        <exclude>com/gsc/programaavisos/config/**</exclude>
+                        <exclude>com/gsc/programaavisos/constants/**</exclude>
+                        <exclude>com/gsc/programaavisos/dto/**</exclude>
+                        <exclude>com/gsc/programaavisos/exceptions/**</exclude>
+                        <exclude>com/gsc/programaavisos/model/**</exclude>
+                        <exclude>com/gsc/programaavisos/repository/**</exclude>
+                        <exclude>com/gsc/programaavisos/security/**</exclude>
+                        <exclude>com/gsc/programaavisos/utils/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

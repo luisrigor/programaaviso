@@ -46,7 +46,7 @@ log4j:
 #Ficheiro de configuracao da SC
 sc:
   config:
-    file: "C:/Users/Luis Parra/OneDrive - Rigor/Documentos/REPOSITORIOS/Proyectos GITHUB/programaaviso/src/main/resources/sc_config.properties"
+    file: ""
 
 #customom properties ex local url
 app:
@@ -66,6 +66,9 @@ app:
       username: db2inst1
       password: db2admin
       driver-class-name: com.ibm.db2.jcc.DB2Driver
+  ctt:
+    client:
+      url: "https://demowssccommons.rigorcg.pt/WSSCCommons/services/CTTService/"
 logging:
   level:
     org:

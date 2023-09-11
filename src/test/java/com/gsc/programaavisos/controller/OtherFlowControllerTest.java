@@ -5,9 +5,7 @@ import com.google.gson.Gson;
 import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiEndpoints;
-import com.gsc.programaavisos.dto.DelegatorsDTO;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
-import com.gsc.programaavisos.dto.GetDelegatorsDTO;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
@@ -15,12 +13,14 @@ import com.gsc.programaavisos.repository.crm.ClientRepository;
 import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
 import com.gsc.programaavisos.repository.crm.LoginKeyRepository;
 import com.gsc.programaavisos.repository.crm.ServiceLoginRepository;
+import com.gsc.programaavisos.sample.data.provider.ItemData;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.TokenProvider;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
 import com.rg.dealer.Dealer;
+import com.sun.mail.imap.protocol.Item;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -216,5 +219,153 @@ public class OtherFlowControllerTest {
                         .content(objectMapper.writeValueAsString(getDelegatorsDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(objectMapper.writeValueAsString(delegatorsDTOS)));
+    }
+
+    @Test
+    void whenGetContactTypeThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<ContactType> contactTypeList = Collections.singletonList(OtherFlowData.getContactType());
+        when(otherFlowService.getContactTypeList(anyString())).thenReturn(contactTypeList);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_CONTACT_TYPE)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(contactTypeList)));
+    }
+
+    @Test
+    void whenGetChangedListThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<Object[]> changedList = new ArrayList<>();
+        GetDelegatorsDTO getDelegatorsDTO = new GetDelegatorsDTO();
+        when(otherFlowService.getChangedList(any())).thenReturn(changedList);
+        mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.GET_CHANGED_LIST)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(getDelegatorsDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(changedList)));
+    }
+
+    @Test
+    void whenGetPAClientContactsThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<ClientPropDTO> contactsForPlate = Collections.singletonList(OtherFlowData.getClientPropDTO());
+        List<ClientPropDTO> contactsForClient = Collections.singletonList(OtherFlowData.getClientPropDTO());
+        ClientContactsDTO clientContacts = ClientContactsDTO.builder()
+                .contactsForClient(contactsForClient)
+                .contactsForPlate(contactsForPlate).build();
+        FilterBean filterBean = FilterBean.builder().build();
+
+        when(otherFlowService.getPAClientContacts(anyString(),anyString(),anyInt(),any(FilterBean.class)))
+                .thenReturn(clientContacts);
+        mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.GET_PA_CLIENT_CONTACTS)
+                        .header("accessToken", accessToken)
+                        .queryParam("nif","anyNif")
+                        .queryParam("selPlate","anyPlate")
+                        .queryParam("idPaData","1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filterBean)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(clientContacts)));
+    }
+
+    @Test
+    void whenMapUpdateItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        doNothing().when(otherFlowService).mapUpdate(any());
+        mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.MAP_UPDATE)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Update"));
+    }
+
+    @Test
+    void whenGetClientTypesThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<ClientType> clientTypes = new ArrayList<>();
+        when(otherFlowService.getClientTypes()).thenReturn(clientTypes);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_CLIENT_TYPE)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(clientTypes)));
+    }
+
+    @Test
+    void whenGetChannelsThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<Channel> channels = new ArrayList<>();
+        when(otherFlowService.getChannels()).thenReturn(channels);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_CHANNEL)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(channels)));
+    }
+
+    @Test
+    void whenGetSourcesThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<Source> sources = new ArrayList<>();
+        when(otherFlowService.getSources()).thenReturn(sources);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_SOURCE)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(sources)));
+    }
+
+    @Test
+    void whenGetContactTypeListThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<ContactType> contactTypes = new ArrayList<>();
+        when(otherFlowService.getAllContactTypes()).thenReturn(contactTypes);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_ALL_CONTACT_TYPE)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(contactTypes)));
+    }
+
+    @Test
+    void whenGetMaintenanceTypesListThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<MaintenanceTypeDTO> maintenanceTypes = new ArrayList<>();
+        when(otherFlowService.getMaintenanceTypes()).thenReturn(maintenanceTypes);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.GET_MAIN_TYPE)
+                        .header("accessToken", accessToken)
+                        .param("userLogin","anyInput"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(maintenanceTypes)));
+    }
+
+    @Test
+    void whenDownloadSimulationThenItsSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        List<MaintenanceTypeDTO> maintenanceTypes = new ArrayList<>();
+        doNothing().when(otherFlowService).downloadSimulation(any(),any(),any());
+        mvc.perform(post(BASE_REQUEST_MAPPING + ApiEndpoints.DOWNLOAD_SIMULATION)
+                        .header("accessToken", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TpaSimulation()))
+                        )
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void whenSendNewsletterThenItsReturnSuccessfully() throws Exception {
+        String accessToken = generatedToken;
+        NewsLetterDTO newsletter = new NewsLetterDTO();
+        when(otherFlowService.sendNewsletter(anyInt(),anyString())).thenReturn(newsletter);
+        mvc.perform(get(BASE_REQUEST_MAPPING + ApiEndpoints.SEND_NEWSLETTER)
+                        .header("accessToken", accessToken)
+                        .queryParam("id","1")
+                        .queryParam("email","anyEmail")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(newsletter)));
     }
 }

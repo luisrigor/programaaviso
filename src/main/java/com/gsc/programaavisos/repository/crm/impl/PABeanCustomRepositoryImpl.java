@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.sql.Date;
-
 import java.util.List;
 
 public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
@@ -66,12 +65,13 @@ public class PABeanCustomRepositoryImpl implements PABeanCustomRepository {
         else
             sql.append(" SELECT ROW_NUMBER() OVER( ").append(oFilter.getOrderBy()).append(" ) AS ROWNUM, ");
 
-        sql.append("PA_DATA_INFO.*, .PRODUCT_ID AS HHC_PRODUCT_ID, ")
+        sql.append("PA_DATA_INFO.*, HHC.PRODUCT_ID AS HHC_PRODUCT_ID, ")
                 .append("HHC.PRODUCT_DESCRIPTION AS HHC_PRODUCT_DESCRIPTION, HHC.PRODUCT_DISPLAY_NAME AS HHC_PRODUCT_DISPLAY_NAME, ")
                 .append("HHC.CONTRACT_START_DATE AS HHC_CONTRACT_START_DATE, HHC.CONTRACT_END_DATE AS HHC_CONTRACT_END_DATE, " )
                 .append("(HHC.MILEAGE_CONTRACT_CREATION + HHC.COVER_KM) AS HHC_CONTRACT_END_KM ")
                 .append("FROM PA_DATA_INFO ").append("LEFT JOIN VEHICLE_HHC HHC ON HHC.CONTRACT_VIN = PA_DATA_INFO.PA_VIN ")
-                .append("AND HHC.CONTRACT_STATUS = 'Active')");
+                .append("AND HHC.CONTRACT_STATUS = 'Active'");
+        sql.append(")");
 
         if (checkExpiredContracts)
             sql.append(" WHERE MC_DT_FINISH_CONTRACT >= '").append(dtStart).append("' AND MC_DT_FINISH_CONTRACT < '")

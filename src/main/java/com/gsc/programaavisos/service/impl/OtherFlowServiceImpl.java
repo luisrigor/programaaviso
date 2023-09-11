@@ -5,14 +5,15 @@ import com.gsc.consent.invoke.ConsentCenterInvoke;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.constants.AppProfile;
-import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.dto.ProgramaAvisosBean;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.entity.*;
-import com.gsc.programaavisos.repository.cardb.*;
+import com.gsc.programaavisos.repository.cardb.CombustivelRepository;
+import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
@@ -27,6 +28,16 @@ import com.sc.commons.comunications.Sms;
 import com.sc.commons.exceptions.SCErrorException;
 import com.sc.commons.user.GSCUser;
 import com.sc.commons.utils.*;
+import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.service.impl.pa.TPALexusUtil;
+import com.gsc.programaavisos.service.impl.pa.TPAToyotaUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
+import com.gsc.ws.newsletter.core.WsResponse;
+import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
+import com.rg.dealer.Dealer;
+import com.sc.commons.utils.ArrayTasks;
+import com.sc.commons.utils.CarTasks;
+import com.sc.commons.utils.HttpTasks;
 import com.sc.commons.utils.StringTasks;
 import com.sc.commons.validations.Validate;
 import lombok.RequiredArgsConstructor;
@@ -44,13 +55,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
 import java.net.SocketException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
-
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;
@@ -60,7 +71,7 @@ import static com.gsc.programaavisos.constants.PaConstants.*;
 @Service
 @Log4j
 @RequiredArgsConstructor
-public class OtherFlowServiceImpl implements OtherFlowService {
+public class  OtherFlowServiceImpl implements OtherFlowService {
 
     private final ContactReasonRepository contactReasonRepository;
     private final ModeloRepository modeloRepository;
@@ -85,15 +96,16 @@ public class OtherFlowServiceImpl implements OtherFlowService {
 
     private final ContactTypeRepositoryCRM contactTypeRepositoryCRM;
     private final MapUpdateUtil mapUpdateUtil;
-
     private final Environment env;
     private final EnvironmentConfig environmentConfig;
-
     public static final int PARAM_ID_TPA_ITEM_TYPE_SERVICE = 1;
     public static final int PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT = 2;
     public static final int PARAM_ID_TPA_ITEM_TYPE_HEADER = 3;
     public static final String FTP_EPOSTAL_PATH = "/epostais/comum";
-
+    private final TPAToyotaUtil tpaToyotaUtil;
+    private final TPALexusUtil tpaLexusUtil;
+    private final Environment env;
+    private final EnvironmentConfig environmentConfig;
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -419,6 +431,7 @@ public class OtherFlowServiceImpl implements OtherFlowService {
             throw new ProgramaAvisosException("Error fetching plates list for the same customer");
         }
     }
+
     public List<ClientType> getClientTypes() {
         try {
             return clientTypeRepository.getByStatus("S".charAt(0));
@@ -459,11 +472,8 @@ public class OtherFlowServiceImpl implements OtherFlowService {
 
     public Map<Integer, String> getContactAcces() {
         Map<Integer, String> MAP_PA_CONTACT_TYPE_ACCESS = new HashMap<Integer, String>();
-
         String USERS_CAN_VIEW_CONNECTIVITY = "";
-
         String[] activeProfiles = env.getActiveProfiles();
-
 
         if (!Arrays.asList(activeProfiles).contains(PRODUCTION_SERVER_STR)){
             USERS_CAN_VIEW_CONNECTIVITY = "tcap1@tpo";
@@ -505,11 +515,6 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }catch (Exception e){
             throw new ProgramaAvisosException("Error fetching source ", e);
         }
-    }
-
-    public void readMapUpdate(int year, int month, Integer idsContactType) {
-
-
     }
 
     @Override
@@ -624,4 +629,80 @@ public class OtherFlowServiceImpl implements OtherFlowService {
         }
     }
 
+
+    public void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response) {
+        Map<String, String> envV = environmentConfig.getEnvVariables();
+        File oFile = null;
+        try {
+            List<TpaSimulation> simulations = new ArrayList<TpaSimulation>();
+            simulations.add(simulation);
+
+            if(oGSCUser.getOidNet().equals(Dealer.OID_NET_TOYOTA)){
+                oFile = tpaToyotaUtil.writePdf(simulations, false, envV.get(CONST_STATIC_FILES_URL),
+                        envV.get(CONST_IMG_POSTAL_ACCESSORY_URL), envV.get(CONST_IMG_POSTAL_SERVICE_URL),
+                        envV.get(CONST_IMG_POSTAL_HIGHLIGHT_URL), envV.get(CONST_IMG_POSTAL_HEADER_URL),
+                        simulation.getPaData().getYear(), simulation.getPaData().getMonth(), false, null);
+            }else if(oGSCUser.getOidNet().equals(Dealer.OID_NET_LEXUS)){
+                oFile = tpaLexusUtil.writePdf(simulations, false, envV.get(CONST_STATIC_FILES_URL),
+                        envV.get(CONST_IMG_POSTAL_ACCESSORY_URL), envV.get(CONST_IMG_POSTAL_SERVICE_URL),
+                        envV.get(CONST_IMG_POSTAL_HIGHLIGHT_URL), envV.get(CONST_IMG_POSTAL_HEADER_URL),
+                        simulation.getPaData().getYear(), simulation.getPaData().getMonth(), false, null);
+            }
+            if(oFile!=null){
+                HttpTasks.sendFileToClient(response, oFile, oFile.getName());
+            }
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error downloading simulation ", e);
+        }finally{
+            if(oFile!=null && oFile.exists()){
+                oFile.delete();
+            }
+        }
+    }
+
+
+    @Override
+    public NewsLetterDTO sendNewsletter(Integer id, String email) {
+        if (id == 0 || email.equals(""))
+            throw new ProgramaAvisosException("The id and the email can't be empty");
+
+        ProgramaAvisosBean oPABean = null;
+        Map<String, String> envV = environmentConfig.getEnvVariables();
+
+        try {
+            oPABean = paRepository.getProgramaAvisosById(id);
+            WsInvokeNewsletter oWsInfo = new WsInvokeNewsletter(envV.get(CONST_WS_NEWSLETTER_SERVER));
+            // Contactos
+
+            String[] fields = ProgramaAvisosUtil.getNewslettersFields(oPABean.getIdContactType(), oPABean.getBrand());
+            log.trace("fields >> " + (fields == null ? "is null!" : Arrays.toString(fields)));
+
+            String personalData = oPABean.getNewsletterPersonalData();
+            int _Pos = personalData.indexOf(";");
+            if (_Pos != -1)
+                personalData = email + personalData.substring(_Pos);
+
+            String[] arrEmailContacts = new String[] {};
+            if(fields!=null){
+                arrEmailContacts = new String[] { fields[1] };
+                arrEmailContacts = (String[]) ArrayTasks.Expand(arrEmailContacts, 1);
+                arrEmailContacts[1] = new String(personalData.getBytes(), "ISO-8859-1");
+            }
+            WsResponse oWsResponse = oWsInfo.addContactsAndReschedule(oPABean.getOidNewsletter(), arrEmailContacts);
+
+            String operation = "success", msg = "Reenvio efetuado para o email " + email;
+            if (!oWsResponse.getErrorDescription().equals("")) {
+                operation = "error";
+                msg = oWsResponse.getErrorDescription();
+            }
+
+            return NewsLetterDTO.builder()
+                    .message(msg)
+                    .operation(operation)
+                    .build();
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error send newsletter ", e);
+        }
+
+    }
 }

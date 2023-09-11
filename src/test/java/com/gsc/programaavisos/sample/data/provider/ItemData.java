@@ -3,6 +3,7 @@ package com.gsc.programaavisos.sample.data.provider;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
+import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
 
 import java.time.Instant;
@@ -15,9 +16,10 @@ public class ItemData {
     public static final Integer RANDOM_ID = 111;
     public static final String RANDOM_NAME = "RANDOM_NAME";
     public static final Date RANDOM_DATE = new Date(111111L);
+    public static final LocalDate RANDOM_LOCAL_DATE = LocalDate.now();
 
 
-/*
+
     public static DocumentUnitDTO getDocumentUnit(){
         return DocumentUnitDTO.builder()
                 .id(RANDOM_ID)
@@ -26,7 +28,7 @@ public class ItemData {
                 .description("RANDOM DESCRIPTION")
                 .build();
     }
- */
+
 
     public static ManageItemsDTO getManageItemsDTO(){
         return ManageItemsDTO.builder()
@@ -43,6 +45,18 @@ public class ItemData {
                 .idBrand(RANDOM_ID+1)
                 .searchInput(RANDOM_NAME)
                 .dtEnd(RANDOM_DATE)
+                .build();
+    }
+
+    public static SaveManageItemDTO getSaveManageItemDto(){
+        return SaveManageItemDTO.builder()
+                .idItemType(RANDOM_ID)
+                .serviceName(RANDOM_NAME)
+                .category(RANDOM_ID)
+                .description(RANDOM_NAME)
+                .serviceLink(RANDOM_NAME)
+                .endDateInput(RANDOM_LOCAL_DATE)
+                .serviceCode(RANDOM_NAME)
                 .build();
     }
 

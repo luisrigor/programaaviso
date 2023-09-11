@@ -1,9 +1,12 @@
 package com.gsc.programaavisos.service;
 
 import com.gsc.programaavisos.dto.ParameterizationDTO;
+import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import com.gsc.programaavisos.security.UserPrincipal;
+
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public interface ParametrizationService {
@@ -13,4 +16,6 @@ public interface ParametrizationService {
     PaParameterization getNewParametrization(UserPrincipal userPrincipal,Integer id);
     void saveParameterization(UserPrincipal userPrincipal, ParameterizationDTO parameterizationDTO);
     void cloneParameterization(UserPrincipal oGSCUser, Integer id);
+
+    HashMap<Integer,List<PaParameterization>> getByIdClient(ParameterizationFilter filter, boolean onlyActives);
 }

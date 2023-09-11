@@ -2,40 +2,52 @@ package com.gsc.programaavisos.service.impl;
 
 import com.gsc.claims.object.auxiliary.Area;
 import com.gsc.claims.object.auxiliary.DealerLevel1;
+import com.gsc.claims.object.core.ClaimDetail;
+import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
+import com.gsc.programaavisos.config.CacheConfig;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.PaDataInfoP;
-import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
+import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import com.gsc.programaavisos.service.converter.PaDataInfoConverter;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.PAUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
+import com.gsc.ws.core.*;
+import com.gsc.ws.core.maintenancecontract.MaintenanceContract;
+import com.gsc.ws.core.objects.response.*;
+import com.gsc.ws.invoke.WsInvokeCarServiceTCAP;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
+import com.sc.commons.utils.CarTasks;
 import com.sc.commons.utils.DateTimerTasks;
 import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import com.gsc.claims.object.core.ClaimDetail;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import static com.gsc.programaavisos.constants.AppProfile.*;
 
 
@@ -53,9 +65,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final PaDataInfoRepository paDataInfoRepository;
     private final PARepository programaAvisosRepository;
     private final ProgramaAvisosUtil programaAvisosUtil;
+    private final TPAInvokerSimulator tpaInvokerSimulator;
+    private final CacheConfig cacheConfig;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
-
     private final  CallsRepository callsRepository;
 
 
@@ -244,23 +257,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    @Override
-    public void uploadFile(UserPrincipal userPrincipal, MultipartFile file) {
-
-        String importErrors = "";
-        try {
-            //TODO Validate file
-            // validate file
-//            String importErrors = CSVUploadFileUtils.validateFile(file);
-
-            // parse file and update DB
-            importErrors = parseAndUpdateDB(file, userPrincipal, importErrors);
-        } catch(Exception e) {
-            throw new ProgramaAvisosException("An error occurred while uploading files ", e);
-        }
-
-    }
-
     public void unlockPARegister(Integer id) {
         try {
             paRepository.updateBlockedByById("", id);
@@ -270,7 +266,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     @Override
-    public void activatePA(Integer id) {
+    public void activatePA(UserPrincipal userPrincipal,Integer id) {
         try {
            ProgramaAvisos oPA = paRepository.findById(id).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + id));
             if(oPA.getId() > 0) {
@@ -282,7 +278,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 oPA.setRevisionScheduleMotive(StringUtils.EMPTY);
                 oPA.setRevisionScheduleMotive2(StringUtils.EMPTY);
                 oPA.setRemovedObs(StringUtils.EMPTY);
-                //oPA.save(String.valueOf(oGSCUser.getIdUser()), oGSCUser.containsRole(ApplicationConfiguration.ROLE_VIEW_CALL_CENTER_DEALERS));
+                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
             }
         } catch (Exception e) {
             log.error("An error occurred while activating listing registration");
@@ -299,7 +295,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         boolean isBlocked = false;
         try {
             oPABean = paBeanRepository.getProgramaAvisosBeanById(id);
-            System.out.println(oPABean);
             if (oPABean != null && oldId > 0) {
                 oPABeanOld = paBeanRepository.getProgramaAvisosBeanById(oldId);
                 if (oPABeanOld != null) {
@@ -310,7 +305,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 isBlocked = true;
             } else {
                 paRepository.updateBlockedByById(String.valueOf(userPrincipal.getClientId()), id);
-                //  oPABean = ProgramaAvisos.getHelper().fillPAWsData(oPABean, true);
+                oPABean = fillPAWsData(oPABean,true);
                 if (oPABean != null && oPABean.getNrCalls() > 0) {
                     callsList = callsRepository.findByIdPaData(id);
                 }
@@ -326,6 +321,215 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             log.error("Get registration to make call");
             throw new ProgramaAvisosException("Get registration to make call", e);
         }
+    }
+
+    public ProgramaAvisosBean fillPAWsData(ProgramaAvisosBean oPABean, boolean completedData) throws SCErrorException {
+        String plate = oPABean.getLicensePlate();
+        if (plate == null || StringUtils.EMPTY.equals(plate))
+            return oPABean;
+
+        String model = StringUtils.EMPTY;
+        CarInfo oCarInfo = new CarInfo();
+        String eurocare = StringUtils.EMPTY;
+        String eurocareText = StringUtils.EMPTY;
+        String extracareText = StringUtils.EMPTY;
+        String extracareDate = StringUtils.EMPTY;
+        String dtNextIUC = StringUtils.EMPTY;
+        String dtNextITV = StringUtils.EMPTY;
+        String dtStartNextITV = StringUtils.EMPTY;
+        String dtInvoice = StringUtils.EMPTY;
+        String tecnicalModel = StringUtils.EMPTY;
+        MaintenanceContract maintenanceContract = new MaintenanceContract();
+        WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+
+        CarInfoResponse oCarInfoResponse = wsInfo.getCarByPlate(plate);
+        if(oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null){
+            oCarInfo = oCarInfoResponse.getCarInfo();
+        }
+
+        if (oCarInfo != null)
+            model = oCarInfo.getComercialModelDesig();
+
+        List<Campaign> listCampaigns = getCampaigns(plate);
+        List<Claim> listClaims = new ArrayList<>();
+        List<Rpt> listRpts = new ArrayList<>();
+        List<Revision> listRevisions = new ArrayList<>();
+        List<Warranty> listWarranties = new ArrayList<>();
+        List<ECareNotification> listNotifications = new ArrayList<>();
+        List<ECareNotification> allNotifications = new ArrayList<>();
+
+        if (completedData) {
+            if (oCarInfo != null) {
+                tecnicalModel = oCarInfo.getTecnicalModel();
+
+                MaintenanceContractResponse oMaintenanceContractResponse = wsInfo.getMaintenanceContractByPlate(plate);
+                if(oMaintenanceContractResponse != null && oMaintenanceContractResponse.getMaintenanceContract() != null){
+                    maintenanceContract = oMaintenanceContractResponse.getMaintenanceContract();
+                }
+
+                allNotifications = ECareNotification.getHelper().listAllNotificationsByVIN(PaConstants.ECARE, oCarInfo.getVin());
+                listRevisions = getRevisions(plate);
+                listWarranties = getWarranties(plate);
+                listClaims = getClaims(plate);
+                listRpts = getRpts(plate);
+                extracareDate = StringTasks.cleanString(oCarInfo.getDtStartWarrantyExtension(), StringUtils.EMPTY).trim();
+                eurocare = StringTasks.cleanString(oCarInfo.getDtEndEurocare(), StringUtils.EMPTY).trim();
+                dtInvoice = StringTasks.cleanString(oCarInfo.getDtInvoice(), StringUtils.EMPTY).trim();
+                dtNextIUC = oCarInfo.getDtNextIUC();
+                dtNextITV = oCarInfo.getDtNextITV();
+                dtStartNextITV = CarTasks.getNextStartITVDate(oCarInfo.getCategory(), oCarInfo.getDtPlate());
+            }
+
+            Calendar calNow = Calendar.getInstance();
+            if (!dtInvoice.equals(StringUtils.EMPTY)) {
+                if (!eurocare.equals(StringUtils.EMPTY)) {
+                    Calendar calEurocare = Calendar.getInstance();
+                    Calendar calInvoice = Calendar.getInstance();
+                    try {
+                        calEurocare.setTime(new Date(DateTimerTasks.fmtDT.parse(eurocare).getTime()));
+                        calInvoice.setTime(new Date(DateTimerTasks.fmtDT.parse(dtInvoice).getTime()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (calEurocare.after(calNow)) {
+                        eurocareText = eurocare;
+                    } else {
+                        calInvoice.add(Calendar.YEAR, 10);
+                        if (calInvoice.after(calNow)) {
+                            eurocareText = PaConstants.EURO_CARE_TEXT;
+                        } else {
+                            eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                        }
+                    }
+                } else {
+                    Calendar calInvoice = Calendar.getInstance();
+                    try {
+                        calInvoice.setTime(new Date(DateTimerTasks.fmtDT.parse(dtInvoice).getTime()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    calInvoice.add(Calendar.YEAR, 10);
+                    if (calInvoice.after(calNow)) {
+                        eurocareText = PaConstants.EURO_CARE_TEXT;
+                    } else {
+                        eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                    }
+                }
+            }
+            if (!extracareDate.equals(StringUtils.EMPTY)) {
+                Calendar cal = Calendar.getInstance();
+                try {
+                    cal.setTime(new Date(DateTimerTasks.fmtDT.parse(extracareDate).getTime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                cal.add(Calendar.MONTH, 24);
+                if (cal.after(calNow)) {
+                    eurocareText = PaConstants.EURO_CARE_TEXT;
+                } else {
+                    eurocareText = PaConstants.EURO_CARE_TEXT_NO;
+                }
+            }
+        }
+        oPABean.setModel(model);
+        oPABean.setTechnicalCampaigns(listCampaigns);
+        oPABean.setRevisions(listRevisions);
+        oPABean.setWarranties(listWarranties);
+        oPABean.setClaims(listClaims);
+        oPABean.setRpts(listRpts);
+        oPABean.setECareNotifications(listNotifications);
+        oPABean.setECareAllNotifications(allNotifications);
+        oPABean.setExtracare(extracareText);
+        oPABean.setEuroCare(eurocareText);
+        oPABean.setDtNextIUC(dtNextIUC);
+        oPABean.setDtNextItv(dtNextITV);
+        oPABean.setDtStartNextITV(dtStartNextITV);
+        oPABean.setMaintenanceContract(maintenanceContract);
+        oPABean.setTecnicalModel(tecnicalModel);
+        return oPABean;
+    }
+
+    public List<Revision> getRevisions(String plate) {
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
+        } else {
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Revision> lstRevisions = null;
+            RevisionResponse oRevisionResponse = wsInfo.getCarRevisionsByPlate(plate);
+            if(oRevisionResponse != null && oRevisionResponse.getRevision() != null){
+                lstRevisions = oRevisionResponse.getRevision();
+            }
+            return lstRevisions;
+        }
+    }
+
+    public List<Warranty> getWarranties(String plate) {
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
+        } else {
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Warranty> lstWarranty = null;
+            WarrantyResponse oWarrantyResponse = wsInfo.getCarWarrantiesByPlate(plate);
+            if(oWarrantyResponse != null && oWarrantyResponse.getWarranty() != null){
+                lstWarranty = oWarrantyResponse.getWarranty();
+            }
+            return lstWarranty;
+        }
+    }
+
+    public List<Claim> getClaims(String plate) {
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
+        } else {
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Claim> lstClaim = null;
+            ClaimResponse oClaimResponse = wsInfo.getCarClaimsByPlate(plate);
+            if(oClaimResponse != null && oClaimResponse.getClaim() != null){
+                lstClaim = oClaimResponse.getClaim();
+            }
+            return lstClaim;
+        }
+    }
+
+    public List<Rpt> getRpts(String plate) {
+
+        if(plate == null || plate.isEmpty()){
+            return Collections.emptyList();
+        } else {
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            List<Rpt> lstRpt = null;
+            RptResponse oRptResponse = wsInfo.getCarRptsByPlate(plate);
+            if(oRptResponse != null && oRptResponse.getRpt() != null){
+                lstRpt = oRptResponse.getRpt();
+            }
+            return lstRpt;
+        }
+    }
+
+    public List<Campaign> getCampaigns(String plate) {
+
+        if (plate == null || plate.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            CampaignResponse oCampaignResponse = wsInfo.getCarCampaignsByPlate(plate);
+            List<Campaign> lstCampaigns = null;
+            if (oCampaignResponse != null && oCampaignResponse.getCampaign() != null) {
+                lstCampaigns = oCampaignResponse.getCampaign();
+                sortCampaigns(lstCampaigns);
+            }
+            return lstCampaigns;
+        }
+    }
+
+    public static void sortCampaigns(List<Campaign> lstCampaigns) {
+        lstCampaigns.sort( (o1, o2) -> {
+            if (o1.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_I) && o2.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_N))
+                return 10;
+            if (o1.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_N) && o2.getCarExecuteCampaign().equals(PaConstants.CAMPAIGN_I))
+                return 0;
+            return o1.getCarExecuteCampaign().compareTo(o2.getCarExecuteCampaign());
+        });
     }
 
     private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
@@ -716,10 +920,8 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 default:
                     break;
             }
-
             return paDataInfoP;
         }
-
         return null;
     }
     @Override
@@ -741,4 +943,31 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     public PATotals getPaTotals(FilterBean filterBean) {
         return paBeanRepository.getPaTotals(filterBean);
     }
+
+    @Override
+    public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO) {
+
+        String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
+        String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
+
+        try {
+            TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
+            simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
+            simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
+            simulation.setAccessory1Code(simulation.getPaData().getMRS().getAccessoryCode1());
+            simulation.setAccessory2Code(simulation.getPaData().getMRS().getAccessoryCode2());
+            simulation.setAccessory1Link(simulation.getPaData().getMRS().getAccessory1Link());
+            simulation.setAccessory2Link(simulation.getPaData().getMRS().getAccessory2Link());
+            simulation.setAccessory1ImgPostal(simulation.getPaData().getMRS().getAcessory1ImgPostal());
+            simulation.setAccessory2ImgPostal(simulation.getPaData().getMRS().getAcessory2ImgPostal());
+            simulation.setAccessory1ImgEPostal(simulation.getPaData().getMRS().getAccessory1ImgEPostal());
+            simulation.setAccessory2ImgEPostal(simulation.getPaData().getMRS().getAccessory2ImgEPostal());
+            return simulation;
+        } catch (ProgramaAvisosException e) {
+            throw new ProgramaAvisosException("Error Getting TPA Simulator ", e);
+        } catch (SCErrorException e) {
+            throw new ProgramaAvisosException("Error Getting CarInfo", e);
+        }
+    }
+
 }

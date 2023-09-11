@@ -4,25 +4,15 @@ package com.gsc.programaavisos.controller;
 import com.google.gson.Gson;
 import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.dto.*;
-import com.gsc.programaavisos.model.crm.entity.PATotals;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
-
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.ProgramaAvisosService;
 import io.swagger.annotations.Api;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Filter;
-
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Log4j
@@ -61,14 +51,6 @@ public class ProgramaAvisosController {
         programaAvisosService.removePA(userPrincipal,id,removedOption,removedObs);
         return ResponseEntity.status(HttpStatus.OK).body("removed");
     }
-
-    @PostMapping()
-    public ResponseEntity<String> uploadFile(@AuthenticationPrincipal UserPrincipal userPrincipal,  @RequestPart MultipartFile file) {
-        log.info("uploadFile controller");
-        programaAvisosService.uploadFile(userPrincipal, file);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Document successfully imported.");
-    }
     @PutMapping(ApiEndpoints.UNLOCK_PA)
     public ResponseEntity<String> unlockPARegister(@RequestParam Integer id) {
         log.info("unlockPARegister controller");
@@ -84,9 +66,10 @@ public class ProgramaAvisosController {
     }
 
     @PutMapping(ApiEndpoints.ACTIVE_PA)
-    public ResponseEntity<String> activePA(@RequestParam Integer id) {
+    public ResponseEntity<String> activePA(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                           @RequestParam Integer id) {
         log.info("activePA controller");
-        programaAvisosService.activatePA(id);
+        programaAvisosService.activatePA(userPrincipal,id);
         return ResponseEntity.status(HttpStatus.OK).body("activePA");
     }
 
@@ -96,5 +79,12 @@ public class ProgramaAvisosController {
                             @RequestParam Integer oldId) {
         DetailsPADTO detailsInfo = programaAvisosService.getPaDetail(userPrincipal,id,oldId);
         return ResponseEntity.status(HttpStatus.OK).body(detailsInfo);
+    }
+
+    @GetMapping(ApiEndpoints.GET_TPA_SIMULATOR)
+    public ResponseEntity<TpaSimulation> getTPASimulator(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                     @RequestBody TpaDTO tpaDTO) {
+        TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);
     }
 }
