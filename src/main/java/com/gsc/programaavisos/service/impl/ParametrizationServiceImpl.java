@@ -170,7 +170,7 @@ public class ParametrizationServiceImpl implements ParametrizationService {
         }
     }
 
-    public  <T> void saveItemsList(List<T> items, Integer parameterizationItemId, String createdBy, BiConsumer<T, Integer> idParamSetter,
+    private <T> void saveItemsList(List<T> items, Integer parameterizationItemId, String createdBy, BiConsumer<T, Integer> idParamSetter,
                                    BiConsumer<T, String> createdBySetter, BiConsumer<T, LocalDateTime> dtCreatedSetter, JpaRepository<T, Integer> repository) {
         for (T item : items) {
             idParamSetter.accept(item, parameterizationItemId);
@@ -216,7 +216,6 @@ public class ParametrizationServiceImpl implements ParametrizationService {
                             .createdBy(createdBy)
                             .dtCreated(LocalDateTime.now())
                             .build();
-
                     int parameterizationItemId = parametrizationItemsRepository.save(cloneParaItem).getId();
 
                     for (ItemsAge age:paramToClone.getItemAges()){
@@ -263,7 +262,6 @@ public class ParametrizationServiceImpl implements ParametrizationService {
 
         HashMap<Integer,List<PaParameterization>> mapParameterizations = new HashMap<>();
         List<PaParameterization> parameterizationList = paParameterizationRepository.getByFilter(filter);
-
         List<PaParameterization> toyotaParam = new ArrayList<>();
         List<PaParameterization> lexusParam = new ArrayList<>();
 

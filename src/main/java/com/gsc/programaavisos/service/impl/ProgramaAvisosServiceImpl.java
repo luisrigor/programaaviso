@@ -507,7 +507,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
     public List<Campaign> getCampaigns(String plate) {
-
         if (plate == null || plate.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -597,6 +596,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             vehicleRepository.save(vehicle);
         }
     }
+
     private void dataQuarantine(ProgramaAvisos  oPA,String userStamp,String oidNet) throws SCErrorException {
         Quarantine quarantine = new Quarantine();
         Dealer dealer = Dealer.getHelper().getByObjectId(oidNet, oPA.getOidDealer());
