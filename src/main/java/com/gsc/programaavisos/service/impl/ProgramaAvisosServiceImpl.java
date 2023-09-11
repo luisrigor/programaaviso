@@ -174,7 +174,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                       .removedObs(removedObs.equals(StringUtils.EMPTY) ? removedOption : removedOption + ": " + removedObs)
                       .build();
 
-                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
+                programaAvisosUtil.save(userPrincipal.getUserStamp(), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
 
             }
         } catch (Exception e) {
@@ -278,7 +278,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 oPA.setRevisionScheduleMotive(StringUtils.EMPTY);
                 oPA.setRevisionScheduleMotive2(StringUtils.EMPTY);
                 oPA.setRemovedObs(StringUtils.EMPTY);
-                programaAvisosUtil.save(String.valueOf(137), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
+                programaAvisosUtil.save(userPrincipal.getUserStamp(), userPrincipal.getRoles().contains(ROLE_VIEW_CALL_CENTER_DEALERS), oPA);
             }
         } catch (Exception e) {
             log.error("An error occurred while activating listing registration");
@@ -531,7 +531,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         });
     }
 
-    private ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
+    public ProgramaAvisosBean getPaInfo(ProgramaAvisosBean oPABean, ProgramaAvisosBean oPABeanOld){
         oPABean.setIdClientChannelPreference(oPABeanOld.getIdClientChannelPreference());
         oPABean.setReceiveInformation(oPABeanOld.getReceiveInformation());
         oPABean.setSuccessContact(oPABeanOld.getSuccessContact());
@@ -552,7 +552,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     }
 
 
-    private ProgramaAvisos dataPA(PADTO pa){
+    public ProgramaAvisos dataPA(PADTO pa){
         ProgramaAvisos oPA;
         oPA = paRepository.findById(pa.getId()).orElseThrow(()-> new ProgramaAvisosException("Id not found: " + pa.getId()));
         String revisionScheduleMotive = StringTasks.cleanString(pa.getRevisionScheduleMotive(), "").trim();
@@ -924,6 +924,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
         return null;
     }
+
     @Override
     public PAInfoDTO getInfoPA(UserPrincipal userPrincipal) {
         try {
@@ -946,11 +947,9 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
 
     @Override
     public TpaSimulation getTpaSimulation(UserPrincipal oGSCUser, TpaDTO tpaDTO) {
-
-        String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
-        String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
-
         try {
+            String plate = StringTasks.cleanString(tpaDTO.getPlate(), StringUtils.EMPTY);
+            String nif = StringTasks.cleanString(tpaDTO.getNif(), StringUtils.EMPTY);
             TpaSimulation simulation = tpaInvokerSimulator.getTpaSimulation(nif, plate, tpaDTO.getDate(),false);
             simulation.setAccessory1Name(simulation.getPaData().getMRS().getAcessory1());
             simulation.setAccessory2Name(simulation.getPaData().getMRS().getAcessory2());
