@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -29,6 +29,7 @@ import java.util.List;
 public class OtherFlowController {
 
     private final OtherFlowService otherFlowService;
+
 
     @GetMapping(ApiEndpoints.GET_MODELS)
     public ResponseEntity<List<Modelo>> getModels(@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -131,10 +132,12 @@ public class OtherFlowController {
     }
 
     @PostMapping(ApiEndpoints.MAP_UPDATE)
-    public ResponseEntity<String> mapUpdate(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-       otherFlowService.mapUpdate(userPrincipal);
-        return ResponseEntity.status(HttpStatus.OK).body("Update");
+    public ResponseEntity<String> mapUpdate(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestPart MultipartFile file) {
+        String res = otherFlowService.mapUpdate(userPrincipal, file);
+
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
+  
     @GetMapping(ApiEndpoints.GET_CLIENT_TYPE)
     public ResponseEntity<List<ClientType>> getClientType() {
         log.info("getClientType controller");
@@ -148,6 +151,7 @@ public class OtherFlowController {
         List<Channel> rs = otherFlowService.getChannels();
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
+
 
     @GetMapping(ApiEndpoints.GET_SOURCE)
     public ResponseEntity<List<Source>> getSource() {
@@ -170,6 +174,14 @@ public class OtherFlowController {
         return ResponseEntity.status(HttpStatus.OK).body(rs);
     }
 
+    @PostMapping(ApiEndpoints.VERIFY_IMAGE)
+    public ResponseEntity<String> verifyImageNameOnServer(@RequestParam String fileName, @RequestParam String idTpaItemType,
+                                                                            @RequestParam String tpaItemTypeNameSingular) {
+        log.info("getAllContactType controller");
+         otherFlowService.verifyImageNameOnServer(fileName, idTpaItemType, tpaItemTypeNameSingular);
+        return ResponseEntity.status(HttpStatus.OK).body("");
+    }
+
     @PostMapping(ApiEndpoints.DOWNLOAD_SIMULATION)
     public ResponseEntity<String> downloadSimulation(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                       @RequestBody TpaSimulation simulation, HttpServletResponse response) {
@@ -184,5 +196,4 @@ public class OtherFlowController {
         NewsLetterDTO newsletter = otherFlowService.sendNewsletter(id, email);
         return ResponseEntity.status(HttpStatus.OK).body(newsletter);
     }
-
 }

@@ -4,10 +4,7 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.model.crm.entity.*;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

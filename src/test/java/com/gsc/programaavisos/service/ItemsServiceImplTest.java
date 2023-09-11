@@ -30,12 +30,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
-public class ItemsServiceImplTest {
+class ItemsServiceImplTest {
 
     @Mock
     private DocumentUnitRepository documentUnitRepository;
@@ -219,134 +218,3 @@ public class ItemsServiceImplTest {
     }
 
 }
-
-
-/*
-
-    @Override
-    public void saveManageItems(UserPrincipal oGSCUser, SaveManageItemDTO saveManageItemDTO, MultipartFile[] files) {
-
-        int idBrand = ApiConstants.getIdBrand(oGSCUser.getOidNet());
-        String uploadDir = System.getProperty("java.io.tmpdir");
-
-        File fileAttach1;
-        File fileAttach2;
-
-        Map<String, String> envVar = environmentConfig.getEnvVariables();
-
-        try {
-            Integer idItemType = saveManageItemDTO.getIdItemType();
-            String name = StringTasks.cleanString(saveManageItemDTO.getServiceName(), StringUtils.EMPTY);
-            String code = StringTasks.cleanString(saveManageItemDTO.getServiceCode(), StringUtils.EMPTY);
-            String link = StringTasks.cleanString(saveManageItemDTO.getServiceLink(), StringUtils.EMPTY);
-            Integer categoryId = saveManageItemDTO.getCategory();
-            Integer id = StringTasks.cleanInteger(saveManageItemDTO.getIdTpaItem().toString(), 0);
-
-            LocalDate dtEnd = saveManageItemDTO.getEndDateInput() == null ? LocalDate.now() : saveManageItemDTO.getEndDateInput();
-
-            String description = StringTasks.cleanString(saveManageItemDTO.getDescription(), StringUtils.EMPTY)
-                    .replaceAll("[\\t\\n\\r]+", StringUtils.EMPTY);
-
-            DocumentUnit documentUnit;
-
-            if (id > 0) {
-                documentUnit = documentUnitRepository.findById(id).orElseThrow(() -> new ProgramaAvisosException("itemId not found " + id));
-                documentUnit.setIdDocumentUnitCategory(categoryId);
-                documentUnit.setLink(link);
-                documentUnit.setName(name);
-                documentUnit.setDescription(description);
-                documentUnit.setDtEnd(dtEnd);
-                documentUnitRepository.save(documentUnit);
-            } else {
-
-                List<MultipartFile> fileAttachItems = new ArrayList<>(Arrays.asList(files));
-
-                documentUnit = new DocumentUnit();
-                documentUnit.setStatus('S');
-                documentUnit.setIdDocumentUnitType(idItemType);
-                documentUnit.setIdDocumentUnitCategory(categoryId);
-                documentUnit.setLink(link);
-                documentUnit.setCode(code);
-                documentUnit.setName(name);
-                documentUnit.setDescription(description);
-                documentUnit.setIdBrand(idBrand);
-                documentUnit.setDtEnd(dtEnd);
-                documentUnit.setCreatedBy(oGSCUser.getUsername());
-                documentUnit.setDtCreated(LocalDate.now());
-                String extension;
-
-                if (!fileAttachItems.isEmpty()) {
-                    BufferedImage image = ImageIO.read(fileAttachItems.get(0).getInputStream());
-                    extension = getFileExtension(fileAttachItems.get(0));
-                    documentUnit.setImgPostal(code + "." + extension);
-                    fileAttach1 = new File(uploadDir + PaConstants.BACKSLASH + code + "." + extension);
-                    ImageIO.write(image, extension, fileAttach1);
-
-                    if (idItemType == 1) {
-                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
-                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
-                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_SERVICE);
-                    } else if (idItemType == 2) {
-                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
-                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
-                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_DESTAQUE);
-                    } else if (idItemType == 3) {
-                        SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
-                                envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach1,
-                                        envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_POSTAL_HEADER);
-                    }
-                }
-                if (fileAttachItems.size()>1) {
-                    BufferedImage image = ImageIO.read(fileAttachItems.get(1).getInputStream());
-                    extension = getFileExtension(fileAttachItems.get(1));
-                    documentUnit.setImgEPostal(code + "." + extension);
-                    fileAttach2 = new File(uploadDir + "/" + code + "." + extension);
-                    ImageIO.write(image, extension, fileAttach2);
-
-                    SftpTasks.putFile(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER), envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN),
-                            envVar.get(CONST_FTP_MANAGE_ITEM_PWD), fileAttach2,
-                            envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + PaConstants.FTP_EPOSTAL_PATH);
-                }
-                documentUnitRepository.save(documentUnit);
-            }
-        } catch (Exception e) {
-            throw new ProgramaAvisosException("Error saving manage items ", e);
-        }
-    }
-
-    public String getFileExtension(MultipartFile file) {
-        String originalFileName = file.getOriginalFilename();
-        if (org.springframework.util.StringUtils.hasText(originalFileName)) {
-            int dotIndex = originalFileName.lastIndexOf('.');
-            if (dotIndex >= 0) {
-                return originalFileName.substring(dotIndex + 1).toLowerCase();
-            }
-        }
-        return null;
-    }
-     */
-
-    /*
-    @Test
-    void whenSearchManageItemsListAndItemIdIsEqualTwoThenReturnManagedItemsDto() {
-        //Arrange
-        int itemType = 1;
-        int itemId = 2;
-        DocumentUnit expectedItem = new DocumentUnit();
-        expectedItem.setImgEPostal("EV_UX.jpg");
-        expectedItem.setImgPostal("EV_UX.jpg");
-        List<DocumentUnitCategory> categories = new ArrayList<>();
-        when(documentUnitCategoryRepository.getByType(any())).thenReturn(categories);
-        when(documentUnitRepository.findById(itemId)).thenReturn(Optional.of(expectedItem));
-        doNothing().when(SftpTasks.class);
-        // Act
-        ManageItemsDTO actualManageItemsDTO = itemService.getManageItems(SecurityData.getUserPrincipalStatic(),itemType,itemId);
-        // Assert
-        Assertions.assertEquals(expectedItem,actualManageItemsDTO.getItem());
-        Assertions.assertNull(actualManageItemsDTO.getItemId());
-        Assertions.assertEquals(itemType,actualManageItemsDTO.getItemType());
-        Assertions.assertEquals(categories,actualManageItemsDTO.getCategories());
-    }
-*/
-
-

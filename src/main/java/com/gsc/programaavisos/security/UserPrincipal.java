@@ -47,6 +47,14 @@ public class UserPrincipal {
       this.oidDealerParent = oidDealerParent;
    }
 
+   public String getEmail() {
+      return this.getUsername().split("\\|\\|")[2];
+   }
+
+   public String getUserStamp() {
+     return this.getUsername().split("\\|\\|")[0]+"||"+this.getUsername().split("\\|\\|")[1];
+   }
+
 
 
 }

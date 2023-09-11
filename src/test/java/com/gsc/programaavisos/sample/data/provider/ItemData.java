@@ -1,12 +1,10 @@
 package com.gsc.programaavisos.sample.data.provider;
 
-import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.dto.ItemFilter;
 import com.gsc.programaavisos.dto.ManageItemsDTO;
 import com.gsc.programaavisos.dto.SaveManageItemDTO;
 import com.gsc.programaavisos.model.crm.entity.DocumentUnit;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;

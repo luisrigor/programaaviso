@@ -6,7 +6,6 @@ public interface ApiEndpoints {
     String GET_PARAMETRIZATION_LIST = "/get-parametrization-list";
     String  GET_NEW_PARAMETRIZATION= "/new-parametrization";
     String SAVE_PARAMETRIZATION= "/save-parametrization";
-
     String CLONE_PARAMETRIZATION= "/clone-parametrization";
     String GET_CONTACT_REASONS = "/contact-reasons";
     String GET_MODELS = "/models";
@@ -15,7 +14,6 @@ public interface ApiEndpoints {
     String GET_KILOMENTERS = "/kilometers";
     String GET_ENTITY_TYPE = "/entity-type";
     String GET_AGE = "/age";
-
     String GET_FIDELITYS = "/fidelitys";
     String GET_DOCUMENT_UNIT = "/document-unit";
     String GET_SEARCH_ITEMS = "/search-items";
@@ -42,6 +40,7 @@ public interface ApiEndpoints {
     String GET_CONTACT_TYPE = "/contact-type";
     String GET_MAIN_TYPE = "/main-types";
     String GET_PA_DETAIL= "/details-pa";
+    String VERIFY_IMAGE= "/verify-image";
     String GET_TPA_SIMULATOR= "/tpa-simulation";
     String SAVE_MANAGE_ITEMS = "/save-manage-item";
     String DOWNLOAD_SIMULATION = "/download-simulation";

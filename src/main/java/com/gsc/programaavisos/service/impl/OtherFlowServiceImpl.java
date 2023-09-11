@@ -15,13 +15,15 @@ import com.gsc.programaavisos.repository.cardb.ModeloRepository;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.OtherFlowService;
+import com.gsc.programaavisos.service.impl.pa.MapUpdateUtil;
+import com.gsc.programaavisos.util.TPAInvokerSimulator;
+import com.rg.dealer.Dealer;
+import com.sc.commons.utils.*;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.service.impl.pa.TPALexusUtil;
 import com.gsc.programaavisos.service.impl.pa.TPAToyotaUtil;
-import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.newsletter.core.WsResponse;
 import com.gsc.ws.newsletter.invoke.WsInvokeNewsletter;
-import com.rg.dealer.Dealer;
 import com.sc.commons.utils.ArrayTasks;
 import com.sc.commons.utils.CarTasks;
 import com.sc.commons.utils.HttpTasks;
@@ -29,17 +31,23 @@ import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPFileFilter;
+import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.sql.Date;
 import java.util.*;
-
 import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
 import static com.gsc.programaavisos.constants.AppProfile.*;
+import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
+import static com.gsc.programaavisos.constants.PaConstants.*;
 
 @Service
 @Log4j
@@ -60,21 +68,21 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
     private final ContactTypeRepository contactTypeRepository;
     private final PaDataInfoRepository dataInfoRepository;
     private final CcRigorServiceRepository ccRepository;
-
-
     private static final String QUOTES = "\"";
     private final ClientTypeRepository clientTypeRepository;
     private final SourceRepository sourceRepository;
     private final ChannelRepository channelRepository;
 
     private final ContactTypeRepositoryCRM contactTypeRepositoryCRM;
-
-    private final TPAToyotaUtil tpaToyotaUtil;
-    private final TPALexusUtil tpaLexusUtil;
+    private final MapUpdateUtil mapUpdateUtil;
     private final Environment env;
     private final EnvironmentConfig environmentConfig;
-
-
+    public static final int PARAM_ID_TPA_ITEM_TYPE_SERVICE = 1;
+    public static final int PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT = 2;
+    public static final int PARAM_ID_TPA_ITEM_TYPE_HEADER = 3;
+    public static final String FTP_EPOSTAL_PATH = "/epostais/comum";
+    private final TPAToyotaUtil tpaToyotaUtil;
+    private final TPALexusUtil tpaLexusUtil;
 
     @Override
     public List<ContactReason> getContactReasons() {
@@ -410,30 +418,15 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
     }
 
     @Override
-    public void mapUpdate(UserPrincipal userPrincipal) {
-//        MultipartWrapper mpWrapper = null;
-//        int MAXFILESIZE = 20971520;//20*1024*1024=20 MB
-//        String msg="O ficheiro est� a ser processado, ser� notificado sobre o resultado por email.";
-//        PrintWriter pr = null;
-//
-//        try {
-//            mpWrapper = new MultipartWrapper(request,MAXFILESIZE);
-//
-//            FileItem fileAttachItem = mpWrapper.getFileItem("arquivo");
-//            PlateToSmsThread thread = new PlateToSmsThread(fileAttachItem, oGSCUser);
-//
-//            thread.start();
-//
-//            Gson gson = new Gson();
-//            String json = gson.toJson(msg);
-//            response.setCharacterEncoding("UTF-8");
-//            response.setContentType("application/json");
-//            pr = response.getWriter();
-//            pr.write(json);
-//
-//        } catch (Exception e) {
-//            throw new ProgramaAvisosException("Error reading file ", e);
-//        }
+    public String mapUpdate(UserPrincipal userPrincipal, MultipartFile file) {
+        try {
+            mapUpdateUtil.plateToSms(userPrincipal, file);
+            return "The file is being processed, you will be notified of the result by email";
+        } catch (Exception e) {
+            throw new ProgramaAvisosException("Error reading file ", e);
+        }
+
+
     }
 
     public Map<Integer, List<String>> getMaintenanceTypesByContactType() {
@@ -511,6 +504,109 @@ public class  OtherFlowServiceImpl implements OtherFlowService {
     }
 
     @Override
+    public void verifyImageNameOnServer(String fileName, String idTpaItemType, String tpaItemTypeNameSingular) {
+
+        if(fileName!=null && !fileName.equals("") && idTpaItemType!=null && !idTpaItemType.equals("")) {
+            FTPClient ftp = null;
+
+            try {
+                ftp = new FTPClient();
+                ftp.setDataTimeout(20000);
+                Map<String, String> envVar = environmentConfig.getEnvVariables();
+                ftp.connect(envVar.get(CONST_FTP_MANAGE_ITEM_SERVER));
+                int reply = ftp.getReplyCode();
+                log.trace("ReplyCode.....:" + reply);
+                if(FTPReply.isPositiveCompletion(reply)) {
+                    if (ftp.login(envVar.get(CONST_FTP_MANAGE_ITEM_LOGIN), envVar.get(CONST_FTP_MANAGE_ITEM_PWD)));
+                    log.trace("Utilizador e Password V�lidos.");
+                }
+
+
+                if(Integer.valueOf(idTpaItemType) == PARAM_ID_TPA_ITEM_TYPE_SERVICE){
+                    ftp.changeWorkingDirectory(envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_POSTAL_SERVICE);
+                }else if(Integer.valueOf(idTpaItemType) == PARAM_ID_TPA_ITEM_TYPE_HIGHLIGHT){
+                    ftp.changeWorkingDirectory(envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_POSTAL_DESTAQUE);
+                }else if(Integer.valueOf(idTpaItemType) == PARAM_ID_TPA_ITEM_TYPE_HEADER){
+                    ftp.changeWorkingDirectory(envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_POSTAL_HEADER);
+                }
+
+                FTPFile[] ftpAllFiles = ftp.listFiles(ftp.printWorkingDirectory(), new FTPFileFilter() {
+                    public boolean accept(FTPFile ftpFile) {
+                        log.trace("Processar.....:" + ftpFile.getName());
+                        return ftpFile.isFile() || wait1MinuteAfterCreateFile(ftpFile);
+                    }
+                    private boolean wait1MinuteAfterCreateFile(FTPFile ftpFile) {
+                        int minutesDiff = DateTimerTasks.DateDiff(ftpFile.getTimestamp(), Calendar.getInstance(), DateTimerTasks.MINUTES);
+                        log.trace("minutesDiff.....:" + minutesDiff);
+                        return minutesDiff >= 2 || minutesDiff < 0;
+                    }
+                });
+                FTPFile ftpFile = new FTPFile();
+                int curFile = 0;
+                boolean filelExist = false;
+                while(curFile < ftpAllFiles.length) {
+                    ftpFile = ftpAllFiles[curFile];
+                    if(ftpFile.getName().substring(0,ftpFile.getName().indexOf(".")).equals(fileName)){
+                        filelExist = true;
+                        break;
+                    }
+                    curFile++;
+                }
+
+                if(filelExist==false){
+                    ftp.changeWorkingDirectory(envVar.get(CONST_FTP_MANAGE_ITEM_ADDRESS) + FTP_EPOSTAL_PATH);
+
+                    ftpAllFiles = ftp.listFiles(ftp.printWorkingDirectory(), new FTPFileFilter() {
+                        public boolean accept(FTPFile ftpFile) {
+                            log.trace("Processar.....:" + ftpFile.getName());
+                            return ftpFile.isFile() || wait1MinuteAfterCreateFile(ftpFile);
+                        }
+                        private boolean wait1MinuteAfterCreateFile(FTPFile ftpFile) {
+                            int minutesDiff = DateTimerTasks.DateDiff(ftpFile.getTimestamp(), Calendar.getInstance(), DateTimerTasks.MINUTES);
+                            log.trace("minutesDiff.....:" + minutesDiff);
+                            return minutesDiff >= 2 || minutesDiff < 0;
+                        }
+                    });
+                    ftpFile = new FTPFile();
+                    curFile = 0;
+                    filelExist = false;
+                    while(curFile < ftpAllFiles.length) {
+                        ftpFile = ftpAllFiles[curFile];
+                        if(ftpFile.getName().substring(0,ftpFile.getName().indexOf(".")).equals(fileName)){
+                            filelExist = true;
+                            break;
+                        }
+                        curFile++;
+                    }
+                }
+
+
+                String msg = "";
+                if(filelExist){
+                    msg = "O nome das imagens inseridas � colocado no servidor com o texto que est� digitado no campo C�digo do "+ tpaItemTypeNameSingular+". Se recebeu este alerta significa que j� existe uma imagem no servidor com o mesmo nome do C�digo inserido. Por favor digite outro c�digo.";
+                    throw new ProgramaAvisosException(msg);
+                }
+
+            } catch (Exception e) {
+                throw new ProgramaAvisosException("Error validating image ", e);
+            } finally {
+                log.trace("Terminar conex�o com servidor de ftp.");
+                if (ftp != null) {
+                    try {
+                        ftp.logout();
+                        if (ftp.isConnected()) {
+                            ftp.disconnect();
+                        }
+                    } catch (IOException e) {
+                        throw new ProgramaAvisosException("Error closing connection", e);
+                    }
+
+                }
+            }
+        }
+    }
+
+
     public void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response) {
         Map<String, String> envV = environmentConfig.getEnvVariables();
         File oFile = null;

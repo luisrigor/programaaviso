@@ -6,7 +6,7 @@ import com.gsc.programaavisos.model.cardb.entity.Modelo;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.rg.dealer.Dealer;
-
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -25,12 +25,13 @@ public interface OtherFlowService {
     List<Object[]> getChangedList(GetDelegatorsDTO delegatorsDTO);
     List<ContactType> getContactTypeList(String userLogin);
     ClientContactsDTO getPAClientContacts(String nif, String selPlate, int idPaData, FilterBean oPAFilterBean);
-    void mapUpdate(UserPrincipal userPrincipal);
+    String mapUpdate(UserPrincipal userPrincipal, MultipartFile file);
     List<ClientType> getClientTypes();
     List<Channel> getChannels();
     List<Source> getSources();
     List<ContactType> getAllContactTypes();
     List<MaintenanceTypeDTO> getMaintenanceTypes();
+    void verifyImageNameOnServer(String fileName, String idTpaItemType, String tpaItemTypeNameSingular);
    void downloadSimulation(UserPrincipal oGSCUser, TpaSimulation simulation, HttpServletResponse response);
     NewsLetterDTO sendNewsletter(Integer id, String email);
 }

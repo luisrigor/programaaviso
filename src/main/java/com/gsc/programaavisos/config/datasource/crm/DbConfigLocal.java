@@ -77,6 +77,16 @@ public class DbConfigLocal {
         dbclaims.setPassword(SET_PAS);
         conn.setDataSource(dbclaims, "jdbc/dbclaims");
         log.info("Datasource initialized successfully: jdbc/dbclaims");
+        DB2SimpleDataSource dblists = new DB2SimpleDataSource();
+        dblists.setServerName("scdbesrvb.sc.pt");
+        dblists.setPortNumber(50000);
+        dblists.setDatabaseName("DBLISTS");
+        dblists.setDriverType(4);
+        dblists.setCurrentSchema("DB2INST2");
+        dblists.setUser(SET_USER);
+        dblists.setPassword(SET_PAS);
+        conn.setDataSource(dblists, "jdbc/dblists");
+        log.info("Datasource initialized successfully: jdbc/dblists");
     }
 
     @Primary
