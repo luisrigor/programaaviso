@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Log4j
@@ -86,5 +87,12 @@ public class ProgramaAvisosController {
                                                      @RequestBody TpaDTO tpaDTO) {
         TpaSimulation tpaSimulation = programaAvisosService.getTpaSimulation(userPrincipal, tpaDTO);
         return ResponseEntity.status(HttpStatus.OK).body(tpaSimulation);
+    }
+    @PostMapping(ApiEndpoints.UPLOAD_FILE)
+    public ResponseEntity<String> uploadFile(@AuthenticationPrincipal UserPrincipal userPrincipal,  @RequestPart MultipartFile file) {
+        log.info("uploadFile controller");
+        programaAvisosService.uploadFile(userPrincipal, file);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Document successfully imported.");
     }
 }
