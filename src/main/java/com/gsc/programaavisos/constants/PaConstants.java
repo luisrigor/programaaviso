@@ -47,7 +47,6 @@ public class PaConstants {
     public static final int LETTER		= 5;
     public final static int BUSINESS_PLUS_ID	= 2;
     public static final int AS400_ID = 2;
-    public static final String WS_CAR_LOCATION="https://wscar.gruposalvadorcaetano.pt";
     public static final int ECARE = 1;
     public static final String BACKSLASH = "/";
     public static final int ID_CONTACT_TYPE_MAN = 1;

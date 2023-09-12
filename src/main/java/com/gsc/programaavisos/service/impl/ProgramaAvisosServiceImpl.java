@@ -6,6 +6,7 @@ import com.gsc.claims.object.core.ClaimDetail;
 import com.gsc.ecare.core.ECareNotification;
 import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.config.CacheConfig;
+import com.gsc.programaavisos.config.environment.EnvironmentConfig;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -50,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.gsc.programaavisos.constants.AppProfile.*;
+import static com.gsc.programaavisos.config.environment.MapProfileVariables.*;
 
 
 @Service
@@ -68,6 +70,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
     private final ProgramaAvisosUtil programaAvisosUtil;
     private final TPAInvokerSimulator tpaInvokerSimulator;
     private final CacheConfig cacheConfig;
+    private final EnvironmentConfig environmentConfig;
 
     public static final String MRS_MAINTENANCE_TYPE_PRE_ITV			= "Pr�-ITV + Pack �leo e Filtro";
     private final  CallsRepository callsRepository;
@@ -342,7 +345,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         String plate = oPABean.getLicensePlate();
         if (plate == null || StringUtils.EMPTY.equals(plate))
             return oPABean;
-
+        Map<String, String> envV = environmentConfig.getEnvVariables();
         String model = StringUtils.EMPTY;
         CarInfo oCarInfo = new CarInfo();
         String eurocare = StringUtils.EMPTY;
@@ -355,7 +358,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         String dtInvoice = StringUtils.EMPTY;
         String tecnicalModel = StringUtils.EMPTY;
         MaintenanceContract maintenanceContract = new MaintenanceContract();
-        WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+        WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(envV.get(CONST_WS_CAR_LOCATION));
 
         CarInfoResponse oCarInfoResponse = wsInfo.getCarByPlate(plate);
         if(oCarInfoResponse != null && oCarInfoResponse.getCarInfo() != null){
@@ -365,7 +368,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         if (oCarInfo != null)
             model = oCarInfo.getComercialModelDesig();
 
-        List<Campaign> listCampaigns = getCampaigns(plate);
+        List<Campaign> listCampaigns = getCampaigns(plate,envV.get(CONST_WS_CAR_LOCATION));
         List<Claim> listClaims = new ArrayList<>();
         List<Rpt> listRpts = new ArrayList<>();
         List<Revision> listRevisions = new ArrayList<>();
@@ -383,10 +386,10 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
                 }
 
                 allNotifications = ECareNotification.getHelper().listAllNotificationsByVIN(PaConstants.ECARE, oCarInfo.getVin());
-                listRevisions = getRevisions(plate);
-                listWarranties = getWarranties(plate);
-                listClaims = getClaims(plate);
-                listRpts = getRpts(plate);
+                listRevisions = getRevisions(plate,envV.get(CONST_WS_CAR_LOCATION));
+                listWarranties = getWarranties(plate,envV.get(CONST_WS_CAR_LOCATION));
+                listClaims = getClaims(plate,envV.get(CONST_WS_CAR_LOCATION));
+                listRpts = getRpts(plate,envV.get(CONST_WS_CAR_LOCATION));
                 extracareDate = StringTasks.cleanString(oCarInfo.getDtStartWarrantyExtension(), StringUtils.EMPTY).trim();
                 eurocare = StringTasks.cleanString(oCarInfo.getDtEndEurocare(), StringUtils.EMPTY).trim();
                 dtInvoice = StringTasks.cleanString(oCarInfo.getDtInvoice(), StringUtils.EMPTY).trim();
@@ -464,11 +467,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return oPABean;
     }
 
-    public List<Revision> getRevisions(String plate) {
+    public List<Revision> getRevisions(String plate,String wsLocation) {
         if(plate == null || plate.isEmpty()){
             return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(wsLocation);
             List<Revision> lstRevisions = null;
             RevisionResponse oRevisionResponse = wsInfo.getCarRevisionsByPlate(plate);
             if(oRevisionResponse != null && oRevisionResponse.getRevision() != null){
@@ -478,11 +481,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    public List<Warranty> getWarranties(String plate) {
+    public List<Warranty> getWarranties(String plate,String wsLocation) {
         if(plate == null || plate.isEmpty()){
             return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(wsLocation);
             List<Warranty> lstWarranty = null;
             WarrantyResponse oWarrantyResponse = wsInfo.getCarWarrantiesByPlate(plate);
             if(oWarrantyResponse != null && oWarrantyResponse.getWarranty() != null){
@@ -492,11 +495,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    public List<Claim> getClaims(String plate) {
+    public List<Claim> getClaims(String plate, String wsLocation) {
         if(plate == null || plate.isEmpty()){
             return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(wsLocation);
             List<Claim> lstClaim = null;
             ClaimResponse oClaimResponse = wsInfo.getCarClaimsByPlate(plate);
             if(oClaimResponse != null && oClaimResponse.getClaim() != null){
@@ -506,12 +509,12 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    public List<Rpt> getRpts(String plate) {
+    public List<Rpt> getRpts(String plate, String wsLocation) {
 
         if(plate == null || plate.isEmpty()){
             return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(wsLocation);
             List<Rpt> lstRpt = null;
             RptResponse oRptResponse = wsInfo.getCarRptsByPlate(plate);
             if(oRptResponse != null && oRptResponse.getRpt() != null){
@@ -521,11 +524,11 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    public List<Campaign> getCampaigns(String plate) {
+    public List<Campaign> getCampaigns(String plate,String wsLocation) {
         if (plate == null || plate.isEmpty()) {
             return Collections.emptyList();
         } else {
-            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(PaConstants.WS_CAR_LOCATION);
+            WsInvokeCarServiceTCAP wsInfo = new WsInvokeCarServiceTCAP(wsLocation);
             CampaignResponse oCampaignResponse = wsInfo.getCarCampaignsByPlate(plate);
             List<Campaign> lstCampaigns = null;
             if (oCampaignResponse != null && oCampaignResponse.getCampaign() != null) {

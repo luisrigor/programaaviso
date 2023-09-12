@@ -13,6 +13,7 @@ import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.BackOfficeService;
 import com.gsc.programaavisos.service.impl.pa.ExcelUtils;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
+import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
 import com.sc.commons.utils.*;
@@ -31,7 +32,6 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.*;
 import static com.gsc.programaavisos.constants.ApiConstants.PRODUCTION_SERVER_STR;
-import static com.gsc.programaavisos.util.PAUtil.getKeyByListElements;
 
 
 @Log4j
@@ -45,7 +45,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
     public static final int NUMBER_OF_REGISTERS_FOR_ROW = 25;
     public static final String MAIL_ADDRESS_EXTRANET_TOYOTA = "extranettoyota@toyotacaetano.pt";
     public static final String CSV_SEPARATOR = ";";
-    private final ProgramaAvisosUtil paUtil;
+    private final ProgramaAvisosUtil paUtils;
     private final TechnicalCampaignsRepository tcRepository;
     private final Environment env;
 
@@ -152,8 +152,10 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
         for (PaDataInfo oProgramaAvisosBean: paDataInfoList) {
             ProgramaAvisosServiceImpl.fillPABean(oProgramaAvisosBean);
-            String keyPaTechincalCampign = getKeyByListElements(Arrays.asList(oProgramaAvisosBean.getPaLicensePlate(),
-                    oProgramaAvisosBean.getTcCampaign(),DateTimerTasks.fmtDT2.format(oProgramaAvisosBean.getTcGenerationDate())));
+            String keyPaTechincalCampign = PAUtil.getKeyByListElements(Arrays.asList(oProgramaAvisosBean.getPaLicensePlate(),
+                    oProgramaAvisosBean.getTcCampaign(),
+                   oProgramaAvisosBean.getTcGenerationDate().toString()));
+                    //DateTimerTasks.fmtDT2.format(oProgramaAvisosBean.getTcGenerationDate())));
 
             if(!mapProgramaAvisosTC.containsKey(keyPaTechincalCampign))
                 mapProgramaAvisosTC.put(keyPaTechincalCampign, oProgramaAvisosBean);
@@ -183,7 +185,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
                 TechnicalCampaigns oTechnicalCampaigns = lstProgramaAvisos.get(i).getTc();
 
                 if(oTechnicalCampaigns.getStErrorImport().length()==0) {
-                    ProgramaAvisos oProgramaAvisos = paUtil.insert(lstProgramaAvisos.get(i).getPa(), false, userStamp);
+                    ProgramaAvisos oProgramaAvisos = paUtils.insert(lstProgramaAvisos.get(i).getPa(), false, userStamp);
                     oTechnicalCampaigns.setIdPaData(oProgramaAvisos.getId());
                     oTechnicalCampaigns.setCreatedBy(userStamp);
                     oTechnicalCampaigns.setDtCreated(new Timestamp(System.currentTimeMillis()).toLocalDateTime());

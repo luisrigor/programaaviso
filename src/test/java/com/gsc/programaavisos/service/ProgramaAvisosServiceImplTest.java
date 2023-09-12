@@ -193,37 +193,37 @@ class ProgramaAvisosServiceImplTest {
 
     @Test
     void getRevisionsSuccessfullyCase(){
-        List<Revision> revisions = programaAvisosService.getRevisions(StringUtils.EMPTY);
+        List<Revision> revisions = programaAvisosService.getRevisions(StringUtils.EMPTY,"wsLocation");
         Assertions.assertTrue(revisions.isEmpty());
     }
 
     @Test
     void getWarrantiesSuccessfullyCase(){
-        List<Warranty> warranties = programaAvisosService.getWarranties(StringUtils.EMPTY);
+        List<Warranty> warranties = programaAvisosService.getWarranties(StringUtils.EMPTY,"wsLocation");
         Assertions.assertTrue(warranties.isEmpty());
     }
 
     @Test
     void getClaimsSuccessfullyCase(){
-        List<Claim> claims = programaAvisosService.getClaims(StringUtils.EMPTY);
+        List<Claim> claims = programaAvisosService.getClaims(StringUtils.EMPTY,"wsLocation");
         Assertions.assertTrue(claims.isEmpty());
     }
 
     @Test
     void getRptsSuccessfullyCase(){
-        List<Rpt> rpts = programaAvisosService.getRpts(StringUtils.EMPTY);
+        List<Rpt> rpts = programaAvisosService.getRpts(StringUtils.EMPTY,"wsLocation");
         Assertions.assertTrue(rpts.isEmpty());
     }
 
     @Test
     void getCampaignsSuccessfullyCase(){
-        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY);
+        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY,"wsLocation");
         Assertions.assertTrue(campaigns.isEmpty());
     }
 
     @Test
     void sortCampaignsSuccessfullyCase(){
-        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY);
+        List<Campaign> campaigns = programaAvisosService.getCampaigns(StringUtils.EMPTY,"wsLocation");
         programaAvisosService.sortCampaigns(campaigns);
         Assertions.assertTrue(campaigns.isEmpty());
     }
@@ -475,6 +475,9 @@ class ProgramaAvisosServiceImplTest {
             verify(quarantineRepository,times(1)).save(any());
         }
     }
+
+
+
 
 
 }
