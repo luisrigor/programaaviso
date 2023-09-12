@@ -2,5 +2,5 @@ projectKey=ProgramaAvisos
 serverUrl=http://scjetsrvt:9000
 serverVersion=9.9.1.69595
 dashboardUrl=http://scjetsrvt:9000/dashboard?id=ProgramaAvisos
-ceTaskId=AYqJi1ZASGRIGcBuopXg
-ceTaskUrl=http://scjetsrvt:9000/api/ce/task?id=AYqJi1ZASGRIGcBuopXg
+ceTaskId=AYqKFLbASGRIGcBuopXj
+ceTaskUrl=http://scjetsrvt:9000/api/ce/task?id=AYqKFLbASGRIGcBuopXj
