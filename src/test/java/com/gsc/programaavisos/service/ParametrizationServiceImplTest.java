@@ -1,6 +1,5 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.claims.object.core.User;
 import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
@@ -9,11 +8,9 @@ import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
-import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
 import com.gsc.programaavisos.service.impl.ParametrizationServiceImpl;
-import com.gsc.programaavisos.util.PAUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
