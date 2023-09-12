@@ -1,5 +1,6 @@
 package com.gsc.programaavisos.service;
 
+import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
@@ -25,9 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.test.context.ActiveProfiles;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -51,6 +50,10 @@ class ProgramaAvisosServiceImplTest {
     private ChannelRepository channelRepository;
     @Mock
     private CallsRepository callsRepository;
+    @Mock
+    private VehicleRepository vehicleRepository;
+    @Mock
+    private QuarantineRepository quarantineRepository;
     @Mock
     private TPAInvokerSimulator tpaInvokerSimulator;
     @InjectMocks
@@ -338,5 +341,47 @@ class ProgramaAvisosServiceImplTest {
         Assertions.assertThrows(ProgramaAvisosException.class,()->
                 programaAvisosService.getTpaSimulation(SecurityData.getUserDefaultStatic(), new TpaDTO("plate","nif", localDate)));
     }
+
+    @Test
+    void whenDataVehicleSaveSuccessfully(){
+        //Arrange
+        String licensePlate = "ABC-123";
+        Vehicle vehicle = ProgramaAvisosData.getVehicle();
+        when(vehicleRepository.getVehicle(anyString())).thenReturn(vehicle);
+        when(vehicleRepository.save(any())).thenReturn(vehicle);
+        //Act
+        programaAvisosService.dataVehicle(licensePlate);
+        //Arrange
+        verify(vehicleRepository,times(1)).save(vehicle);
+    }
+
+    @Test
+    void whenSavePASuccessfully(){
+        //Arrange
+        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
+        PADTO padto = ProgramaAvisosData.getPADTO();
+        oPA.setObservations(StringUtils.EMPTY);
+        padto.setObservations(StringUtils.EMPTY);
+        when(paRepository.findById(anyInt())).thenReturn(Optional.of(oPA));
+        //Act
+        programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
+        //Arrange
+        verify(programaAvisosUtil,times(1)).save(anyString(),anyBoolean(),any());
+    }
+
+    @Test
+    void whenGetEmailStrSuccessfully() throws SCErrorException {
+        //Arrange
+        Dealer dealer = new Dealer();
+        try (MockedStatic<ApplicationConfiguration> utilities = Mockito.mockStatic(ApplicationConfiguration.class)) {
+            utilities.when(() -> ApplicationConfiguration.getDealer(anyString()))
+                    .thenReturn(dealer);
+            String emailStr = programaAvisosService.getEmailStr("from","to","SC00020001","eventDescription",
+                    "subject","dateScheduledFormated","currentDateFormatted");
+            Assertions.assertNotNull(emailStr);
+        }
+    }
+
+
 
 }
