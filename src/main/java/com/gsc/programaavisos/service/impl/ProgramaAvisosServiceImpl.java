@@ -324,6 +324,20 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
+    @Override
+    public void uploadFile(UserPrincipal userPrincipal, MultipartFile file) {
+        String importErrors = "";
+        try {
+            //TODO Validate file
+            // validate file
+//            String importErrors = CSVUploadFileUtils.validateFile(file);
+            importErrors = parseAndUpdateDB(file, userPrincipal, importErrors);
+        } catch(Exception e) {
+            throw new ProgramaAvisosException("An error occurred while uploading files ", e);
+        }
+
+    }
+
     public ProgramaAvisosBean fillPAWsData(ProgramaAvisosBean oPABean, boolean completedData) throws SCErrorException {
         String plate = oPABean.getLicensePlate();
         if (plate == null || StringUtils.EMPTY.equals(plate))
@@ -775,9 +789,6 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
             filter.setCurrPage(1);
             filter.setFirstPage(1);
             filter.setShowImportByExcell(false);
-
-            //TODO VALIDAR DE  DONDE TOMAR VARIABLE
-//            filter.setGSCUserLogin(oGSCUser.getLogin());
         }
         return filter;
     }

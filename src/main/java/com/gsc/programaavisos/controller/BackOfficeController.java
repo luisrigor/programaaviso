@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Log4j
 @RequestMapping("${app.baseUrl}")
-@Api(value = "", tags = "Back-Office")
+@Api(value = "", tags = "BACK-OFFICE")
 @RestController
 @CrossOrigin("*")
 public class BackOfficeController {
