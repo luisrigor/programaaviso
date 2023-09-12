@@ -4,6 +4,7 @@ import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.crm.PaDataInfoP;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.PARepository;
@@ -21,6 +22,8 @@ import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.rg.dealer.Dealer;
+import com.rg.dealer.DealerHelper;
+import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +47,8 @@ class ProgramaAvisosServiceImplTest {
     private PARepository paRepository;
     @Mock
     private PABeanRepository paBeanRepository;
+    @Mock
+    private DealerHelper dealerHelper;
     @Mock
     private ProgramaAvisosUtil programaAvisosUtil;
     @Mock
@@ -379,9 +384,97 @@ class ProgramaAvisosServiceImplTest {
             String emailStr = programaAvisosService.getEmailStr("from","to","SC00020001","eventDescription",
                     "subject","dateScheduledFormated","currentDateFormatted");
             Assertions.assertNotNull(emailStr);
+            utilities.verify(()->ApplicationConfiguration.getDealer(anyString()));
         }
     }
 
+    @Test
+    void sendEmailSuccessfullyCase() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        try (
+                MockedStatic<Mail> mail = Mockito.mockStatic(Mail.class);
+                MockedStatic<ApplicationConfiguration> utilities = Mockito.mockStatic(ApplicationConfiguration.class)
+        ) {
+            utilities.when(() -> ApplicationConfiguration.getDealer(anyString()))
+                    .thenReturn(dealer);
+            mail.when(()->Mail.SendMailICalendar(anyString(),anyString(),anyString(),anyString(),anyString())).thenReturn(0);
+            programaAvisosService.sendMail(pa,new Date(),"hrSchedule","oidDealer");
+            utilities.verify(()->ApplicationConfiguration.getDealer(anyString()));
+            mail.verify(()->Mail.SendMailICalendar(anyString(),anyString(),anyString(),anyString(),anyString()));
+        }
+    }
+
+    @Test
+    void whenDataQuarantineSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsEmailSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.EMAIL);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsPostalSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.POSTAL);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsSMSSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.SMS);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
 
 
 }

@@ -640,7 +640,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         quarantineRepository.save(quarantine);
     }
 
-    private void sendMail(ProgramaAvisos oPA, java.util.Date dtSchedule, String hrSchedule, String oidDealerSchedule) throws SCErrorException {
+    public void sendMail(ProgramaAvisos oPA, java.util.Date dtSchedule, String hrSchedule, String oidDealerSchedule) throws SCErrorException {
         String from = oPA.getBrand().equals("T")?"Toyota<toyota@toyotacaetano.pt>":"Lexus<info@lexus.pt>";
         String to = StringTasks.cleanString(oPA.getNewEmail(), "").equals("") ? oPA.getEmail() : oPA.getNewEmail();
         String subject = "Ir à "+ (oPA.getBrand().equals("T")?"Toyota":"Lexus");
