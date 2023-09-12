@@ -45,7 +45,7 @@ public class MapProfileVariables {
         envVariables.put(CONST_IMG_POSTAL_HIGHLIGHT_URL, CONST_IMG_POSTAL_HIGHLIGHT_URL_VALUE);
         envVariables.put(CONST_IMG_POSTAL_HEADER_URL, CONST_IMG_POSTAL_HEADER_URL_VALUE);
         envVariables.put(CONST_WS_NEWSLETTER_SERVER, WsInvokeNewsletter.SERVER_STAGING);
-        envVariables.put(CONST_WS_CAR_LOCATION, "http://localhost:10080");
+        envVariables.put(CONST_WS_CAR_LOCATION, WS_CAR_LOCATION);
         envVariables.put(CONST_CONSENT_CENTER_URL, com.gsc.consent.util.DATA.CONSENT_CENTER_URL_STAGING_HTTPS);
         envVariables.put(CONST_AS400_WEBSERVICE_ADDRESS, com.gsc.ws.util.DATA.SERVER_STAGING_HTTPS);
         return envVariables;
