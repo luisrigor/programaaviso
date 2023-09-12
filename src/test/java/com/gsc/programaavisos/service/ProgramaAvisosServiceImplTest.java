@@ -1,8 +1,10 @@
 package com.gsc.programaavisos.service;
 
+import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
+import com.gsc.programaavisos.model.crm.PaDataInfoP;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
 import com.gsc.programaavisos.repository.crm.PARepository;
@@ -20,14 +22,14 @@ import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.util.TPAInvokerSimulator;
 import com.gsc.ws.core.*;
 import com.rg.dealer.Dealer;
+import com.rg.dealer.DealerHelper;
+import com.sc.commons.comunications.Mail;
 import com.sc.commons.exceptions.SCErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.test.context.ActiveProfiles;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -46,11 +48,17 @@ class ProgramaAvisosServiceImplTest {
     @Mock
     private PABeanRepository paBeanRepository;
     @Mock
+    private DealerHelper dealerHelper;
+    @Mock
     private ProgramaAvisosUtil programaAvisosUtil;
     @Mock
     private ChannelRepository channelRepository;
     @Mock
     private CallsRepository callsRepository;
+    @Mock
+    private VehicleRepository vehicleRepository;
+    @Mock
+    private QuarantineRepository quarantineRepository;
     @Mock
     private TPAInvokerSimulator tpaInvokerSimulator;
     @InjectMocks
@@ -338,5 +346,135 @@ class ProgramaAvisosServiceImplTest {
         Assertions.assertThrows(ProgramaAvisosException.class,()->
                 programaAvisosService.getTpaSimulation(SecurityData.getUserDefaultStatic(), new TpaDTO("plate","nif", localDate)));
     }
+
+    @Test
+    void whenDataVehicleSaveSuccessfully(){
+        //Arrange
+        String licensePlate = "ABC-123";
+        Vehicle vehicle = ProgramaAvisosData.getVehicle();
+        when(vehicleRepository.getVehicle(anyString())).thenReturn(vehicle);
+        when(vehicleRepository.save(any())).thenReturn(vehicle);
+        //Act
+        programaAvisosService.dataVehicle(licensePlate);
+        //Arrange
+        verify(vehicleRepository,times(1)).save(vehicle);
+    }
+
+    @Test
+    void whenSavePASuccessfully(){
+        //Arrange
+        ProgramaAvisos oPA = ProgramaAvisosData.getCompletePA();
+        PADTO padto = ProgramaAvisosData.getPADTO();
+        oPA.setObservations(StringUtils.EMPTY);
+        padto.setObservations(StringUtils.EMPTY);
+        when(paRepository.findById(anyInt())).thenReturn(Optional.of(oPA));
+        //Act
+        programaAvisosService.savePA(SecurityData.getUserDefaultStatic(),padto);
+        //Arrange
+        verify(programaAvisosUtil,times(1)).save(anyString(),anyBoolean(),any());
+    }
+
+    @Test
+    void whenGetEmailStrSuccessfully() throws SCErrorException {
+        //Arrange
+        Dealer dealer = new Dealer();
+        try (MockedStatic<ApplicationConfiguration> utilities = Mockito.mockStatic(ApplicationConfiguration.class)) {
+            utilities.when(() -> ApplicationConfiguration.getDealer(anyString()))
+                    .thenReturn(dealer);
+            String emailStr = programaAvisosService.getEmailStr("from","to","SC00020001","eventDescription",
+                    "subject","dateScheduledFormated","currentDateFormatted");
+            Assertions.assertNotNull(emailStr);
+            utilities.verify(()->ApplicationConfiguration.getDealer(anyString()));
+        }
+    }
+
+    @Test
+    void sendEmailSuccessfullyCase() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        ProgramaAvisos pa = ProgramaAvisosData.getCompletePA();
+        try (
+                MockedStatic<Mail> mail = Mockito.mockStatic(Mail.class);
+                MockedStatic<ApplicationConfiguration> utilities = Mockito.mockStatic(ApplicationConfiguration.class)
+        ) {
+            utilities.when(() -> ApplicationConfiguration.getDealer(anyString()))
+                    .thenReturn(dealer);
+            mail.when(()->Mail.SendMailICalendar(anyString(),anyString(),anyString(),anyString(),anyString())).thenReturn(0);
+            programaAvisosService.sendMail(pa,new Date(),"hrSchedule","oidDealer");
+            utilities.verify(()->ApplicationConfiguration.getDealer(anyString()));
+            mail.verify(()->Mail.SendMailICalendar(anyString(),anyString(),anyString(),anyString(),anyString()));
+        }
+    }
+
+    @Test
+    void whenDataQuarantineSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsEmailSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.EMAIL);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsPostalSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.POSTAL);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
+    @Test
+    void whenDataQuarantineWithPaConstantsSMSSaveSuccessfully() throws SCErrorException {
+        Dealer dealer = new Dealer();
+        dealer.setOid_Parent("oidParent");
+        ProgramaAvisos oPa = ProgramaAvisosData.getCompletePA();
+        String oidNet = "SC00010001";
+        String userStamp = oPa.getCreatedBy();
+        oPa.setIdClientChannelPreference(PaConstants.SMS);
+        Quarantine quarantine = ProgramaAvisosData.getQuarantine();
+        try (MockedStatic<Dealer> utilities = Mockito.mockStatic(Dealer.class)){
+            when(quarantineRepository.save(any())).thenReturn(quarantine);
+            utilities.when(Dealer::getHelper).thenReturn(dealerHelper);
+            when(dealerHelper.getByObjectId(anyString(),anyString())).thenReturn(dealer);
+            programaAvisosService.dataQuarantine(oPa,userStamp,oidNet);
+            verify(quarantineRepository,times(1)).save(any());
+        }
+    }
+
 
 }

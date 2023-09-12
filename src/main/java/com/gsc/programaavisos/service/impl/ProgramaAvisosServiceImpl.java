@@ -37,6 +37,7 @@ import com.sc.commons.utils.StringTasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -598,7 +599,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         return oPA;
     }
 
-    private void dataVehicle(String licencePlate){
+    public void dataVehicle(String licencePlate){
         if(licencePlate!=null)
             licencePlate = StringTasks.ReplaceStr(licencePlate, "-", "").toUpperCase();
 
@@ -611,7 +612,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         }
     }
 
-    private void dataQuarantine(ProgramaAvisos  oPA,String userStamp,String oidNet) throws SCErrorException {
+    public void dataQuarantine(@NotNull ProgramaAvisos  oPA, String userStamp, String oidNet) throws SCErrorException {
         Quarantine quarantine = new Quarantine();
         Dealer dealer = Dealer.getHelper().getByObjectId(oidNet, oPA.getOidDealer());
         Calendar cal = Calendar.getInstance();
@@ -653,7 +654,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         quarantineRepository.save(quarantine);
     }
 
-    private void sendMail(ProgramaAvisos oPA, java.util.Date dtSchedule, String hrSchedule, String oidDealerSchedule) throws SCErrorException {
+    public void sendMail(ProgramaAvisos oPA, java.util.Date dtSchedule, String hrSchedule, String oidDealerSchedule) throws SCErrorException {
         String from = oPA.getBrand().equals("T")?"Toyota<toyota@toyotacaetano.pt>":"Lexus<info@lexus.pt>";
         String to = StringTasks.cleanString(oPA.getNewEmail(), "").equals("") ? oPA.getEmail() : oPA.getNewEmail();
         String subject = "Ir à "+ (oPA.getBrand().equals("T")?"Toyota":"Lexus");
@@ -665,7 +666,7 @@ public class ProgramaAvisosServiceImpl implements ProgramaAvisosService {
         Mail.SendMailICalendar(from, to, "", subject, strICalendar);
     }
 
-    private String getEmailStr(String from, String to,String oidDealer, String eventDescription, String subject, String dateScheduledFormatted, String currentDateFormatted) throws SCErrorException {
+    public String getEmailStr(String from, String to,String oidDealer, String eventDescription, String subject, String dateScheduledFormatted, String currentDateFormatted) throws SCErrorException {
         Dealer oDealer = ApplicationConfiguration.getDealer(oidDealer);
         String dealerDesc = oDealer.getDesig()+" ( "+oDealer.getCpExt() + " ) - " + oDealer.getEnd();
         StringBuffer buffer = new StringBuffer("BEGIN:VCALENDAR\n" +

@@ -423,6 +423,58 @@ public class ProgramaAvisosData {
                 .lastServiceDealer("Dealer1")
                 .lastServiceDealerContact("Contact1")
                 .build();
+    }
 
+    public static Vehicle getVehicle(){
+        return Vehicle.builder()
+                .licencePlate("ABC123")
+                .vin("VIN123456789")
+                .brand("Toyota")
+                .model("Camry")
+                .version("XLE")
+                .color("Blue")
+                .idOwner(1)
+                .idUser(2)
+                .idFinancial(3)
+                .createdBy("User1")
+                .dtCreated(LocalDateTime.now())
+                .changedBy("User2")
+                .dtChanged(LocalDateTime.now())
+                .build();
+    }
+
+    public static Quarantine getQuarantine(){
+        return Quarantine.builder()
+                .entityType("Person")
+                .name("John Doe")
+                .birthYear("1990")
+                .birthMonth("05")
+                .birthDay("15")
+                .gender("Male")
+                .phone1("+123456789")
+                .civilStatus("Single")
+                .nif("123456789A")
+                .cc1("A1")
+                .cc2("B2")
+                .CC3("C3")
+                .cc4("D4")
+                .address("123 Main St")
+                .cpExt("12345")
+                .municipaly("Cityville")
+                .idOrigin(1)
+                .idEvent(1001)
+                .eventDate(new Date())
+                .houseNumber("123")
+                .floor("2nd Floor")
+                .cp4("5432")
+                .cp3("123")
+                .dealerParent("Dealer XYZ")
+                .email("johndoe@example.com")
+                .licencePlate("ABC123")
+                .vin("VIN123456789")
+                .isVehicleOwner("Yes")
+                .paPreferredCommunicationnChannel("Email")
+                .createdBy("Admin")
+                .build();
     }
 }
