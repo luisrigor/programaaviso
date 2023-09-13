@@ -3,13 +3,14 @@ package com.gsc.programaavisos.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gsc.programaavisos.config.SecurityConfig;
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
+import com.gsc.programaavisos.constants.ApiEndpoints;
 import com.gsc.programaavisos.repository.crm.ClientRepository;
 import com.gsc.programaavisos.repository.crm.ConfigurationRepository;
 import com.gsc.programaavisos.repository.crm.LoginKeyRepository;
 import com.gsc.programaavisos.repository.crm.ServiceLoginRepository;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.TokenProvider;
-import com.gsc.programaavisos.service.CttService;
+import com.gsc.programaavisos.service.BackOfficeService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,31 +18,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Import({SecurityConfig.class, TokenProvider.class})
 @ActiveProfiles(profiles = SecurityData.ACTIVE_PROFILE)
-@WebMvcTest(CttController.class)
-class CttControllerTest {
+@WebMvcTest(BackOfficeController.class)
+public class BackOfficeControllerTest {
 
     @Autowired
     private MockMvc mvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private CttService cttService;
+    private BackOfficeService backOfficeService;
     @MockBean
     private ConfigurationRepository configurationRepository;
     @MockBean
@@ -69,18 +71,16 @@ class CttControllerTest {
         generatedToken = secData.generateNewToken();
     }
 
-
     @Test
-    void whenRequestGetCttAddressInfoThenItsSuccessfully() throws Exception {
+    void whenRequestModelListThenItsReturnSuccessfully() throws Exception {
         String accessToken = generatedToken;
-        ResponseEntity<String> responseEntity = new ResponseEntity<>("CttAddressInfo", HttpStatus.OK);
-        when(cttService.getCttAddressInfo(anyString(), anyString())).thenReturn(responseEntity);
-        mvc.perform(get("/ctt-address-info")
-                        .header("accessToken", accessToken)
-                        .queryParam("cp4", "anyCp4")
-                        .queryParam("cp3", "anyCp3"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("CttAddressInfo"));
+        doNothing().when(backOfficeService).importTechnicalCampaign(any(),any());
+        MockMultipartFile firstFile = new MockMultipartFile("file", "filename.txt", "text/plain", "some xml".getBytes());
+        mvc.perform(MockMvcRequestBuilders.multipart(BASE_REQUEST_MAPPING+ ApiEndpoints.IMPORT_TECHNICAL_CAMPAIGN)
+                        .file(firstFile)
+                        .header("accessToken", accessToken))
+                .andExpect(status().is(200))
+                .andExpect(content().string("File is being processed at the end an email will be sent to "+SecurityData.getUserDefaultStatic().getEmail()));;
     }
 
 }

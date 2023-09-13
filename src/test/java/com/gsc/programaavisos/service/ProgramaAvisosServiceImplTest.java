@@ -4,16 +4,9 @@ import com.gsc.programaavisos.config.ApplicationConfiguration;
 import com.gsc.programaavisos.constants.PaConstants;
 import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.model.crm.PaDataInfoP;
-import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisosBean;
-import com.gsc.programaavisos.repository.crm.PARepository;
-import com.gsc.programaavisos.repository.crm.QuarantineRepository;
-import com.gsc.programaavisos.repository.crm.VehicleRepository;
 import com.gsc.programaavisos.model.crm.entity.*;
 import com.gsc.programaavisos.repository.crm.*;
-import com.gsc.programaavisos.sample.data.provider.ItemData;
-import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
 import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.security.UserPrincipal;
@@ -31,11 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.gsc.programaavisos.constants.AppProfile.ROLE_VIEW_CALL_CENTER_DEALERS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -475,9 +468,5 @@ class ProgramaAvisosServiceImplTest {
             verify(quarantineRepository,times(1)).save(any());
         }
     }
-
-
-
-
 
 }

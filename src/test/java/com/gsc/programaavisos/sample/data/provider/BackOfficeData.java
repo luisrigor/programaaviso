@@ -2,8 +2,6 @@ package com.gsc.programaavisos.sample.data.provider;
 
 import com.gsc.programaavisos.dto.PACampaing;
 import com.gsc.programaavisos.model.crm.entity.TechnicalCampaigns;
-import com.gsc.ws.core.Campaign;
-import io.jsonwebtoken.lang.Strings;
 import org.apache.commons.lang3.StringUtils;
 
 public class BackOfficeData {

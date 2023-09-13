@@ -20,7 +20,6 @@ import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
 import com.gsc.programaavisos.util.PAUtil;
 import com.rg.dealer.Dealer;
 import com.sc.commons.comunications.Mail;
-import com.sc.commons.exceptions.SCErrorException;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Assertions;

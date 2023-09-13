@@ -1,15 +1,12 @@
 package com.gsc.programaavisos.service.pa;
 
 import com.gsc.programaavisos.config.environment.EnvironmentConfig;
-import com.gsc.programaavisos.dto.DocumentUnitDTO;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.crm.ContactTypeB;
 import com.gsc.programaavisos.model.crm.entity.Calls;
 import com.gsc.programaavisos.model.crm.entity.ProgramaAvisos;
 import com.gsc.programaavisos.repository.crm.CallsRepository;
 import com.gsc.programaavisos.repository.crm.PARepository;
-import com.gsc.programaavisos.sample.data.provider.ItemData;
-import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.ProgramaAvisosData;
 import com.gsc.programaavisos.sample.data.provider.SecurityData;
 import com.gsc.programaavisos.service.impl.pa.ProgramaAvisosUtil;
@@ -20,13 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
