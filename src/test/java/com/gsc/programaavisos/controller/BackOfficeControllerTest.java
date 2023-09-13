@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, TokenProvider.class})
 @ActiveProfiles(profiles = SecurityData.ACTIVE_PROFILE)
 @WebMvcTest(BackOfficeController.class)
-public class BackOfficeControllerTest {
+class BackOfficeControllerTest {
 
     @Autowired
     private MockMvc mvc;
