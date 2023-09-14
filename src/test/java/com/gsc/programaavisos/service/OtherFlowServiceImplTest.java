@@ -1,7 +1,7 @@
 package com.gsc.programaavisos.service;
 
-import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.dto.ProgramaAvisosBean;
+import com.gsc.programaavisos.dto.*;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
 import com.gsc.programaavisos.model.cardb.Fuel;
 import com.gsc.programaavisos.model.cardb.entity.Modelo;
@@ -27,9 +27,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.util.*;
+
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles(SecurityData.ACTIVE_PROFILE)
 class OtherFlowServiceImplTest {

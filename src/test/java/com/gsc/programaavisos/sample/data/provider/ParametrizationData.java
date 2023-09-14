@@ -4,7 +4,6 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.model.crm.entity.*;
 
-import com.gsc.programaavisos.model.crm.entity.PaParameterization;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

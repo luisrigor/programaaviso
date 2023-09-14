@@ -4,7 +4,8 @@ import com.gsc.programaavisos.constants.ApiConstants;
 import com.gsc.programaavisos.dto.ParameterizationDTO;
 import com.gsc.programaavisos.dto.ParameterizationFilter;
 import com.gsc.programaavisos.exceptions.ProgramaAvisosException;
-import com.gsc.programaavisos.model.crm.entity.*;
+import com.gsc.programaavisos.model.crm.entity.PaParameterization;
+import com.gsc.programaavisos.model.crm.entity.ParametrizationItems;
 import com.gsc.programaavisos.repository.crm.*;
 import com.gsc.programaavisos.sample.data.provider.OtherFlowData;
 import com.gsc.programaavisos.sample.data.provider.ParametrizationData;
@@ -18,12 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
